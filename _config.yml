@@ -31,7 +31,7 @@ description: >-                        # used by seo meta and the atom feed
 url: 'https://carmanzheng.github.io/'
 
 github:
-  username: github_username             # change to your github username
+  username: carmanzheng             # change to your github username
 
 twitter:
   username: carmanzheng            # change to your twitter username
