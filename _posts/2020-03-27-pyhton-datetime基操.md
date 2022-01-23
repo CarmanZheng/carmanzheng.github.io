@@ -116,14 +116,14 @@ datetime.datetime(2017, 3, 22, 16, 55, 49, 148233)
 >>> datetime.datetime.utcfromtimestamp(time.time())
 datetime.datetime(2017, 3, 22, 8, 29, 7, 654272)
 
-# 构造需要的时间 [从字符串构建]，     记忆：这个中间是p，strptime，str product time
+# 构造需要的时间 [从字符串构建]，     记忆：这个中间是p，[datetime parsed from a string]
 # 这里需要指定两个参量：  时间字符串、字符串格式
 >>> datetime.datetime.strptime('2017-3-22 15:25','%Y-%m-%d %H:%M')
 datetime.datetime(2017, 3, 22, 15, 25)
 ```
 
 ```python
-# 格式化日期，字符串输出，记忆：这个中间是f，strftime， str from time
+# 格式化日期，字符串输出，记忆：这个中间是f，strftime， str format time
 >>> td = datetime.datetime.now()
 >>> print(td.strftime("%Y-%m-%d"))
 2022-01-23
