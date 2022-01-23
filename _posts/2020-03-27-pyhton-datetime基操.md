@@ -153,7 +153,7 @@ datetime.strptime(date_string, format)：将格式字符串转换为datetime对�
 dt = datetime.now() 
 print  ((%Y-%m-%d %H:%M:%S %f): ' , dt.strftime( '%Y-%m-%d %H:%M:%S %f' ))
 print  ((%Y-%m-%d %H:%M:%S %p): ' , dt.strftime( '%y-%m-%d %I:%M:%S %p' )) 
-print  （%%a: %s ' % dt.strftime( '%a' ) ）
+print  (%%a: %s ' % dt.strftime( '%a' ) )
 print  (%%A: %s ' % dt.strftime( '%A' ) )
 print  (%%b: %s ' % dt.strftime( '%b' )) 
 print  (%%B: %s ' % dt.strftime( '%B' ) )
