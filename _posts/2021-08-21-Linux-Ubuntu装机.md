@@ -1,5 +1,5 @@
 ---
-title: Linux基础
+title: Ubuntu装机
 layout: post
 tags: Linux基础
 categories: 'Linux'
