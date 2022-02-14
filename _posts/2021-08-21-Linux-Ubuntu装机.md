@@ -15,4 +15,4 @@ https://docs.docker.com/engine/install/ubuntu/
 sudo apt-get remove docker docker-engine docker.io containerd runc
 ```
 
-![image-20220214091811996](..\_images\image-20220214091811996.png)
+![image-20220214091811996](../_images/image-20220214091811996.png)
