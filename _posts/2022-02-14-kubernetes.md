@@ -37,3 +37,4 @@ categories: '边缘计算'
 
 ### 4.集群安装
 
+![](D:\07_GitHub\GitHub_Blogs\carmanzheng.github.io\assets\images\image-20220214091811996.png)
