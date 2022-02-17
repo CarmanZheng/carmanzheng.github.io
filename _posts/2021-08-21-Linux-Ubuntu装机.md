@@ -48,6 +48,19 @@ sudo apt-get -y upgrade
 
 https://developer.aliyun.com/mirror/?spm=a2c6h.13651102.0.0.77cd1b11h9CKdC&serviceType=mirror
 
+`daemon.json`
+
+```sh
+{
+    "registry-mirrors" : [
+    "https://registry.docker-cn.com",
+    "https://docker.mirrors.ustc.edu.cn",
+    "http://hub-mirror.c.163.com",
+    "https://cr.console.aliyun.com/"
+  ]
+}
+```
+
 `docker_install.sh`
 
 ```sh
@@ -65,6 +78,8 @@ sudo add-apt-repository "deb [arch=amd64] https://mirrors.aliyun.com/docker-ce/l
 # Step 4: 更新并安装Docker-CE
 sudo apt-get -y update
 sudo apt-get -y install docker-ce
+# Step 5: 更改镜像源为阿里源
+sudo cp ./daemon.json  /etc/docker/daemon.json
 
 # 安装指定版本的Docker-CE:
 # Step 1: 查找Docker-CE的版本:
@@ -91,3 +106,4 @@ apt-get update
 apt-get install -y kubelet kubeadm kubectl
 ```
 
+未完待补充...
