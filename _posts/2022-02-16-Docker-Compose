@@ -1,0 +1,8 @@
+---
+title: Docker-Compose
+layout: post
+tags: DevOps
+categories: '边缘计算'
+---
+
+本文主要对docker-compose相关的知识进行归纳，针对docker-compose的yaml文件编写和集群管理进行整理
