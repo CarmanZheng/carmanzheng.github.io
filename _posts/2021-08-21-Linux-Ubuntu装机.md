@@ -90,7 +90,17 @@ sudo cp ./daemon.json  /etc/docker/daemon.json
 # sudo apt-get -y install docker-ce=[VERSION]
 ```
 
-### 3. kubernetes安装
+#### 3.docker-compose
+
+```sh
+#!bin/bash
+# 需要切换到root状态下
+curl -L https://get.daocloud.io/docker/compose/releases/download/1.24.0/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose
+chmod +x /usr/local/bin/docker-compose
+docker-compose --verison 
+```
+
+### 4. kubernetes安装
 
 `k8s_install.sh`
 
