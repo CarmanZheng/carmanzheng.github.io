@@ -21,7 +21,7 @@ Docker-Compose 通过一个配置文件来管理多个Docker容器，在配置�
 
 在安装`docker-compose`时，需要注意版本与`docker`版本的匹配
 
-### 3. 使用步骤
+### 3. 基础使用步骤
 
 首先保证计算机中安装了`Docker`和`Docker-Compose`，然后官网给出了3个步骤：
 
@@ -130,4 +130,78 @@ volumes:
 
    `compose`文件中包含了两个服务`web`和`redis`，其中**`web`服务**中`build`后面的`.`表示使用当前文件夹下的`Dockerfile`创建镜像，端口将镜像内部的`5000`端口映射出来，映射到宿主机的`8000`端口，这样访问宿主机的`8000`端口就可以访问该web服务了。**`redis`服务**直接使用本地的`redis`镜像创建。
 
-   
+4. 创建生成服务
+
+   ```sh
+   docker-compose up
+   ```
+
+   启动服务后，在宿主机的`http://localhost:8000/`访问服务页面，可以看到
+
+   ```sh
+   Hello World! I have been seen 1 times.
+   ```
+
+   刷新后，会有数据的增长
+
+   ```sh
+   # 停止应用
+   docker-compose down
+   ```
+
+5. 编辑Compose文件并重生成
+
+   ```yaml
+   version: "3.5"
+   services:
+     web:
+       build: .
+       ports:
+         - "8000:5000"
+       volumes:
+         - .:/code
+       environment:
+         FLASK_ENV: development
+     redis:
+       image: "redis"
+   ```
+
+   * 新增一个卷，将项目中的所有内容（宿主机内容）挂载到容器的`/code`文件夹，这样就可以在本地直接编辑容器内的代码了
+   * 设置运行环境`environment`，设置`FLASK_ENV`为开发者环境，这样`flask run`就可以重加载（仅用于开发模式）
+
+   ```sh
+   docker-compose up
+   Recreating composetest_redis_1 ... done
+   Recreating composetest_web_1   ... done
+   Attaching to composetest_redis_1, composetest_web_1
+   redis_1  | 1:C 18 Feb 2022 00:40:52.396 # oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+   redis_1  | 1:C 18 Feb 2022 00:40:52.396 # Redis version=6.2.6, bits=64, commit=00000000, modified=0, pid=1, just started
+   redis_1  | 1:C 18 Feb 2022 00:40:52.396 # Warning: no config file specified, using the default config. In order to specify a config file use redis-server /path/to/redis.conf
+   redis_1  | 1:M 18 Feb 2022 00:40:52.396 * monotonic clock: POSIX clock_gettime
+   redis_1  | 1:M 18 Feb 2022 00:40:52.397 * Running mode=standalone, port=6379.
+   redis_1  | 1:M 18 Feb 2022 00:40:52.397 # Server initialized
+   redis_1  | 1:M 18 Feb 2022 00:40:52.397 # WARNING overcommit_memory is set to 0! Background save may fail under low memory condition. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+   redis_1  | 1:M 18 Feb 2022 00:40:52.397 * Loading RDB produced by version 6.2.6
+   redis_1  | 1:M 18 Feb 2022 00:40:52.397 * RDB age 4 seconds
+   redis_1  | 1:M 18 Feb 2022 00:40:52.397 * RDB memory usage when created 0.79 Mb
+   ...
+   ```
+
+6. 修改宿主机内容，验证挂载
+
+   `app.py`
+
+   ```sh
+   ...
+   # 将app.py中最后一句话修改为如下所示
+   return 'Hello from Docker! I have been seen {} times.\n'.format(count)
+   ```
+
+   刷新页面，可以看到
+
+   ```html
+   Hello from Docker! I have been seen 37 times.
+   ```
+
+### 4. docker-compose数据卷
+
