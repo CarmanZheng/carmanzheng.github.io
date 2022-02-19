@@ -17,6 +17,107 @@ Docker-Compose是一个用来定义和运行复杂应用的Docker工具。一个
 
 Docker-Compose 通过一个配置文件来管理多个Docker容器，在配置文件中，**所有的容器通过services来定义**，然后使用docker-compose脚本编排容器应用，控制容器的启动、停止和重启以及应用中的服务和所有依赖服务的容器，非常适合组合使用多个容器进行开发的场景。
 
+供参考的`dokcer-compose.yml`文件，配置项参考 https://docs.docker.com/compose/compose-file/compose-file-v3/#volume-configuration-reference
+
+```yaml
+version: "3.9"
+services:
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379"
+    networks:
+      - frontend
+    deploy:
+      replicas: 2
+      update_config:
+        parallelism: 2
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+
+  db:
+    image: postgres:9.4
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - backend
+    deploy:
+      placement:
+        max_replicas_per_node: 1
+        constraints:
+          - "node.role==manager"
+
+  vote:
+    image: dockersamples/examplevotingapp_vote:before
+    ports:
+      - "5000:80"
+    networks:
+      - frontend
+    depends_on:
+      - redis
+    deploy:
+      replicas: 2
+      update_config:
+        parallelism: 2
+      restart_policy:
+        condition: on-failure
+
+  result:
+    image: dockersamples/examplevotingapp_result:before
+    ports:
+      - "5001:80"
+    networks:
+      - backend
+    depends_on:
+      - db
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 2
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+
+  worker:
+    image: dockersamples/examplevotingapp_worker
+    networks:
+      - frontend
+      - backend
+    deploy:
+      mode: replicated
+      replicas: 1
+      labels: [APP=VOTING]
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 3
+        window: 120s
+      placement:
+        constraints:
+          - "node.role==manager"
+
+  visualizer:
+    image: dockersamples/visualizer:stable
+    ports:
+      - "8080:8080"
+    stop_grace_period: 1m30s
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    deploy:
+      placement:
+        constraints:
+          - "node.role==manager"
+
+networks:
+  frontend:
+  backend:
+
+volumes:
+  db-data:
+```
+
 ### 2. Dokcer-compose安装
 
 在安装`docker-compose`时，需要注意版本与`docker`版本的匹配
@@ -204,4 +305,71 @@ volumes:
    ```
 
 ### 4. docker-compose数据卷
+
+1. #### `.env`设置
+
+   在`docker-compose.yml`文件中，可以使用环境变量。这些环境变量定义在与`yaml`文件同文件夹下的`.env`文件中。
+
+   举例说明
+
+   `.env`
+
+   ```sh
+   TAG=v1.5
+   ```
+
+   `docker-compose.yml`
+
+   ```yaml
+   version: '3'
+   services: 
+   	web:
+   		image: "webapp:$(TAG)"
+   ```
+
+   使用`docker-compose config`查看
+
+   ```sh
+   version: '3'
+   services: 
+   	web:
+   		image: "webapp:v1.5"
+   ```
+
+   除此之外，还可以在`docker-compose.yml`文件中指定环境变量文件，具体参考：https://docs.docker.com/compose/environment-variables/
+
+   ```yaml
+   web:
+     env_file:
+       - web-variables.env
+   ```
+
+2. #### 数据持久化
+
+   在docker中，数据持久化的方法有三种：`volumes（数据卷）`、`bind mount`和`tmpfs`
+
+   ![types of mounts and where they live on the Docker host](..\..\assets\images\20220218docker-compose\types-of-mounts.png)
+
+   三种方式当中，最优先推荐也最常用的方式是`volumes（数据卷）`，简单介绍几种的区别：
+
+   Volumes：将docker容器中的数据持久化保存到宿主机文件系统中，Linux系统中保存到`/var/lib/docker/volumes/`,非docker进行不能修改这部分文件
+
+   Bind mounts：能够保存docker容器中的文件到宿主机文件系统中的任意位置，非docker进程可以随意修改该部分文件
+
+   Tmpfs mounts：保存数据到宿主机的内存中，不能够保存数据到宿主机文件系统中，不能持久化保存数据
+
+   ```sh
+   # 使用 volume 和 bind mount 需要注意的地方
+   1. 挂载空卷（宿主机）--> 容器（有文件和文件夹），那么这些文件和文件夹会被复制--> 宿主机空卷
+   2. 挂载数据卷（宿主机，但该卷不存在于宿主机）--> 容器，这个空卷将被创建（宿主机）
+   3. 挂载数据卷（宿主机）-->容器特定文件夹，那么容器特定文件夹中的内容会被覆盖但不会删除和被修改，直到该数据卷卸载
+   ```
+
+   下面着重记录`Volumes`数据持久化：
+
+
+
+
+
+### 5.docker-compose网络
 
