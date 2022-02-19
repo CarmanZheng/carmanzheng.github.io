@@ -362,14 +362,167 @@ volumes:
    # 使用 volume 和 bind mount 需要注意的地方
    1. 挂载空卷（宿主机）--> 容器（有文件和文件夹），那么这些文件和文件夹会被复制--> 宿主机空卷
    2. 挂载数据卷（宿主机，但该卷不存在于宿主机）--> 容器，这个空卷将被创建（宿主机）
-   3. 挂载数据卷（宿主机）-->容器特定文件夹，那么容器特定文件夹中的内容会被覆盖但不会删除和被修改，直到该数据卷卸载
+   3. 挂载数据卷（宿主机）-->容器特定文件夹，那么容器特定文件夹中的内容会被覆盖但不会删除和被修改，直到该数据卷卸载(相当于U盘挂载到Linux系统)
    ```
 
-   下面着重记录`Volumes`数据持久化：
+   ```yaml
+volumes:
+     # Just specify a path and let the Engine create a volume
+     - /var/lib/mysql
+   
+     # Specify an absolute path mapping
+     - /opt/data:/var/lib/mysql
+   
+     # Path on the host, relative to the Compose file
+     - ./cache:/tmp/cache
+   
+  # User-relative path
+     - ~/configs:/etc/configs/:ro
+
+     # Named volume
+     - datavolume:/var/lib/mysql
+   ```
+   
+   下面着重记录`Volumes`数据持久化，以`mysql`为例：
+   
+   ```sh
+   文件目录 参考链接：https://github.com/treetips/docker-compose-all-mysql，仅供参考，尝试了下，感觉无用
+   mysql
+   	|------ docker-compose.yml
+   	|------ mysql
+   			|----- config
+   					|----- mysqld.cnf
+   			|----- data			
+   ```
+   
+   `docker-compose.yml`
+
+   ```yaml
+version: "3.7"
+   services:
+     mysql:
+       container_name: mysql
+       image: mysql:8.0                            #从私有仓库拉镜像
+       restart: always     
+       command: --default-authentication-plugin=mysql_native_password #这行代码解决无法访问的问题
+       volumes:
+         - ./mysql/data/:/var/lib/mysql/                            #映射mysql的数据目录到宿主机，保存数据
+         - ./mysql/config/mysqld.cnf:/etc/mysql/mysql.conf.d/mysqld.cnf   #把mysql的配置文件映射到容器的相应目录
+       ports:
+          - "3305:3306"
+       environment:
+         - MYSQL_ROOT_PASSWORD=123456
+         - LANG=C.UTF-8
+   ```
+   
+   此时运行`docker-compose up -d`，启动服务，可以看到在`./mysql/data`文件夹下有数据库中的数据被挂载到本地
+   
+   如果需要通过`Navicat`远程连接到这个mysql，需要等几分钟才行
+   
+3. 注意事项
+
+   ```yaml
+   # 外部卷
+   # 如果设置为true，则指定该卷已在Compose外部创建。 docker-compose up不会尝试创建它，并且如果它不存在将会引发一个错误。
+   version: '2'
+   
+   services:
+     db:
+       image: postgres
+       volumes:
+         - data:/var/lib/postgresql/data     
+   
+   volumes:
+     data:							# 这里的data必须是已经在外部创建好的卷，不然external为true不能用，就出现错误
+       external: true
+   ```
+
+   
+
+   
+
+### 5. docker-compose网络
+
+​	docker-compose基于docker的网络，启动后会默认创建网络，通过`docker network ls`查看
+
+```sh
+docker network ls
+NETWORK ID     NAME                               DRIVER    SCOPE
+88d2242caf7b   bridge                             bridge    local
+147d30941ecb   composetest_default                bridge    local
+e2523367faaa   docker-compose-all-mysql_default   bridge    local
+db2e9c36669e   host                               host      local
+d7e251a21e14   mysql_default                      bridge    local
+7016f0320535   none                               null      local
+```
+
+1. 使用已存在的网络
+
+   ```yaml
+   version: '2'
+   
+   services:
+     proxy:
+       build: ./proxy
+       networks:
+         - outside
+         - default
+     app:
+       build: ./app
+       networks:
+         - default
+   
+   networks:
+     outside:			# 这里的outside网络必须是已经在外部创建好的卷，不然external为true不能用，就出现错误
+       external: true
+   ```
+
+2. 创建指定网络
+
+   ```yaml
+   version: '2.1'
+   services:
+     app:
+       image: busybox
+       networks:		#  服务级别(service-level)的networks用来定义网络名字的列表，供顶层级别的networks参考配置
+         - app_net
+   
+   networks:            # 顶层级别(top-level)的networks关键字用来指定自定义网络，用于创建复杂的网络
+     app_net:
+       driver: bridge   # 指定网络模式为bridge
+   ```
+
+3. 指定默认网络
+
+   Instead of (or as well as) specifying your own networks, you can also change the settings of the app-wide default network by defining an entry under `networks` named `default`:
+
+   ```yaml
+   version: "3.9"
+   services:
+     web:
+       build: .
+       ports:
+         - "8000:8000"
+     db:
+       image: postgres
+   
+   networks:
+     default:
+       # Use a custom driver
+       driver: custom-driver-1
+   ```
+
+   ```yaml
+   # 将容器加入外部预定网络
+   services:
+     # ...
+   networks:
+     default:
+       external: true
+       name: my-pre-existing-network
+   ```
+
+   
 
 
-
-
-
-### 5.docker-compose网络
 
