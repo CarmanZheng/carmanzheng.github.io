@@ -348,7 +348,7 @@ volumes:
 
    在docker中，数据持久化的方法有三种：`volumes（数据卷）`、`bind mount`和`tmpfs`
 
-   ![types of mounts and where they live on the Docker host](..\..\assets\images\20220218docker-compose\types-of-mounts.png)
+   ![types of mounts and where they live on the Docker host](../../assets/images/20220218docker-compose/types-of-mounts.png)
 
    三种方式当中，最优先推荐也最常用的方式是`volumes（数据卷）`，简单介绍几种的区别：
 
@@ -376,9 +376,10 @@ volumes:
      # Path on the host, relative to the Compose file
      - ./cache:/tmp/cache
    
+   ```
   # User-relative path
      - ~/configs:/etc/configs/:ro
-
+    
      # Named volume
      - datavolume:/var/lib/mysql
    ```
@@ -394,7 +395,7 @@ volumes:
    					|----- mysqld.cnf
    			|----- data			
    ```
-   
+
    `docker-compose.yml`
 
    ```yaml
@@ -414,11 +415,11 @@ version: "3.7"
          - MYSQL_ROOT_PASSWORD=123456
          - LANG=C.UTF-8
    ```
-   
+
    此时运行`docker-compose up -d`，启动服务，可以看到在`./mysql/data`文件夹下有数据库中的数据被挂载到本地
-   
+
    如果需要通过`Navicat`远程连接到这个mysql，需要等几分钟才行
-   
+
 3. 注意事项
 
    ```yaml
