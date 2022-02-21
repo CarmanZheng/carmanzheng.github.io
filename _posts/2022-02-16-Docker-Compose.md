@@ -352,11 +352,11 @@ volumes:
 
    三种方式当中，最优先推荐也最常用的方式是`volumes（数据卷）`，简单介绍几种的区别：
 
-   Volumes：将docker容器中的数据持久化保存到宿主机文件系统中，Linux系统中保存到`/var/lib/docker/volumes/`,非docker进行不能修改这部分文件
+   `Volumes`：将docker容器中的数据持久化保存到宿主机文件系统中，Linux系统中保存到`/var/lib/docker/volumes/`,非docker进行不能修改这部分文件
 
-   Bind mounts：能够保存docker容器中的文件到宿主机文件系统中的任意位置，非docker进程可以随意修改该部分文件
+   `Bind mounts`：能够保存docker容器中的文件到宿主机文件系统中的任意位置，非docker进程可以随意修改该部分文件
 
-   Tmpfs mounts：保存数据到宿主机的内存中，不能够保存数据到宿主机文件系统中，不能持久化保存数据
+   `Tmpfs mounts`：保存数据到宿主机的内存中，不能够保存数据到宿主机文件系统中，不能持久化保存数据
 
    ```sh
    # 使用 volume 和 bind mount 需要注意的地方
@@ -376,48 +376,49 @@ volumes:
      # Path on the host, relative to the Compose file
      - ./cache:/tmp/cache
    
-   ```
-  # User-relative path
-     - ~/configs:/etc/configs/:ro
-    
-     # Named volume
-     - datavolume:/var/lib/mysql
+    # User-relative path
+   	 - ~/configs:/etc/configs/:ro
+   
+    # Named volume
+    - datavolume:/var/lib/mysql
    ```
    
-   下面着重记录`Volumes`数据持久化，以`mysql`为例：
+     下面着重记录`Volumes`数据持久化，以`mysql`为例：
    
    ```sh
-   文件目录 参考链接：https://github.com/treetips/docker-compose-all-mysql，仅供参考，尝试了下，感觉无用
-   mysql
-   	|------ docker-compose.yml
-   	|------ mysql
-   			|----- config
-   					|----- mysqld.cnf
-   			|----- data			
+      文件目录 参考链接：https://github.com/treetips/docker-compose-all-mysql，仅供参考，尝试了下，感觉无用
+      mysql
+      	|------ docker-compose.yml
+      	|------ mysql
+      			|----- config
+      					|----- mysqld.cnf
+      			|----- data			
    ```
-
-   `docker-compose.yml`
-
+   
+   
+   
+      `docker-compose.yml`
+   
    ```yaml
-version: "3.7"
-   services:
-     mysql:
-       container_name: mysql
-       image: mysql:8.0                            #从私有仓库拉镜像
-       restart: always     
-       command: --default-authentication-plugin=mysql_native_password #这行代码解决无法访问的问题
-       volumes:
-         - ./mysql/data/:/var/lib/mysql/                            #映射mysql的数据目录到宿主机，保存数据
-         - ./mysql/config/mysqld.cnf:/etc/mysql/mysql.conf.d/mysqld.cnf   #把mysql的配置文件映射到容器的相应目录
-       ports:
-          - "3305:3306"
-       environment:
-         - MYSQL_ROOT_PASSWORD=123456
-         - LANG=C.UTF-8
+   version: "3.7"
+      services:
+        mysql:
+          container_name: mysql
+          image: mysql:8.0                            #从私有仓库拉镜像
+          restart: always     
+          command: --default-authentication-plugin=mysql_native_password #这行代码解决无法访问的问题
+          volumes:
+            - ./mysql/data/:/var/lib/mysql/                            #映射mysql的数据目录到宿主机，保存数据
+            - ./mysql/config/mysqld.cnf:/etc/mysql/mysql.conf.d/mysqld.cnf   #把mysql的配置文件映射到容器的相应目录
+          ports:
+             - "3305:3306"
+          environment:
+            - MYSQL_ROOT_PASSWORD=123456
+            - LANG=C.UTF-8
    ```
-
+   
    此时运行`docker-compose up -d`，启动服务，可以看到在`./mysql/data`文件夹下有数据库中的数据被挂载到本地
-
+   
    如果需要通过`Navicat`远程连接到这个mysql，需要等几分钟才行
 
 3. 注意事项
@@ -438,9 +439,6 @@ version: "3.7"
        external: true
    ```
 
-   
-
-   
 
 ### 5. docker-compose网络
 
