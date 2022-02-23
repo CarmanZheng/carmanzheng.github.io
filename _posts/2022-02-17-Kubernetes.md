@@ -57,6 +57,15 @@ https://github.com/lework/kainstall
 
 ```sh
 # 准备cfssl工具
+# 自签etcd ssl证书
+```
+
+#### 3.修改主机名
+
+```sh
+homenamectl set-homename k8s-master
+homenamectl set-homename k8s-node1
+homenamectl set-homename k8s-node2
 ```
 
 
