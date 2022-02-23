@@ -39,3 +39,21 @@ https://github.com/lework/kainstall
 | kubeadm     | Kubeadm也是一个工具，提供`kubeadm init `和`kubeadm join`，用于快速部署`Kubernetes`集群，参考：https://kubernetes.io/docs/tasks/tools/ |
 | 二进制      | 推荐，从官方下载发行版的二进制包，手动部署每个组件，组成k8s集群 |
 
+### 5. 使用步骤
+
+#### 1.系统初始化
+
+```sh
+# 关闭防火墙
+# 关闭selinux
+# 关闭swap
+# 同步服务器时间 (ntpdate time.windows.com),不联网可以自己设定时间，总之保持时间一致
+# 更改HOST文件(基于主机名通信，所以要进行IP和主机名的绑定，这个在Master机器上更改就行)
+
+
+```
+
+2.
+
+
+
