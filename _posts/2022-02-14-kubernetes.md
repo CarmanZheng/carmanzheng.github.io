@@ -53,7 +53,11 @@ https://github.com/lework/kainstall
 
 ```
 
-2.
+#### 2.签发证书
+
+```sh
+# 准备cfssl工具
+```
 
 
 
