@@ -90,7 +90,7 @@ sudo cp ./daemon.json  /etc/docker/daemon.json
 # sudo apt-get -y install docker-ce=[VERSION]
 ```
 
-#### 3.docker-compose
+### 3.docker-compose
 
 ```sh
 #!bin/bash
@@ -116,4 +116,41 @@ apt-get update
 apt-get install -y kubelet kubeadm kubectl
 ```
 
+### 5. python
+
+`pip.conf`
+
+```sh
+[global]
+index-url = https://pypi.tuna.tsinghua.edu.cn/simple
+[install]
+trusted-host=mirrors.aliyun.com
+```
+
+`python_source.sh`
+
+```sh
+#!bin/bash
+# 需要切换到root状态下
+mkdir ~/.pip/
+cp pip.conf  ~/.pip/pip.conf
+```
+
+```sh
+# 附录
+清华：https://pypi.tuna.tsinghua.edu.cn/simple
+阿里云：http://mirrors.aliyun.com/pypi/simple/
+中国科技大学 https://pypi.mirrors.ustc.edu.cn/simple/
+华中科技大学：http://pypi.hustunique.com/
+山东理工大学：http://pypi.sdutlinux.org/ 
+豆瓣：http://pypi.douban.com/simple/
+
+note：新版ubuntu要求使用https源，要注意。
+
+例如：pip3 install -i https://pypi.doubanio.com/simple/ 包名
+```
+
+
+
 未完待补充...
+

@@ -1,527 +1,782 @@
 ---
-title: Docker-Compose
+title: Docker基础
 layout: post
 tags: DevOps
 categories: '边缘计算'
 ---
 
-本文主要对docker-compose相关的知识进行归纳，针对docker-compose的yaml文件编写和集群管理进行整理
+本文主要对docker的基础知识进行介绍，了解docker的镜像、容器和仓库。
 
-官网文档：https://docs.docker.com/compose/compose-file/；https://docs.docker.com/compose/
+### 1.镜像
 
-### 1. Docker-compose
+docker的镜像实由一层一层的文件系统组成，这种层级的文件系统采用联合文件系统编写（UnionFS)，优点：共享资源。 
 
-Docker-Compose是一个用来定义和运行复杂应用的Docker工具。一个使用Docker容器的应用，通常由多个容器组成。
+即有多个镜像从相同的base镜像构建而来，那么宿主机上只需要在磁盘上保存一份base镜像，同时内存中只需要加载一份base镜像，就可以为所有容器提供服务了，且镜像的每一层都能被共享。
 
-**使用Docker Compose不再需要使用shell脚本来启动容器**。 
+**bootfs(boot files system)**
 
-Docker-Compose 通过一个配置文件来管理多个Docker容器，在配置文件中，**所有的容器通过services来定义**，然后使用docker-compose脚本编排容器应用，控制容器的启动、停止和重启以及应用中的服务和所有依赖服务的容器，非常适合组合使用多个容器进行开发的场景。
+​		主要包含bootloader和kernel，bootloader主要是引导加载kernel。Linux刚启动会加载bootfs文件系统，在docker镜像的最底层就是bootfs。这一层与典型的Linux/Unix系统一样的，包含boot加载器和内核。当boot加载完成后，整个内核就在内存当中，此时内存的使用权由bootfs转交为内核，然后系统也会卸载bootfs。
 
-供参考的`dokcer-compose.yml`文件，配置项参考 https://docs.docker.com/compose/compose-file/compose-file-v3/#volume-configuration-reference
+**rootfs(root file system)**
 
-```yaml
-version: "3.9"
-services:
+​		在bootfs之上，包含的就是典型的Linux系统中的/dev,/proc,/bin,/ect等标准目录和文件。rootfs就是不同操作系统的发行版，比如Ubuntu，CentOS等等
 
-  redis:
-    image: redis:alpine
-    ports:
-      - "6379"
-    networks:
-      - frontend
-    deploy:
-      replicas: 2
-      update_config:
-        parallelism: 2
-        delay: 10s
-      restart_policy:
-        condition: on-failure
+### 2.镜像命令
 
-  db:
-    image: postgres:9.4
-    volumes:
-      - db-data:/var/lib/postgresql/data
-    networks:
-      - backend
-    deploy:
-      placement:
-        max_replicas_per_node: 1
-        constraints:
-          - "node.role==manager"
+Docker中与镜像操作相关的命令都在docker image这条子命令下，通过docker image --help这条命令，可以看到docker image子命令的详细文档，如下：
 
-  vote:
-    image: dockersamples/examplevotingapp_vote:before
-    ports:
-      - "5000:80"
-    networks:
-      - frontend
-    depends_on:
-      - redis
-    deploy:
-      replicas: 2
-      update_config:
-        parallelism: 2
-      restart_policy:
-        condition: on-failure
+```tex
+Usage:  docker image COMMAND
 
-  result:
-    image: dockersamples/examplevotingapp_result:before
-    ports:
-      - "5001:80"
-    networks:
-      - backend
-    depends_on:
-      - db
-    deploy:
-      replicas: 1
-      update_config:
-        parallelism: 2
-        delay: 10s
-      restart_policy:
-        condition: on-failure
+Manage images
 
-  worker:
-    image: dockersamples/examplevotingapp_worker
-    networks:
-      - frontend
-      - backend
-    deploy:
-      mode: replicated
-      replicas: 1
-      labels: [APP=VOTING]
-      restart_policy:
-        condition: on-failure
-        delay: 10s
-        max_attempts: 3
-        window: 120s
-      placement:
-        constraints:
-          - "node.role==manager"
-
-  visualizer:
-    image: dockersamples/visualizer:stable
-    ports:
-      - "8080:8080"
-    stop_grace_period: 1m30s
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock"
-    deploy:
-      placement:
-        constraints:
-          - "node.role==manager"
-
-networks:
-  frontend:
-  backend:
-
-volumes:
-  db-data:
+Commands:
+  build       Build an image from a Dockerfile(构建镜像的命令)
+  history     Show the history of an image(显示镜像构建历史过程)
+  import      Import the contents from a tarball to create a filesystem image(导入一个由容器导出的镜像)
+  inspect     Display detailed information on one or more images(显示一个镜像的详细信息)
+  load        Load an image from a tar archive or STDIN(从一个文件或标准输入流中导入镜像)
+  ls          List images(查看镜像列表)
+  prune       Remove unused images(删除虚悬镜像)
+  pull        Pull an image or a repository from a registry(从仓库拉取镜像)
+  push        Push an image or a repository to a registry(推送镜像到仓库)
+  rm          Remove one or more images(删除镜像)
+  save        Save one or more images to a tar archive (streamed to STDOUT by default)(保存镜像到文件)
+  tag         Create a tag TARGET_IMAGE that refers to SOURCE_IMAGE(给镜像打标签)
 ```
 
-### 2. Dokcer-compose安装
+#### 1.构建镜像
 
-在安装`docker-compose`时，需要注意版本与`docker`版本的匹配
+构建镜像方式：
 
-### 3. 基础使用步骤
+1. 从官方仓库或其他镜像仓库拉取别人构建好的镜像
 
-首先保证计算机中安装了`Docker`和`Docker-Compose`，然后官网给出了3个步骤：
+2. 构建自己的镜像 【1. commit方法     2.dockerfile方法（推荐）】
 
 ```sh
-1. 在 Dockerfile 中定义 app ，这样可以在任何地方进行app的生成
-2. 编写 docker-compose.yml 文件，这样可以在独立环境中启动所有应用
-3. 使用 docker-compose up 命令启动所有的app
+# 拉取镜像
+# 下载最新版本
+(base) zhengkan03@ubuntu:~/桌面$ docker pull mysql
+Using default tag: latest
+latest: Pulling from library/mysql
+69692152171a: Pull complete       # 分层下载
+1651b0be3df3: Pull complete 
+951da7386bc8: Pull complete 
+0f86c95aa242: Pull complete 
+37ba2d8bd4fe: Pull complete 
+6d278bb05e94: Pull complete 
+497efbd93a3e: Pull complete 
+f7fddf10c2c2: Pull complete 
+16415d159dfb: Pull complete 
+0e530ffc6b73: Pull complete 
+b0a4a1a77178: Pull complete 
+cd90f92aa9ef: Pull complete 
+Digest: sha256:d50098d7fcb25b1fcb24e2d3247cae3fc55815d64fec640dc395840f8fa80969
+Status: Downloaded newer image for mysql:latest
+docker.io/library/mysql:latest
+
+# 等价
+# docker pull mysql 
+# docker pull docker.io/library/mysql:latest
+
+# 下载指定版本
+# docker pull 镜像名[:版本号]
+# docker pull mysql:5.7
 ```
-
-附`docker-compose.yml`示例文件
-
-```yaml
-version: "3.9"  # optional since v1.27.0
-services:
-  web:
-    build: .
-    ports:
-      - "8000:5000"
-    volumes:
-      - .:/code
-      - logvolume01:/var/log
-    links:
-      - redis
-  redis:
-    image: redis
-volumes:
-  logvolume01: {}
-```
-
-具体操作，按照官方文档
-
-1. 创建项目文件夹
-
-   ```sh
-    mkdir composetest
-    cd composetest
-   ```
-
-2. 创建项目文件`app.py`和依赖`requirements.txt`
-
-   `app.py`
-
-   ```python
-   import time
-   
-   import redis
-   from flask import Flask
-   
-   app = Flask(__name__)
-   cache = redis.Redis(host='redis', port=6379)
-   
-   def get_hit_count():
-       retries = 5
-       while True:
-           try:
-               return cache.incr('hits')
-           except redis.exceptions.ConnectionError as exc:
-               if retries == 0:
-                   raise exc
-               retries -= 1
-               time.sleep(0.5)
-   
-   @app.route('/')
-   def hello():
-       count = get_hit_count()
-       return 'Hello World! I have been seen {} times.\n'.format(count)
-   
-   ```
-
-   `requirements.txt`
-
-   ```tex
-   flask
-   redis
-   ```
-
-3. 创建`Dockerfile`和`docker-compose.yml`
-
-   `Dockerfile`
-
-   ```dockerfile
-   # syntax=docker/dockerfile:1
-   FROM python:3.7-alpine
-   WORKDIR /code
-   ENV FLASK_APP=app.py
-   ENV FLASK_RUN_HOST=0.0.0.0
-   COPY requirements.txt requirements.txt
-   RUN pip install -r requirements.txt
-   EXPOSE 5000
-   COPY . .
-   CMD ["flask", "run"]
-   ```
-
-   `docker-compose.yml`
-
-   ```yaml
-   version: "3.5"
-   services:
-     web:
-       build: .
-       ports:
-         - "8000:5000"
-     redis:
-       image: "redis"
-   ```
-
-   `compose`文件中包含了两个服务`web`和`redis`，其中**`web`服务**中`build`后面的`.`表示使用当前文件夹下的`Dockerfile`创建镜像，端口将镜像内部的`5000`端口映射出来，映射到宿主机的`8000`端口，这样访问宿主机的`8000`端口就可以访问该web服务了。**`redis`服务**直接使用本地的`redis`镜像创建。
-
-4. 创建生成服务
-
-   ```sh
-   docker-compose up
-   ```
-
-   启动服务后，在宿主机的`http://localhost:8000/`访问服务页面，可以看到
-
-   ```sh
-   Hello World! I have been seen 1 times.
-   ```
-
-   刷新后，会有数据的增长
-
-   ```sh
-   # 停止应用
-   docker-compose down
-   ```
-
-5. 编辑Compose文件并重生成
-
-   ```yaml
-   version: "3.5"
-   services:
-     web:
-       build: .
-       ports:
-         - "8000:5000"
-       volumes:
-         - .:/code
-       environment:
-         FLASK_ENV: development
-     redis:
-       image: "redis"
-   ```
-
-   * 新增一个卷，将项目中的所有内容（宿主机内容）挂载到容器的`/code`文件夹，这样就可以在本地直接编辑容器内的代码了
-   * 设置运行环境`environment`，设置`FLASK_ENV`为开发者环境，这样`flask run`就可以重加载（仅用于开发模式）
-
-   ```sh
-   docker-compose up
-   Recreating composetest_redis_1 ... done
-   Recreating composetest_web_1   ... done
-   Attaching to composetest_redis_1, composetest_web_1
-   redis_1  | 1:C 18 Feb 2022 00:40:52.396 # oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
-   redis_1  | 1:C 18 Feb 2022 00:40:52.396 # Redis version=6.2.6, bits=64, commit=00000000, modified=0, pid=1, just started
-   redis_1  | 1:C 18 Feb 2022 00:40:52.396 # Warning: no config file specified, using the default config. In order to specify a config file use redis-server /path/to/redis.conf
-   redis_1  | 1:M 18 Feb 2022 00:40:52.396 * monotonic clock: POSIX clock_gettime
-   redis_1  | 1:M 18 Feb 2022 00:40:52.397 * Running mode=standalone, port=6379.
-   redis_1  | 1:M 18 Feb 2022 00:40:52.397 # Server initialized
-   redis_1  | 1:M 18 Feb 2022 00:40:52.397 # WARNING overcommit_memory is set to 0! Background save may fail under low memory condition. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
-   redis_1  | 1:M 18 Feb 2022 00:40:52.397 * Loading RDB produced by version 6.2.6
-   redis_1  | 1:M 18 Feb 2022 00:40:52.397 * RDB age 4 seconds
-   redis_1  | 1:M 18 Feb 2022 00:40:52.397 * RDB memory usage when created 0.79 Mb
-   ...
-   ```
-
-6. 修改宿主机内容，验证挂载
-
-   `app.py`
-
-   ```sh
-   ...
-   # 将app.py中最后一句话修改为如下所示
-   return 'Hello from Docker! I have been seen {} times.\n'.format(count)
-   ```
-
-   刷新页面，可以看到
-
-   ```html
-   Hello from Docker! I have been seen 37 times.
-   ```
-
-### 4. docker-compose数据卷
-
-1. #### `.env`设置
-
-   在`docker-compose.yml`文件中，可以使用环境变量。这些环境变量定义在与`yaml`文件同文件夹下的`.env`文件中。
-
-   举例说明
-
-   `.env`
-
-   ```sh
-   TAG=v1.5
-   ```
-
-   `docker-compose.yml`
-
-   ```yaml
-   version: '3'
-   services: 
-   	web:
-   		image: "webapp:$(TAG)"
-   ```
-
-   使用`docker-compose config`查看
-
-   ```sh
-   version: '3'
-   services: 
-   	web:
-   		image: "webapp:v1.5"
-   ```
-
-   除此之外，还可以在`docker-compose.yml`文件中指定环境变量文件，具体参考：https://docs.docker.com/compose/environment-variables/
-
-   ```yaml
-   web:
-     env_file:
-       - web-variables.env
-   ```
-
-2. #### 数据持久化
-
-   在docker中，数据持久化的方法有三种：`volumes（数据卷）`、`bind mount`和`tmpfs`
-
-   ![types of mounts and where they live on the Docker host](../../assets/images/20220218docker-compose/types-of-mounts.png)
-
-   三种方式当中，最优先推荐也最常用的方式是`volumes（数据卷）`，简单介绍几种的区别：
-
-   `Volumes`：将docker容器中的数据持久化保存到宿主机文件系统中，Linux系统中保存到`/var/lib/docker/volumes/`,非docker进行不能修改这部分文件
-
-   `Bind mounts`：能够保存docker容器中的文件到宿主机文件系统中的任意位置，非docker进程可以随意修改该部分文件
-
-   `Tmpfs mounts`：保存数据到宿主机的内存中，不能够保存数据到宿主机文件系统中，不能持久化保存数据
-
-   ```sh
-   # 使用 volume 和 bind mount 需要注意的地方
-   1. 挂载空卷（宿主机）--> 容器（有文件和文件夹），那么这些文件和文件夹会被复制--> 宿主机空卷
-   2. 挂载数据卷（宿主机，但该卷不存在于宿主机）--> 容器，这个空卷将被创建（宿主机）
-   3. 挂载数据卷（宿主机）-->容器特定文件夹，那么容器特定文件夹中的内容会被覆盖但不会删除和被修改，直到该数据卷卸载(相当于U盘挂载到Linux系统)
-   ```
-
-   ```yaml
-volumes:
-     # Just specify a path and let the Engine create a volume
-     - /var/lib/mysql
-   
-     # Specify an absolute path mapping
-     - /opt/data:/var/lib/mysql
-   
-     # Path on the host, relative to the Compose file
-     - ./cache:/tmp/cache
-   
-    # User-relative path
-   	 - ~/configs:/etc/configs/:ro
-   
-    # Named volume
-    - datavolume:/var/lib/mysql
-   ```
-   
-     下面着重记录`Volumes`数据持久化，以`mysql`为例：
-   
-   ```sh
-      文件目录 参考链接：https://github.com/treetips/docker-compose-all-mysql，仅供参考，尝试了下，感觉无用
-      mysql
-      	|------ docker-compose.yml
-      	|------ mysql
-      			|----- config
-      					|----- mysqld.cnf
-      			|----- data			
-   ```
-   
-   
-   
-      `docker-compose.yml`
-   
-   ```yaml
-   version: "3.7"
-      services:
-        mysql:
-          container_name: mysql
-          image: mysql:8.0                            #从私有仓库拉镜像
-          restart: always     
-          command: --default-authentication-plugin=mysql_native_password #这行代码解决无法访问的问题
-          volumes:
-            - ./mysql/data/:/var/lib/mysql/                            #映射mysql的数据目录到宿主机，保存数据
-            - ./mysql/config/mysqld.cnf:/etc/mysql/mysql.conf.d/mysqld.cnf   #把mysql的配置文件映射到容器的相应目录
-          ports:
-             - "3305:3306"
-          environment:
-            - MYSQL_ROOT_PASSWORD=123456
-            - LANG=C.UTF-8
-   ```
-   
-   此时运行`docker-compose up -d`，启动服务，可以看到在`./mysql/data`文件夹下有数据库中的数据被挂载到本地
-   
-   如果需要通过`Navicat`远程连接到这个mysql，需要等几分钟才行
-
-3. 注意事项
-
-   ```yaml
-   # 外部卷
-   # 如果设置为true，则指定该卷已在Compose外部创建。 docker-compose up不会尝试创建它，并且如果它不存在将会引发一个错误。
-   version: '2'
-   
-   services:
-     db:
-       image: postgres
-       volumes:
-         - data:/var/lib/postgresql/data     
-   
-   volumes:
-     data:							# 这里的data必须是已经在外部创建好的卷，不然external为true不能用，就出现错误
-       external: true
-   ```
-
-
-### 5. docker-compose网络
-
-​	docker-compose基于docker的网络，启动后会默认创建网络，通过`docker network ls`查看
 
 ```sh
-docker network ls
-NETWORK ID     NAME                               DRIVER    SCOPE
-88d2242caf7b   bridge                             bridge    local
-147d30941ecb   composetest_default                bridge    local
-e2523367faaa   docker-compose-all-mysql_default   bridge    local
-db2e9c36669e   host                               host      local
-d7e251a21e14   mysql_default                      bridge    local
-7016f0320535   none                               null      local
+# 构建镜像
+# 1. commit方法
+# 使用docker commit命令，我们可以将修改过的容器重新提交为一个镜像，如：
+$ docker commit [容器ID] [新生成的文件名]
+$ docker commit conntaner_id my-hello:1.0
+$ docker commit -m='要提交的信息' -a='作者' 容器ID 要创建的目标镜像名：版本号
 ```
 
-1. 使用已存在的网络
+一般推荐编写Dockerfile来构建一种镜像，Docker Hub上的镜像都是采用这种方式构建的.
 
-   ```yaml
-   version: '2'
-   
-   services:
-     proxy:
-       build: ./proxy
-       networks:
-         - outside
-         - default
-     app:
-       build: ./app
-       networks:
-         - default
-   
-   networks:
-     outside:			# 这里的outside网络必须是已经在外部创建好的卷，不然external为true不能用，就出现错误
-       external: true
-   ```
+好处:我们不用把镜像分发给别人，而只是把Dockerfile和相应需要写入镜像的资料发给别人，别人也能自己构建镜像，安全透明
 
-2. 创建指定网络
+##### 1. 构建步骤
 
-   ```yaml
-   version: '2.1'
-   services:
-     app:
-       image: busybox
-       networks:		#  服务级别(service-level)的networks用来定义网络名字的列表，供顶层级别的networks参考配置
-         - app_net
-   
-   networks:            # 顶层级别(top-level)的networks关键字用来指定自定义网络，用于创建复杂的网络
-     app_net:
-       driver: bridge   # 指定网络模式为bridge
-   ```
+1. 编写一个dockerfile文件
+2. docker build 构建成为一个镜像
+3. docker run 运行镜像
+4. docker push 发布镜像（dockerHub,阿里云）
 
-3. 指定默认网络
+##### 2. Dockerfile指令
 
-   Instead of (or as well as) specifying your own networks, you can also change the settings of the app-wide default network by defining an entry under `networks` named `default`:
+```sh
+FROM   		# 基础镜像，一切从这里开始
+MAINTIANER 	# 镜像是谁编写的，姓名+邮箱
+RUN     	# 镜像构建时候需要运行的命令
+ADD			# 步骤，tomcat镜像，添加内容
+WORKDIR 	# 镜像的工作目录
+VOLUME		# 挂载的目录
+EXPOSE		# 暴露对外端口
+CMD			# 指定这个容器的启动时候的命令 ,只有最后一个会生效
+ENTRYPOINT	# 指定 容器启动时候要运行的命令，可以追加命令
+ONBUILD		# 当构建一个被继承Dockerfile，这个时候就会运行ONBUILD
+COPY		# 类似ADD	,将文件拷贝到镜像中
+ENV			# 构建的时候设置环境变量
+```
 
-   ```yaml
-   version: "3.9"
-   services:
-     web:
-       build: .
-       ports:
-         - "8000:8000"
-     db:
-       image: postgres
-   
-   networks:
-     default:
-       # Use a custom driver
-       driver: custom-driver-1
-   ```
+`Dockerfile文件`
 
-   ```yaml
-   # 将容器加入外部预定网络
-   services:
-     # ...
-   networks:
-     default:
-       external: true
-       name: my-pre-existing-network
-   ```
+```dockerfile
+# 1.构建镜像文件
+FROM ubuntu
+MAINTAINER Zheng
+RUN apt-get update
+RUN apt-get install -y python3
+RUN apt-get install -y python3-pip
+RUN apt-get install -y vim
+RUN pip3 install Flask
+RUN mkdir app
+ADD . /app
+WORKDIR /app/app
+CMD ["python3","flask01.py"]
+```
 
-   
+开始构建镜像
+编写好Dockerfile文件后，需要使用docker build命令进行构建，docker build命令的格式如下：
+
+```sh
+# 2. 通过这个文件创建镜像
+#命令 docker build -f dockerfile文件路径 -t 镜像名:版本号
+docker build -f Dockerfile myapp:1.0
+```
+
+测试运行刚创建的镜像
+
+```sh
+# 3.测试运行
+docker run -it mycentos：1.0
+# 可以使用docker inspect 镜像名 来查看镜像构建历史
+```
+
+#### 2.删除镜像
+
+镜像在被运行后，就形成了容器；一般如果镜像已经被使用来创建容器，使用`docker rmi`命令来删除镜像会报下面的错误，告诉我们该镜像已经被使用，不允许删除。
+
+```sh
+Error response from daemon: conflict: unable to remove repository reference "mysql:5.7" (must force) - container ccd406c07a78 is using its referenced image e1e1680ac726
+```
+
+对于已经被用于创建容器的镜像，删除方法有两种
+
+```sh
+# 一种是先把容器删除，再删除镜像【推荐】
+
+# 另一种则只需要在删除镜像的命令中跟一个-f参数便可，如：
+# docker rmi 镜像名
+docker rmi 镜像id
+docker rmi -f 镜像id 					# 强制删除镜像
+docker rmi -f $(docker ps -aq)         # 删除所有镜像
+```
+
+#### 3.拉取镜像
+
+官方的https://hub.docker.com/提供了数十万个镜像提供大家下载，以拉取个人公有centos7.3镜像为例：
+
+```sh
+# docker pull 用户/仓库：标签
+docker pull kennyyaohong/public:centos7.3
+```
+
+#### 4.镜像推送
+
+<img src="../../assets/images/20220218docker-compose/image-20220222145732015.png" alt="image-20220222145732015" style="zoom:67%;" />
+
+```sh
+# 第一步 打标签 docker  tag  镜像id       要推入仓库的用户名/要推入的仓库名:新定义的tag 
+docker tag e12a9ec48ab7 kennyyaohong/public:myproject_centos7.3
+# 第二步 推送 docker push      要推入仓库的用户名/要推入的仓库名:镜像标签
+docker push kennyyaohong/public:myproject_centos7.3
+```
 
 
 
+### 3. 容器命令
+
+容器(Container)与镜像的关系，就如同面向编程中对象与类之间的关系。
+
+因为容器是通过镜像来创建的，所以必须先有镜像才能创建容器，而生成的容器是一个独立于宿主机的隔离进程，并且有属于容器自己的网络和命名空间。
+
+镜像由多个中间层(layer)组成，生成的**镜像是只读的**，但**容器却是可读可写的**，这是因为容器是在镜像上面添一层读写层(writer/read layer)来实现的。
+
+```
+Usage:  docker container COMMAND
+
+Manage containers
+
+Commands:
+  attach      Attach local standard input, output, and error streams to a running container                                                                                          
+  commit      Create a new image from a container's changes(把容器保存为镜像)
+  cp          Copy files/folders between a container and the local filesystem
+  create      Create a new container(创建一个新的容器)
+  diff        Inspect changes to files or directories on a container's filesyste                                                                                             m
+  exec        Run a command in a running container(在一个运行的容器中执行命令)
+  export      Export a container's filesystem as a tar archive
+  inspect     Display detailed information on one or more containers
+  kill        Kill one or more running containers(杀死一个或多个正在运行的容器)
+  logs        Fetch the logs of a container
+  ls          List containers(显示本地容器列表)
+  pause       Pause all processes within one or more containers
+  port        List port mappings or a specific mapping for the container
+  prune       Remove all stopped containers
+  rename      Rename a container(重命名容器)
+  restart     Restart one or more containers(重启一个或多个容器)
+  rm          Remove one or more containers(删除一个或多个容器)
+  run         Run a command in a new container(运行一个新的容器)
+  start       Start one or more stopped containers
+  stats       Display a live stream of container(s) resource usage statistics
+  stop        Stop one or more running containers(停止一个或多个容器)
+  top         Display the running processes of a container
+  unpause     Unpause all processes within one or more containers
+  update      Update configuration of one or more containers
+  wait        Block until one or more containers stop, then print their exit codes
+```
+
+#### 1.启动/停止容器
+
+```sh
+# 通过镜像创建容器，指定容器name 
+# -i interactive -t persu tty
+docker run -it --name myu1 ubuntu 
+# 启动/停止容器
+docker start 容器id
+docker restart 容器id
+docker stop 容器id
+docker kill 容器id  # 强制停止当前容器
+```
+
+#### 2.进入容器
+
+```sh
+# 进入容器
+docker exec -it 容器id /bin/bash
+
+# 示例
+zhengkan03@ubuntu:~/桌面$ docker exec -it  ffbdccd23b40 /bin/bash
+root@ffbdccd23b40:/app# ls
+data  Dockerfile  LSTM.py  __pycache__  README.md  requirements.txt  static  templates  WindPlatform.py
+
+# 进入容器
+docker attach
+
+# 区别
+docker exec       # 进入容器后开启一个新的终端
+docker attach	  # 进入容器正在执行的终端，不会启动新的进程
+```
+
+#### 3.退出容器
+
+```sh
+exit  # 直接容器停止并退出
+CTRL + P + Q # 容器不停止，退出
+```
+
+#### 4.删除容器
+
+```sh
+docker rm 容器id					# 删除指定容器 ，不能删除正在运行的容器
+docker rm -f $(docker ps -aq)	   # 删除所有容器(强制)
+```
+
+#### 5.查看容器
+
+```sh
+# 查看日志
+docker logs 
+docker logs -tf -tail n 容器id   # 查看最后n条日志  -t 显示时间戳   -f 跟随时间戳
+
+# 示例
+zhengkan03@ubuntu:~/桌面$ docker logs -tf --tail 10 26b6aea91aaa
+2021-06-22T07:48:50.905093443Z 
+2021-06-22T07:48:50.905095407Z To try something more ambitious, you can run an Ubuntu container with:
+2021-06-22T07:48:50.905097543Z  $ docker run -it ubuntu bash
+2021-06-22T07:48:50.905099590Z 
+2021-06-22T07:48:50.905101646Z Share images, automate workflows, and more with a free Docker ID:
+2021-06-22T07:48:50.905103754Z  https://hub.docker.com/
+2021-06-22T07:48:50.905105835Z 
+2021-06-22T07:48:50.905107823Z For more examples and ideas, visit:
+2021-06-22T07:48:50.905109929Z  https://docs.docker.com/get-started/
+2021-06-22T07:48:50.905112002Z    
+```
+
+```sh
+# 查看进程信息
+docker top 容器id
+
+# 示例
+hengkan03@ubuntu:~/桌面$ docker top ffbdccd23b40
+UID                 PID                 PPID                C                   STIME               TTY             
+root                4003                3981                1                   16:02               ?               
+root                4048                4003                2                   16:02               ?    
+```
+
+```sh
+# 查看容器元数据
+docker inspect 容器id
+# 示例
+zhengkan03@ubuntu:~/桌面$ docker inspect ffbdccd23b40
+[
+    {
+        "Id": "ffbdccd23b400f0e42060189c76b8497b6b97911c1bd98937d57417ea7751496",
+        "Created": "2021-06-22T08:02:15.072353163Z",
+        "Path": "python3",
+        "Args": [
+            "WindPlatform.py"
+        ],
+        "State": {
+            "Status": "running",
+            "Running": true,
+            "Paused": false,
+            "Restarting": false,
+            "OOMKilled": false,
+            "Dead": false,
+            "Pid": 4003,
+            "ExitCode": 0,
+            "Error": "",
+            "StartedAt": "2021-06-22T08:02:15.329542854Z",
+            "FinishedAt": "0001-01-01T00:00:00Z"
+        },
+        "Image": "sha256:fa7b17d27d4a5dffbfef573effc6c11f8e08050df1d5479d58196a9d3e57e3e4",
+        "ResolvConfPath": "/var/lib/docker/containers/ffbdccd23b400f0e42060189c76b8497b6b97911c1bd98937d57417ea7751496/resolv.conf",
+        "HostnamePath": "/var/lib/docker/containers/ffbdccd23b400f0e42060189c76b8497b6b97911c1bd98937d57417ea7751496/hostname",
+        "HostsPath": "/var/lib/docker/containers/ffbdccd23b400f0e42060189c76b8497b6b97911c1bd98937d57417ea7751496/hosts",
+        "LogPath": "/var/lib/docker/containers/ffbdccd23b400f0e42060189c76b8497b6b97911c1bd98937d57417ea7751496/ffbdccd23b400f0e42060189c76b8497b6b97911c1bd98937d57417ea7751496-json.log",
+        "Name": "/nifty_euclid",
+        "RestartCount": 0,
+        "Driver": "overlay2",
+        "Platform": "linux",
+        "MountLabel": "",
+        "ProcessLabel": "",
+        "AppArmorProfile": "docker-default",
+        "ExecIDs": null,
+        "HostConfig": {
+            "Binds": null,
+            "ContainerIDFile": "",
+            "LogConfig": {
+                "Type": "json-file",
+                "Config": {}
+            },
+            "NetworkMode": "default",
+            "PortBindings": {},
+            "RestartPolicy": {
+                "Name": "no",
+                "MaximumRetryCount": 0
+            },
+            "AutoRemove": false,
+            "VolumeDriver": "",
+            "VolumesFrom": null,
+            "CapAdd": null,
+            "CapDrop": null,
+            "CgroupnsMode": "host",
+            "Dns": [],
+            "DnsOptions": [],
+            "DnsSearch": [],
+            "ExtraHosts": null,
+            "GroupAdd": null,
+            "IpcMode": "private",
+            "Cgroup": "",
+            "Links": null,
+            "OomScoreAdj": 0,
+            "PidMode": "",
+            "Privileged": false,
+            "PublishAllPorts": false,
+            "ReadonlyRootfs": false,
+            "SecurityOpt": null,
+            "UTSMode": "",
+            "UsernsMode": "",
+            "ShmSize": 67108864,
+            "Runtime": "runc",
+            "ConsoleSize": [
+                0,
+                0
+            ],
+            "Isolation": "",
+            "CpuShares": 0,
+            "Memory": 0,
+            "NanoCpus": 0,
+            "CgroupParent": "",
+            "BlkioWeight": 0,
+            "BlkioWeightDevice": [],
+            "BlkioDeviceReadBps": null,
+            "BlkioDeviceWriteBps": null,
+            "BlkioDeviceReadIOps": null,
+            "BlkioDeviceWriteIOps": null,
+            "CpuPeriod": 0,
+            "CpuQuota": 0,
+            "CpuRealtimePeriod": 0,
+            "CpuRealtimeRuntime": 0,
+            "CpusetCpus": "",
+            "CpusetMems": "",
+            "Devices": [],
+            "DeviceCgroupRules": null,
+            "DeviceRequests": null,
+            "KernelMemory": 0,
+            "KernelMemoryTCP": 0,
+            "MemoryReservation": 0,
+            "MemorySwap": 0,
+            "MemorySwappiness": null,
+            "OomKillDisable": false,
+            "PidsLimit": null,
+            "Ulimits": null,
+            "CpuCount": 0,
+            "CpuPercent": 0,
+            "IOMaximumIOps": 0,
+            "IOMaximumBandwidth": 0,
+            "MaskedPaths": [
+                "/proc/asound",
+                "/proc/acpi",
+                "/proc/kcore",
+                "/proc/keys",
+                "/proc/latency_stats",
+                "/proc/timer_list",
+                "/proc/timer_stats",
+                "/proc/sched_debug",
+                "/proc/scsi",
+                "/sys/firmware"
+            ],
+            "ReadonlyPaths": [
+                "/proc/bus",
+                "/proc/fs",
+                "/proc/irq",
+                "/proc/sys",
+                "/proc/sysrq-trigger"
+            ]
+        },
+        "GraphDriver": {
+            "Data": {
+                "LowerDir": "/var/lib/docker/overlay2/683812c5b66d7ff4a6efc7479adf1d1dd69ef966d721104cb240fc810d023f7d-init/diff:/var/lib/docker/overlay2/17a7729fae872dc47beaddd86c02f5a95d1c8b17525e49e9457ff52e126dfc17/diff:/var/lib/docker/overlay2/fa10d11839ed464f0bd78ba5d9cb8fef8212e391876569631c0c04a59aa6e3e3/diff:/var/lib/docker/overlay2/b3c96094f9204af39890d1b8101278a98d7cc6c9c96e76c8fa2efb19d6181a0b/diff:/var/lib/docker/overlay2/c8fe8f5fd4e56531f6452da6ad5e8d300f2b48042a0c72a18fe4e11b3a369aec/diff:/var/lib/docker/overlay2/d28d47c24554c918e4814ef21087b7b334d6b02055c22a690714d9fe905d2407/diff:/var/lib/docker/overlay2/7343c35e91fb791e62ec43253c0ae1705b54dbe72ab65b1361e3a33f7bea1610/diff:/var/lib/docker/overlay2/1ff46c566494d2451a35636d7b28461d0ea2f2c2dd2af2920de52ee25ba53529/diff:/var/lib/docker/overlay2/e736e69f6bb2b87efb5ff8d693c4fd37d887502a06a5b9fabff96ad8153c7f9c/diff:/var/lib/docker/overlay2/18a19eee18a38481e0db17be63f675b6edddba3c72f6ec3ea99b2446b44198c8/diff:/var/lib/docker/overlay2/1cab6ed396a099774fbf46013adbb04aae80e173af01b08bbaebd4330ee5417e/diff:/var/lib/docker/overlay2/0a990a330b637a03878dece926106670d67a6848220433163e8b614e26a4d5fe/diff:/var/lib/docker/overlay2/dcb2bdf25e93fc854e9f20db7af8a15d8121591d0fdc4adf6fd3897c6ad42794/diff:/var/lib/docker/overlay2/32ff4d2f742d16b700a2e71d3e6c4508a976046869a472e52fb7057e2bab2f6c/diff:/var/lib/docker/overlay2/09f6a5b7a03f34cd7ddd7fab9ba8fe9aa3ddf9e232fabf3c54fc8602d80a2f1f/diff",
+                "MergedDir": "/var/lib/docker/overlay2/683812c5b66d7ff4a6efc7479adf1d1dd69ef966d721104cb240fc810d023f7d/merged",
+                "UpperDir": "/var/lib/docker/overlay2/683812c5b66d7ff4a6efc7479adf1d1dd69ef966d721104cb240fc810d023f7d/diff",
+                "WorkDir": "/var/lib/docker/overlay2/683812c5b66d7ff4a6efc7479adf1d1dd69ef966d721104cb240fc810d023f7d/work"
+            },
+            "Name": "overlay2"
+        },
+        "Mounts": [
+            {
+                "Type": "volume",
+                "Name": "506ba62d402f692daf45dad5a846cff4e553a710f541e78949466e0e92325ea9",
+                "Source": "/var/lib/docker/volumes/506ba62d402f692daf45dad5a846cff4e553a710f541e78949466e0e92325ea9/_data",
+                "Destination": "/sys/fs/cgroup",
+                "Driver": "local",
+                "Mode": "",
+                "RW": true,
+                "Propagation": ""
+            }
+        ],
+        "Config": {
+            "Hostname": "ffbdccd23b40",
+            "Domainname": "",
+            "User": "",
+            "AttachStdin": false,
+            "AttachStdout": false,
+            "AttachStderr": false,
+            "Tty": false,
+            "OpenStdin": false,
+            "StdinOnce": false,
+            "Env": [
+                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+                "container=docker",
+                "DEBIAN_FRONTEND=noninteractive",
+                "LANG=en_US.UTF-8",
+                "LANGUAGE=en_US:en",
+                "LC_ALL=en_US.UTF-8"
+            ],
+            "Cmd": [
+                "python3",
+                "WindPlatform.py"
+            ],
+            "Image": "fa7b17d27d4a",
+            "Volumes": {
+                "/sys/fs/cgroup": {}
+            },
+            "WorkingDir": "/app",
+            "Entrypoint": null,
+            "OnBuild": null,
+            "Labels": {}
+        },
+        "NetworkSettings": {
+            "Bridge": "",
+            "SandboxID": "5f09b2026536f58852715967f0f1487828195533aa71896838e9074634e2a403",
+            "HairpinMode": false,
+            "LinkLocalIPv6Address": "",
+            "LinkLocalIPv6PrefixLen": 0,
+            "Ports": {},
+            "SandboxKey": "/var/run/docker/netns/5f09b2026536",
+            "SecondaryIPAddresses": null,
+            "SecondaryIPv6Addresses": null,
+            "EndpointID": "d88f24d5ea6a94c7a9ee0359d7bd829cf66e4dc70ebe7d827b709a8c0a836dd2",
+            "Gateway": "172.17.0.1",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "IPAddress": "172.17.0.2",
+            "IPPrefixLen": 16,
+            "IPv6Gateway": "",
+            "MacAddress": "02:42:ac:11:00:02",
+            "Networks": {
+                "bridge": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "NetworkID": "8f3b1769f0151de1a0edac3bf15a02e0828f2ea16919098ec4cdfd43f0f90ad4",
+                    "EndpointID": "d88f24d5ea6a94c7a9ee0359d7bd829cf66e4dc70ebe7d827b709a8c0a836dd2",
+                    "Gateway": "172.17.0.1",
+                    "IPAddress": "172.17.0.2",
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "MacAddress": "02:42:ac:11:00:02",
+                    "DriverOpts": null
+                }
+            }
+        }
+    }
+]
+```
+
+#### 6.容器文件交互
+
+```sh
+# 容器内文件拷贝到主机 	
+docker cp 容器id:路径 宿主机路径
+# 示例
+zhengkan03@ubuntu:~/桌面$ docker cp ffbdccd23b40:/app/ /home/zhengkan03/Desktop/
+```
+
+#### 7.容器数据卷
+
+docker的理念： 将应用和环境打包为一个镜像！
+
+数据如果保存在容器中，那么容器被删除，数据就会丢失。所以，需要数据的持久化，并保存到本地。这样即便出现删库跑路的情况，数据库中的数据仍能保存到本地。
+
+```sh
+# 方式一：直接使用-v数据挂载 
+# 功能是实现双向绑定:容器内部添加文件，可同步到主机;主机指定文件夹下添加文件可同步到容器内;
+docker run -it -v 宿主机目录:容器内路径
+
+# 匿名挂载
+docker run -d -P --name nginx01 -v /etc/nginx nginx
+-v 容器内路径  # 匿名挂载，不建议使用
+# 具名挂载
+-v 卷名:容器内路径  
+-v 宿主机路径:容器内路径  # 指定路径挂载
+
+# 通过 -v 容器内路径：ro rw 改变读写权限  ，设置后只能通过宿主机操作，不能容器内操作，默认可读可写
+ro  readonly    # 容器内部只读
+rw  readwrite   # 容器内部可读可写
+docker run -d -P --name nginx02 -v jumping-nginx:/etc/nginx:/etc/nginx:ro nginx
+docker run -d -P --name nginx02 -v jumping-nginx:/etc/nginx:/etc/nginx:rw nginx
+
+# 启动后可以通过docker inspect 容器id 查看挂载->Mount
+
+# 方式二： 通过dockerfile中的VOLUME挂载
+```
+
+**创建本地数据卷**
+
+本地数据卷默认路径是在 `/var/lib/docker/volumes/ `下
+
+```sh
+# 创建本地数据卷
+docker volume create my-vol
+# 列出本地数据卷
+docker volume ls
+DRIVER    VOLUME NAME
+local     my-vol
+# 查看本地数据卷
+docker volume inspect my-vol
+[
+    {
+        "CreatedAt": "2022-02-17T09:18:01+08:00",
+        "Driver": "local",
+        "Labels": {},
+        "Mountpoint": "/var/lib/docker/volumes/my-vol/_data",
+        "Name": "my-vol",
+        "Options": {},
+        "Scope": "local"
+    }
+]
+# 删除本地数据卷
+docker volume rm my-vol
+```
+
+**Dokcerfile中的VOLUME**
+
+```dockerfile
+FROM centos
+VOLUME ["volume1","volume2"]  # 这个地方进行匿名挂载,多个数据卷必须使用双引号分割
+CMD echo "--end--"
+CMD /bin/bash
+```
+
+```sh
+zhengkan@station-ThinkStation-P340:~$ docker run -it 17e4 bash
+root@70e127257ef8:/# ls
+bin   dev  home  lib32  libx32  mnt  proc  run   srv  tmp  var      volume2
+boot  etc  lib   lib64  media   opt  root  sbin  sys  usr  volume1        # 出现创建的两个数据卷volume1 和 volume2
+```
+
+```sh
+root@station-ThinkStation-P340:/var/lib/docker/volumes# ls
+19abfa4ee65418e8a78ee144bb582eccf026ca14c0c52cf3b88bec777cd58e6f  backingFsBlockDev
+1c4bf795cb696fe0de894c5164adf8a93ae96b9ae1aa9bcd59599a19be88ff84  metadata.db
+# 进入/var/lib/docker/volumes,可见对应volume1和volume2的两个数据卷
+# 每个卷中有个_data 文件夹与volume1、volume2中的内容对应
+```
+
+此时在容器内部会创建`volume1`和`volume2`两个卷（文件夹），同时在宿主机的`/var/lib/docker/volumes/`下会有随机生成的数据卷（文件夹）与`volume1`和`volume2`对应绑定；
+
+**当修改任意一个数据卷中的内容时，其对应数据卷中的内容也会发生更改**
+
+在创建项目时，通常需要用到具名挂载，方便宿主机的数据查找和应用，这个就需要用到`docker-compose`中的数据挂载了，详见`docker-compose`部分
+
+### 4.Docker网络
+
+#### 1.docker0网卡
+
+Docker使用Linux桥接，在宿主机虚拟一个Docker网桥(docker0)，Docker启动一个容器时会根据Docker网桥的网段分配给容器一个IP地址，称为Container-IP。
+
+同时Docker网桥是每个容器的默认网关，因为在同一宿主机内的容器都接入同一个网桥，这样容器之间就能够通过容器的Container-IP直接通信。
+
+```sh
+root@station-ThinkStation-P340:~# ip addr
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host 
+       valid_lft forever preferred_lft forever
+2: eno1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
+    link/ether d8:bb:c1:7b:4f:3e brd ff:ff:ff:ff:ff:ff
+    altname enp0s31f6
+    inet 192.168.31.65/24 brd 192.168.31.255 scope global dynamic noprefixroute eno1
+       valid_lft 33609sec preferred_lft 33609sec
+    inet6 fe80::bc7:f2c9:9736:8be5/64 scope link noprefixroute 
+       valid_lft forever preferred_lft forever
+3: docker0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN group default 
+    link/ether 02:42:b2:72:14:f2 brd ff:ff:ff:ff:ff:ff
+    inet 172.17.0.1/16 brd 172.17.255.255 scope global docker0
+       valid_lft forever preferred_lft forever
+    inet6 fe80::42:b2ff:fe72:14f2/64 scope link 
+       valid_lft forever preferred_lft forever
+```
+
+在每台装有docker的机器上，会有一张`docker0`的网卡，并且自动创建三个网络；docker内置的这三个网络可以在运行容器时，指定容器连接到那个网络；
+
+```sh
+root@station-ThinkStation-P340:~# docker network ls
+NETWORK ID     NAME      DRIVER    SCOPE
+88d2242caf7b   bridge    bridge    local
+db2e9c36669e   host      host      local
+7016f0320535   none      null      local
+
+# 指定连接网络
+docker run --network=选项指定
+root@station-ThinkStation-P340:~# docker run -it --network=host ubuntu
+```
+
+#### 2.容器通讯
+
+Docker网桥是宿主机虚拟出来的，并不是真实存在的网络设备，外部网络是无法寻址到的，这也意味着外部网络无法通过直接Container-IP访问到容器。
+
+如果容器希望外部访问能够访问到，可以通过映射容器端口到宿主主机（**端口映射**），即docker run创建容器时候通过 -p 或 -P 参数来启用，访问容器的时候就通过**[宿主机IP]:[容器端口]**访问容器。
+
+#### 3.网络模式
+
+| Docker 网络模式 | 配置               | 说明                                                         |
+| --------------- | ------------------ | ------------------------------------------------------------ |
+| Host            | -- net = host      | 容器将不会虚拟出自己的网卡，配置自己的IP等，而是使用宿主机的IP和端口 |
+| Container       | -- net = container | 创建的容器不会创建自己的网卡，配置自己的IP，而是和一个指定的容器共享IP、端口范围。 |
+| None            | -- net = none      | 该模式关闭了容器的网络功能                                   |
+| Bridge          | -- net= bridge     | 此模式会为每一个容器分配、设置IP等，并将容器连接到一个docker0虚拟网桥，通过docker0网桥以及Iptables nat表配置与宿主机通信 【默认是就是该模式】 |
+
+##### Host模式
+
+如果启动容器的时候使用host模式，那么这个容器将不会获得一个独立的Network Namespace，而是**和宿主机共用一个Network Namespace**。容器将不会虚拟出自己的网卡，配置自己的IP等，而是使用宿主机的IP和端口。但是，容器的其他方面，如文件系统、进程列表等还是和宿主机隔离的。
+
+使用host模式的容器可以直接使用宿主机的IP地址与外界通信，容器内部的服务端口也可以使用宿主机的端口，不需要进行NAT，host最大的优势就是网络性能比较好。**但是docker host上已经使用的端口就不能再用了，网络的隔离性不好。**
+
+<img src="../../assets/images/20220217docker/webp" alt="img" style="zoom:50%;" />
+
+##### Container模式
+
+这个模式指定**新创建的容器和已经存在的一个容器共享一个 Network Namespace**，而不是和宿主机共享。新创建的容器不会创建自己的网卡，配置自己的 IP，而是和一个指定的容器共享 IP、端口范围等。同样，两个容器除了网络方面，其他的如文件系统、进程列表等还是隔离的。两个容器的进程可以通过 lo 网卡设备通信。
+
+<img src="../../assets/images/20220217docker/image-20220217143100868.png" alt="image-20220217143100868" style="zoom: 67%;" />
+
+##### None模式
+
+使用none模式，Docker容器拥有自己的Network Namespace，但是，并不为Docker容器进行任何网络配置。也就是说，这个Docker容器没有网卡、IP、路由等信息。需要我们自己为Docker容器添加网卡、配置IP等。
+
+**这种网络模式下容器只有lo回环网络，没有其他网卡**。none模式可以在容器创建时通过--network=none来指定。这种类型的网络没有办法联网，封闭的网络能很好的保证容器的安全性。
+
+<img src="../../assets/images/20220217docker/image-20220217143239419.png" alt="image-20220217143239419" style="zoom:67%;" />
+
+##### Bridge模式
+
+当Docker进程启动时，会在主机上创建一个名为docker0的虚拟网桥，此主机上启动的Docker容器会连接到这个虚拟网桥上。虚拟网桥的工作方式和物理交换机类似，这样主机上的所有容器就通过交换机连在了一个二层网络中。
+
+从docker0子网中分配一个IP给容器使用，并设置docker0的IP地址为容器的默认网关。在主机上创建一对虚拟网卡`veth pair`设备，Docker将`veth pair`设备的一端放在新创建的容器中，并命名为`eth0（容器的网卡）`，另一端放在主机中，以`vethxxx`这样类似的名字命名，并将这个网络设备加入到docker0网桥中。可以通过`brctl show`命令查看。
+
+bridge模式是docker的默认网络模式，不写--net参数，就是bridge模式。使用`docker run -p`时，docker实际是在iptables做了DNAT(目的地址转换)规则，实现端口转发功能。可以使用`iptables -t nat -vnL`查看。
+
+```sh
+docker network inspect bridge
+[
+    {
+        "Name": "bridge",
+        "Id": "88d2242caf7b6af84d1d0aa2415d730f01637c52ef5fb8ca4d3916e1374f0147",
+        "Created": "2022-02-17T11:10:04.698146145+08:00",
+        "Scope": "local",
+        "Driver": "bridge",
+        "EnableIPv6": false,
+        "IPAM": {
+            "Driver": "default",
+            "Options": null,
+            "Config": [
+                {
+                    "Subnet": "172.17.0.0/16",
+                    "Gateway": "172.17.0.1"
+                }
+            ]
+        },
+        "Internal": false,
+        "Attachable": false,
+        "Ingress": false,
+        "ConfigFrom": {
+            "Network": ""
+        },
+        "ConfigOnly": false,
+        "Containers": {},
+        "Options": {
+            "com.docker.network.bridge.default_bridge": "true",
+            "com.docker.network.bridge.enable_icc": "true",
+            "com.docker.network.bridge.enable_ip_masquerade": "true",
+            "com.docker.network.bridge.host_binding_ipv4": "0.0.0.0",
+            "com.docker.network.bridge.name": "docker0",
+            "com.docker.network.driver.mtu": "1500"
+        },
+        "Labels": {}
+    }
+]
+```
+
+
+
+<img src="../../assets/images/20220217docker/image-20220217143400160.png" alt="image-20220217143400160" style="zoom:67%;" />
+
+本节只是介绍了docker容器的4种网络模式，这些都是在创建容器的时候指定的，即通过`docker命令行`来执行，为了容器的编排与管理，后面会讲解`docker-compose`的内容，涉及到在文件中指定网络模式，详情见`docker-compose`文档。
+
+参考链接：
+
+---
+
+链接：https://www.jianshu.com/p/22a7032bb7bd
+
+docker多主机间容器通信 https://www.cnblogs.com/xiao987334176/p/10049844.html
