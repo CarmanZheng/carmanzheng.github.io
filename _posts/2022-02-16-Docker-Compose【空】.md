@@ -135,9 +135,10 @@ Commands:
 docker-compose up -d 			# 后台运行,拉起服务
 dokcer-compose down 			# 停止服务，并移除容器、网络、镜像和挂载卷
 docker-compose version 			# 查看版本
-docker-compose start 			# 启动服务
-docker-compose stop				# 停止服务
+docker-compose start [服务名]	  # 启动服务
+docker-compose stop [服务名]	   # 停止服务
 docker-compose top				# 查看运行的进程
+docker-compose logs [服务名]	  # 查看日志
 ```
 
 #### 3.环境变量
@@ -156,7 +157,7 @@ TAG=v1.5
 version:'3'
 services:
 	web:
-	images:"webapp:${TAG}"
+	   images:"webapp:${TAG}"
 ```
 
 ```sh
@@ -164,6 +165,6 @@ $ docker config
 version:'3'
 services:
 	web:
-	images:"webapp:v1.5"
+	   images:"webapp:v1.5"
 ```
 
