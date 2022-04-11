@@ -737,3 +737,5 @@ new_doc.save("Tech Blogs v2.6.docx")
 3.[python-docx设置页眉和页脚 (baidu.com)](https://baijiahao.baidu.com/s?id=1665454009794833226&wfr=spider&for=pc)
 
 4.[利用python自动写Word文档（三）——用Python-docx修改表格](https://blog.csdn.net/liaosen/article/details/121242200)
+
+5.[python-docx表格样式列表](https://blog.csdn.net/xtfge0915/article/details/83480120)
