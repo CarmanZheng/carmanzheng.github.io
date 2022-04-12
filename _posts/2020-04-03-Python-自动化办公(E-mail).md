@@ -128,18 +128,18 @@ with open("./source/琵琶行.txt", "r", encoding="utf-8") as f:
     text = f.read()
 
 # 构建插图
-with open("./source/琵琶行.jpg", "rb") as f:
+with open("./source/琵琶行.jpeg", "rb") as f:
     pic = MIMEImage(f.read(), _subtype="base64")
 pic.add_header('Content-ID', '<image1>')
-pic["Content-Disposition"] = 'attachment; filename="琵琶行.jpg"'
+pic["Content-Disposition"] = 'attachment; filename="琵琶行.jpeg"'
 mm.attach(pic)
 
 # 整合内容（图片+文字）
 content1 = MIMEText('''
 <html>
     <body>
-    {}
-        </br>
+    {}\n
+       
         <img src="cid:image1" alt="image1">
     </body>
 </html>
@@ -150,6 +150,12 @@ mm.attach(content1)
 txt_file = MIMEApplication(open('./source/琵琶行.txt', 'rb').read())
 txt_file.add_header('content-disposition', 'attachment', filename="琵琶行.txt")
 mm.attach(txt_file)
+xlsx_file = MIMEApplication(open('./source/琵琶行.xlsx', 'rb').read(), 'base64')
+xlsx_file.add_header('content-disposition', 'attachment', filename="琵琶行.xlsx")
+mm.attach(xlsx_file)
+pic_file = MIMEApplication(open('./source/琵琶行.jpeg', 'rb').read(), 'base64')
+pic_file.add_header('content-disposition', 'attachment', filename="琵琶行.jpeg")
+mm.attach(pic_file)
 
 # 创建SMTP对象
 stp = smtplib.SMTP()
