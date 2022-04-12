@@ -123,6 +123,7 @@ subject_content = "琵琶行"
 mm["Subject"] = Header(subject_content, 'utf-8')
 mm["FROM"] = "<zhengkan1993@163.com>"
 mm["TO"] = "<zhengkan@mywind.com.cn>"
+
 # 构建邮件内容
 with open("./source/琵琶行.txt", "r", encoding="utf-8") as f:
     text = f.read()
@@ -138,7 +139,7 @@ mm.attach(pic)
 content1 = MIMEText('''
 <html>
     <body>
-    {}\n
+    {}
        
         <img src="cid:image1" alt="image1">
     </body>
@@ -171,8 +172,6 @@ print("邮件发送成功")
 # 关闭SMTP对象
 stp.quit()
 ```
-
-注意：图片暂时无法显示，网上资料说是网易的不行
 
 ### 参考链接：
 
