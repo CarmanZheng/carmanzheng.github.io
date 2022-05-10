@@ -90,7 +90,7 @@ sudo cp ./daemon.json  /etc/docker/daemon.json
 # sudo apt-get -y install docker-ce=[VERSION]
 ```
 
-### 3.docker-compose
+### 3. docker-compose
 
 ```sh
 #!bin/bash
