@@ -1,5 +1,5 @@
 ---
-title: 基本SELECT语句
+title: MySQL基本SELECT语句
 layout: post
 tags: MySQL
 categories: '数据库'
