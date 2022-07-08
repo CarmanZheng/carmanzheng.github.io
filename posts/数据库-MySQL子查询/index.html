@@ -1,0 +1,872 @@
+<!DOCTYPE html><html lang="zh-CN" ><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><meta name="day-prompt" content="天前"><meta name="hour-prompt" content="小时前"><meta name="minute-prompt" content="分钟前"><meta name="justnow-prompt" content="刚刚"><meta name="generator" content="Jekyll v4.2.1" /><meta property="og:title" content="MySQL子查询" /><meta property="og:locale" content="zh_CN" /><meta name="description" content="​ 子查询指一个查询语句嵌套在另一个查询语句内部的查询，这个特性从MySQL 4.1开始引入。 SQL 中子查询的使用大大增强了 SELECT 查询的能力，因为很多时候查询需要从结果集中获取数据，或者 需要从同一个表中先计算得出一个数据结果，然后与这个数据结果（可能是某个标量，也可能是某个集合）进行比较。" /><meta property="og:description" content="​ 子查询指一个查询语句嵌套在另一个查询语句内部的查询，这个特性从MySQL 4.1开始引入。 SQL 中子查询的使用大大增强了 SELECT 查询的能力，因为很多时候查询需要从结果集中获取数据，或者 需要从同一个表中先计算得出一个数据结果，然后与这个数据结果（可能是某个标量，也可能是某个集合）进行比较。" /><link rel="canonical" href="https://carmanzheng.github.io//posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E5%AD%90%E6%9F%A5%E8%AF%A2/" /><meta property="og:url" content="https://carmanzheng.github.io//posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E5%AD%90%E6%9F%A5%E8%AF%A2/" /><meta property="og:site_name" content="Technical Blogs" /><meta property="og:type" content="article" /><meta property="article:published_time" content="2021-06-09T00:00:00+08:00" /><meta name="twitter:card" content="summary" /><meta property="twitter:title" content="MySQL子查询" /><meta name="twitter:site" content="@twitter_username" /><meta name="google-site-verification" content="google_meta_tag_verification" /> <script type="application/ld+json"> {"description":"​ 子查询指一个查询语句嵌套在另一个查询语句内部的查询，这个特性从MySQL 4.1开始引入。 SQL 中子查询的使用大大增强了 SELECT 查询的能力，因为很多时候查询需要从结果集中获取数据，或者 需要从同一个表中先计算得出一个数据结果，然后与这个数据结果（可能是某个标量，也可能是某个集合）进行比较。","headline":"MySQL子查询","dateModified":"2022-05-17T16:53:15+08:00","datePublished":"2021-06-09T00:00:00+08:00","url":"https://carmanzheng.github.io//posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E5%AD%90%E6%9F%A5%E8%AF%A2/","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://carmanzheng.github.io//posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E5%AD%90%E6%9F%A5%E8%AF%A2/"},"@context":"https://schema.org"}</script><title>MySQL子查询 | Technical Blogs</title><link rel="apple-touch-icon" sizes="180x180" href="/assets/img/favicons/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicons/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicons/favicon-16x16.png"><link rel="manifest" href="/assets/img/favicons/site.webmanifest"><link rel="shortcut icon" href="/assets/img/favicons/favicon.ico"><meta name="apple-mobile-web-app-title" content="Technical Blogs"><meta name="application-name" content="Technical Blogs"><meta name="msapplication-TileColor" content="#da532c"><meta name="msapplication-config" content="/assets/img/favicons/browserconfig.xml"><meta name="theme-color" content="#ffffff"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"><link rel="dns-prefetch" href="https://fonts.gstatic.com"><link rel="preconnect" href="https://www.google-analytics.com" crossorigin="use-credentials"><link rel="dns-prefetch" href="https://www.google-analytics.com"><link rel="preconnect" href="https://www.googletagmanager.com" crossorigin="anonymous"><link rel="dns-prefetch" href="https://www.googletagmanager.com"><link rel="preconnect" href="https://cdn.jsdelivr.net"><link rel="dns-prefetch" href="https://cdn.jsdelivr.net"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.11.2/css/all.min.css"><link rel="stylesheet" href="/assets/css/style.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@1.0.1/dist/bootstrap-toc.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/magnific-popup@1.1.0/dist/magnific-popup.min.css"> <script src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script> <script type="text/javascript"> class ModeToggle { static get MODE_KEY() { return "mode"; } static get DARK_MODE() { return "dark"; } static get LIGHT_MODE() { return "light"; } static get ID() { return "mode-toggle"; } constructor() { if (this.hasMode) { if (this.isDarkMode) { if (!this.isSysDarkPrefer) { this.setDark(); } } else { if (this.isSysDarkPrefer) { this.setLight(); } } } let self = this; /* always follow the system prefers */ this.sysDarkPrefers.addEventListener("change", () => { if (self.hasMode) { if (self.isDarkMode) { if (!self.isSysDarkPrefer) { self.setDark(); } } else { if (self.isSysDarkPrefer) { self.setLight(); } } self.clearMode(); } self.notify(); }); } /* constructor() */ get sysDarkPrefers() { return window.matchMedia("(prefers-color-scheme: dark)"); } get isSysDarkPrefer() { return this.sysDarkPrefers.matches; } get isDarkMode() { return this.mode === ModeToggle.DARK_MODE; } get isLightMode() { return this.mode === ModeToggle.LIGHT_MODE; } get hasMode() { return this.mode != null; } get mode() { return sessionStorage.getItem(ModeToggle.MODE_KEY); } /* get the current mode on screen */ get modeStatus() { if (this.isDarkMode || (!this.hasMode && this.isSysDarkPrefer)) { return ModeToggle.DARK_MODE; } else { return ModeToggle.LIGHT_MODE; } } setDark() { $('html').attr(ModeToggle.MODE_KEY, ModeToggle.DARK_MODE); sessionStorage.setItem(ModeToggle.MODE_KEY, ModeToggle.DARK_MODE); } setLight() { $('html').attr(ModeToggle.MODE_KEY, ModeToggle.LIGHT_MODE); sessionStorage.setItem(ModeToggle.MODE_KEY, ModeToggle.LIGHT_MODE); } clearMode() { $('html').removeAttr(ModeToggle.MODE_KEY); sessionStorage.removeItem(ModeToggle.MODE_KEY); } /* Notify another plugins that the theme mode has changed */ notify() { window.postMessage({ direction: ModeToggle.ID, message: this.modeStatus }, "*"); } } /* ModeToggle */ const toggle = new ModeToggle(); function flipMode() { if (toggle.hasMode) { if (toggle.isSysDarkPrefer) { if (toggle.isLightMode) { toggle.clearMode(); } else { toggle.setLight(); } } else { if (toggle.isDarkMode) { toggle.clearMode(); } else { toggle.setDark(); } } } else { if (toggle.isSysDarkPrefer) { toggle.setLight(); } else { toggle.setDark(); } } toggle.notify(); } /* flipMode() */ </script><body data-spy="scroll" data-target="#toc"><div id="sidebar" class="d-flex flex-column align-items-end" lang="zh-CN"><div class="profile-wrapper text-center"><div id="avatar"> <a href="/" alt="avatar" class="mx-auto"> <img src="/assets/img/favicons/android-chrome-192x192.png" alt="avatar" onerror="this.style.display='none'"> </a></div><div class="site-title mt-3"> <a href="/">Technical Blogs</a></div><div class="site-subtitle font-italic">Learning by Doing, Sharing for more!</div></div><ul class="w-100"><li class="nav-item"> <a href="/" class="nav-link"> <i class="fa-fw fas fa-home ml-xl-3 mr-xl-3 unloaded"></i> <span>首页</span> </a><li class="nav-item"> <a href="/categories/" class="nav-link"> <i class="fa-fw fas fa-stream ml-xl-3 mr-xl-3 unloaded"></i> <span>分类</span> </a><li class="nav-item"> <a href="/tags/" class="nav-link"> <i class="fa-fw fas fa-tag ml-xl-3 mr-xl-3 unloaded"></i> <span>标签</span> </a><li class="nav-item"> <a href="/archives/" class="nav-link"> <i class="fa-fw fas fa-archive ml-xl-3 mr-xl-3 unloaded"></i> <span>归档</span> </a><li class="nav-item"> <a href="/about/" class="nav-link"> <i class="fa-fw fas fa-info-circle ml-xl-3 mr-xl-3 unloaded"></i> <span>关于</span> </a></ul><div class="sidebar-bottom mt-auto d-flex flex-wrap justify-content-center align-items-center"> <button class="mode-toggle btn" aria-label="Switch Mode"> <i class="fas fa-adjust"></i> </button> <span class="icon-border"></span> <a href="https://github.com/Carmanzheng" aria-label="github" target="_blank" rel="noopener"> <i class="fab fa-github"></i> </a> <a href="https://twitter.com/twitter_username" aria-label="twitter" target="_blank" rel="noopener"> <i class="fab fa-twitter"></i> </a> <a href=" javascript:location.href = 'mailto:' + ['zhengkan1993','gmail.com'].join('@')" aria-label="email" > <i class="fas fa-envelope"></i> </a> <a href="/feed.xml" aria-label="rss" > <i class="fas fa-rss"></i> </a></div></div><div id="topbar-wrapper" class="row justify-content-center topbar-down"><div id="topbar" class="col-11 d-flex h-100 align-items-center justify-content-between"> <span id="breadcrumb"> <span> <a href="/"> 首页 </a> </span> <span>MySQL子查询</span> </span> <i id="sidebar-trigger" class="fas fa-bars fa-fw"></i><div id="topbar-title"> 文章</div><i id="search-trigger" class="fas fa-search fa-fw"></i> <span id="search-wrapper" class="align-items-center"> <i class="fas fa-search fa-fw"></i> <input class="form-control" id="search-input" type="search" aria-label="search" autocomplete="off" placeholder="搜索..."> <i class="fa fa-times-circle fa-fw" id="search-cleaner"></i> </span> <span id="search-cancel" >取消</span></div></div><div id="main-wrapper"><div id="main"><div class="row"><div id="core-wrapper" class="col-12 col-lg-11 col-xl-8"><div class="post pl-1 pr-1 pl-sm-2 pr-sm-2 pl-md-4 pr-md-4"><h1 data-toc-skip>MySQL子查询</h1><div class="post-meta text-muted"><div> 作者 <em> <a href="https://github.com/carmanzheng">carmanzheng</a> </em></div><div class="d-flex"><div> <span> 发表于 <em class="timeago" date="2021-06-09 00:00:00 +0800" data-toggle="tooltip" data-placement="bottom" title="2021-06-09, 00:00 +0800" >2021-06-09</em> </span> <span> 更新于 <em class="timeago" date="2022-05-17 16:53:15 +0800 " data-toggle="tooltip" data-placement="bottom" title="2022-05-17, 16:53 +0800" >05-17</em> </span> <span class="readtime" data-toggle="tooltip" data-placement="bottom" title="6069 字"> <em>33 分钟</em>阅读</span></div></div></div><div class="post-content"><p>​ 子查询指一个查询语句嵌套在另一个查询语句内部的查询，这个特性从MySQL 4.1开始引入。 SQL 中子查询的使用大大增强了 SELECT 查询的能力，因为很多时候查询需要从结果集中获取数据，或者 <code class="language-plaintext highlighter-rouge">需要从同一个表中先计算得出一个数据结果</code>，然后与这个数据结果（可能是某个标量，也可能是某个集合）进行比较。</p><h2 id="1-需求分析与问题解决">1. 需求分析与问题解决<a href="#1-需求分析与问题解决" class="anchor"><i class="fas fa-hashtag"></i></a></h2></h2><h3 id="11-查询谁的工资比abel高">1.1 查询谁的工资比<code class="language-plaintext highlighter-rouge">Abel</code>高？<a href="#11-查询谁的工资比abel高" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><pre><code class="language-mysql"># 子查询
+SELECT last_name,salary
+FROM employees
+WHERE salary &gt; (
+SELECT salary
+FROM employees
+WHERE last_name = 'Abel'
+);
+</code></pre><h3 id="12-子查询的基本使用">1.2 子查询的基本使用<a href="#12-子查询的基本使用" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><p>子查询的基本语法结构：</p><p><img data-src="../../assets/images/20210609MysqlSubquery/image-20220516102237920.png" alt="image-20220516102237920" data-proofer-ignore></p><ul><li>子查询（内查询）在主查询之前一次执行完成。<li>子查询的结果被主查询（外查询）使用 。<li>注意事项 :<ul><li>子查询要包含在括号内<li>将子查询放在比较条件的右侧<li>单行操作符对应单行子查询，多行操作符对应多行子查询</ul></ul><h3 id="13-子查询的分类">1.3 子查询的分类<a href="#13-子查询的分类" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><p>​ 分类方式1： 我们按内查询的结果返回一条还是多条记录，将子查询分为 单行子查询 、 多行子查询 。</p><p><img data-src="../../assets/images/20210609MysqlSubquery/image-20220516102447246.png" alt="image-20220516102447246" data-proofer-ignore></p><p>​ 分类方式2： 我们按内查询是否被执行多次，将子查询划分为 相关(或关联)子查询 和 不相关(或非关联)子查询 。</p><p>​ 子查询从数据表中查询了数据结果，如果这个数据结果只执行一次，然后这个数据结果作为主查询的条 件进行执行，那么这样的子查询叫做不相关子查询。</p><p>​ 同样，如果子查询需要执行多次，即采用循环的方式，先从外部查询开始，每次都传入子查询进行查 询，然后再将结果反馈给外部，这种嵌套的执行方式就称为相关子查询。</p><h2 id="2-单行子查询">2. 单行子查询<a href="#2-单行子查询" class="anchor"><i class="fas fa-hashtag"></i></a></h2></h2><h3 id="21-单行比较操作符">2.1 单行比较操作符<a href="#21-单行比较操作符" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><div class="table-wrapper"><table><thead><tr><th>操作符<th>含义<tbody><tr><td>=<td>equal to<tr><td>&gt;<td>greater than<tr><td>&gt;=<td>greater than or equal to<tr><td>&lt;<td>less than<tr><td>&lt;=<td>less than or equal to<tr><td>&lt;&gt;<td>not equal to</table></div><h3 id="22-代码示例">2.2 代码示例<a href="#22-代码示例" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><p>题目：查询工资大于149号员工工资的员工的信息</p><p><img data-src="../../assets/images/20210609MysqlSubquery/image-20220516102831096.png" alt="image-20220516102831096" data-proofer-ignore></p><p>题目：返回job_id与141号员工相同，salary比143号员工多的员工姓名，job_id和工资</p><pre><code class="language-mysql">SELECT last_name, job_id, salary
+FROM employees
+WHERE job_id =
+            (SELECT job_id
+            FROM employees
+            WHERE employee_id = 141)
+AND salary &gt;
+            (SELECT salary
+            FROM employees
+            WHERE employee_id = 143);
+</code></pre><p>题目：返回<code class="language-plaintext highlighter-rouge">公司工资最少的员工</code>的<code class="language-plaintext highlighter-rouge">last_name,job_id和salary</code></p><pre><code class="language-mysql">SELECT last_name, job_id, salary
+FROM employees
+WHERE salary =
+        (SELECT MIN(salary)
+        FROM employees);
+</code></pre><p>题目：查询与141号或174号员工的manager_id和department_id相同的其他员工的employee_id， manager_id，department_id</p><p>实现方式1：不成对比较</p><pre><code class="language-mysql">SELECT employee_id, manager_id, department_id
+FROM employees
+WHERE manager_id IN
+    (SELECT manager_id
+    FROM employees
+    WHERE employee_id IN (174,141))
+AND department_id IN
+    (SELECT department_id
+    FROM employees
+    WHERE employee_id IN (174,141))
+    AND employee_id NOT IN(174,141);
+</code></pre><p>实现方式2：成对比较</p><pre><code class="language-mysql">SELECT employee_id, manager_id, department_id
+FROM employees
+WHERE (manager_id, department_id) IN
+    (SELECT manager_id, department_id
+	FROM employees
+    WHERE employee_id IN (141,174))
+    AND employee_id NOT IN (141,174);
+</code></pre><h3 id="23-having-中的子查询">2.3 HAVING 中的子查询<a href="#23-having-中的子查询" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><p>首先执行子查询。 向主查询中的HAVING 子句返回结果。</p><p>题目：查询最低工资大于110号部门最低工资的部门id和其最低工资</p><pre><code class="language-mysql">SELECT department_id, MIN(salary)
+FROM employees
+GROUP BY department_id
+HAVING MIN(salary) &gt;
+    (SELECT MIN(salary)
+    FROM employees
+    WHERE department_id = 110);
+</code></pre><h3 id="24-case中的子查询">2.4 CASE中的子查询<a href="#24-case中的子查询" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><p>在CASE表达式中使用单列子查询：</p><p>题目：显式员工的employee_id,last_name和location。其中，若员工department_id与location_id为1800 的department_id相同，则location为’Canada’，其余则为’USA’。</p><pre><code class="language-mysql">SELECT employee_id, last_name,
+(CASE department_id
+WHEN
+(SELECT department_id FROM departments
+WHERE location_id = 1800)
+THEN 'Canada' ELSE 'USA' END) location
+FROM employees;
+</code></pre><h3 id="25-子查询中的空值问题">2.5 子查询中的空值问题<a href="#25-子查询中的空值问题" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><pre><code class="language-mysql">SELECT last_name, job_id
+FROM employees
+WHERE job_id =
+    (SELECT job_id
+    FROM employees
+    WHERE last_name = 'Haas');
+    
+Empty set
+</code></pre><p><code class="language-plaintext highlighter-rouge">子查询不返回任何行</code></p><h3 id="26-非法使用子查询">2.6 非法使用子查询<a href="#26-非法使用子查询" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><pre><code class="language-mysql">SELECT employee_id, last_name
+FROM employees
+WHERE salary =
+    (SELECT MIN(salary)
+    FROM employees
+    GROUP BY department_id);
+</code></pre><p><code class="language-plaintext highlighter-rouge">多行子查询使用单行比较符</code></p><h2 id="3-多行子查询">3. 多行子查询<a href="#3-多行子查询" class="anchor"><i class="fas fa-hashtag"></i></a></h2></h2><p>也称为集合比较子查询</p><ul><li>内查询返回多行<li>使用多行比较操作符</ul><h3 id="31-多行比较操作符">3.1 多行比较操作符<a href="#31-多行比较操作符" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><div class="table-wrapper"><table><thead><tr><th>操作符<th>说明<tbody><tr><td>IN<td>等于列表中任意一个<tr><td>ANY<td>需要和单行比较操作符一起使用，和子查询返回的<strong>某一个值比较</strong><tr><td>ALL<td>需要和单行比较操作符一起使用，和子查询返回的所有值比较<tr><td>SOME<td>实际上是ANY的别名，作用相同，一般常使用ANY</table></div><p><code class="language-plaintext highlighter-rouge">体会 ANY 和 ALL 的区别</code></p><h3 id="32-代码示例">3.2 代码示例<a href="#32-代码示例" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><p>题目：返回<code class="language-plaintext highlighter-rouge">其它job_id</code>中比<code class="language-plaintext highlighter-rouge">job_id</code>为<code class="language-plaintext highlighter-rouge">IT_PROG</code>部门任一工资低的员工的员工号、姓名、job_id 以及salary</p><p><img data-src="../../assets/images/20210609MysqlSubquery/image-20220516110650870.png" alt="image-20220516110650870" data-proofer-ignore></p><pre><code class="language-mysql">SELECT employee_id,last_name,job_id,salary
+FROM employees
+WHERE salary &lt;ANY(
+		SELECT salary 
+    	FROM employees
+    	WHERE job_id = 'IT_PROG'
+)
+AND job_id &lt;&gt; 'IT_PROG';
+
++-------------+-------------+------------+--------+
+| employee_id | last_name   | job_id     | salary |
++-------------+-------------+------------+--------+
+|         110 | Chen        | FI_ACCOUNT |   8200 |
+|         111 | Sciarra     | FI_ACCOUNT |   7700 |
+|         112 | Urman       | FI_ACCOUNT |   7800 |
+|         113 | Popp        | FI_ACCOUNT |   6900 |
+|         115 | Khoo        | PU_CLERK   |   3100 |
+|         116 | Baida       | PU_CLERK   |   2900 |
+|         117 | Tobias      | PU_CLERK   |   2800 |
+|         118 | Himuro      | PU_CLERK   |   2600 |
+|         119 | Colmenares  | PU_CLERK   |   2500 |
+|         120 | Weiss       | ST_MAN     |   8000 |
+|         121 | Fripp       | ST_MAN     |   8200 |
+|         122 | Kaufling    | ST_MAN     |   7900 |
+|         123 | Vollman     | ST_MAN     |   6500 |
+|         124 | Mourgos     | ST_MAN     |   5800 |
+|         125 | Nayer       | ST_CLERK   |   3200 |
+|         126 | Mikkilineni | ST_CLERK   |   2700 |
+|         127 | Landry      | ST_CLERK   |   2400 |
+|         128 | Markle      | ST_CLERK   |   2200 |
+|         129 | Bissot      | ST_CLERK   |   3300 |
+|         130 | Atkinson    | ST_CLERK   |   2800 |
+|         131 | Marlow      | ST_CLERK   |   2500 |
+|         132 | Olson       | ST_CLERK   |   2100 |
+|         133 | Mallin      | ST_CLERK   |   3300 |
+|         134 | Rogers      | ST_CLERK   |   2900 |
+|         135 | Gee         | ST_CLERK   |   2400 |
+|         136 | Philtanker  | ST_CLERK   |   2200 |
+|         137 | Ladwig      | ST_CLERK   |   3600 |
+|         138 | Stiles      | ST_CLERK   |   3200 |
+|         139 | Seo         | ST_CLERK   |   2700 |
+|         140 | Patel       | ST_CLERK   |   2500 |
+|         141 | Rajs        | ST_CLERK   |   3500 |
+|         142 | Davies      | ST_CLERK   |   3100 |
+|         143 | Matos       | ST_CLERK   |   2600 |
+|         144 | Vargas      | ST_CLERK   |   2500 |
+|         153 | Olsen       | SA_REP     |   8000 |
+|         154 | Cambrault   | SA_REP     |   7500 |
+|         155 | Tuvault     | SA_REP     |   7000 |
+|         159 | Smith       | SA_REP     |   8000 |
+|         160 | Doran       | SA_REP     |   7500 |
+|         161 | Sewall      | SA_REP     |   7000 |
+|         164 | Marvins     | SA_REP     |   7200 |
+|         165 | Lee         | SA_REP     |   6800 |
+|         166 | Ande        | SA_REP     |   6400 |
+|         167 | Banda       | SA_REP     |   6200 |
+|         171 | Smith       | SA_REP     |   7400 |
+|         172 | Bates       | SA_REP     |   7300 |
+|         173 | Kumar       | SA_REP     |   6100 |
+|         175 | Hutton      | SA_REP     |   8800 |
+|         176 | Taylor      | SA_REP     |   8600 |
+|         177 | Livingston  | SA_REP     |   8400 |
+|         178 | Grant       | SA_REP     |   7000 |
+|         179 | Johnson     | SA_REP     |   6200 |
+|         180 | Taylor      | SH_CLERK   |   3200 |
+|         181 | Fleaur      | SH_CLERK   |   3100 |
+|         182 | Sullivan    | SH_CLERK   |   2500 |
+|         183 | Geoni       | SH_CLERK   |   2800 |
+|         184 | Sarchand    | SH_CLERK   |   4200 |
+|         185 | Bull        | SH_CLERK   |   4100 |
+|         186 | Dellinger   | SH_CLERK   |   3400 |
+|         187 | Cabrio      | SH_CLERK   |   3000 |
+|         188 | Chung       | SH_CLERK   |   3800 |
+|         189 | Dilly       | SH_CLERK   |   3600 |
+|         190 | Gates       | SH_CLERK   |   2900 |
+|         191 | Perkins     | SH_CLERK   |   2500 |
+|         192 | Bell        | SH_CLERK   |   4000 |
+|         193 | Everett     | SH_CLERK   |   3900 |
+|         194 | McCain      | SH_CLERK   |   3200 |
+|         195 | Jones       | SH_CLERK   |   2800 |
+|         196 | Walsh       | SH_CLERK   |   3100 |
+|         197 | Feeney      | SH_CLERK   |   3000 |
+|         198 | OConnell    | SH_CLERK   |   2600 |
+|         199 | Grant       | SH_CLERK   |   2600 |
+|         200 | Whalen      | AD_ASST    |   4400 |
+|         202 | Fay         | MK_REP     |   6000 |
+|         203 | Mavris      | HR_REP     |   6500 |
+|         206 | Gietz       | AC_ACCOUNT |   8300 |
++-------------+-------------+------------+--------+
+76 rows in set
+</code></pre><p>题目：返回其它job_id中比job_id为‘IT_PROG’部门所有工资都低的员工的员工号、姓名、job_id以及 salary</p><p><img data-src="../../assets/images/20210609MysqlSubquery/image-20220516111022300.png" alt="image-20220516111022300" data-proofer-ignore></p><pre><code class="language-MYSQL">SELECT employee_id ,last_name,job_id,salary
+FROM employees 
+WHERE salary &lt;ALL
+			(SELECT salary
+            FROM employees
+            WHERE job_id = 'IT_PROG')
+            AND job_id &lt;&gt; 'IT_PROG';
+           
++-------------+-------------+----------+--------+
+| employee_id | last_name   | job_id   | salary |
++-------------+-------------+----------+--------+
+|         115 | Khoo        | PU_CLERK |   3100 |
+|         116 | Baida       | PU_CLERK |   2900 |
+|         117 | Tobias      | PU_CLERK |   2800 |
+|         118 | Himuro      | PU_CLERK |   2600 |
+|         119 | Colmenares  | PU_CLERK |   2500 |
+|         125 | Nayer       | ST_CLERK |   3200 |
+|         126 | Mikkilineni | ST_CLERK |   2700 |
+|         127 | Landry      | ST_CLERK |   2400 |
+|         128 | Markle      | ST_CLERK |   2200 |
+|         129 | Bissot      | ST_CLERK |   3300 |
+|         130 | Atkinson    | ST_CLERK |   2800 |
+|         131 | Marlow      | ST_CLERK |   2500 |
+|         132 | Olson       | ST_CLERK |   2100 |
+|         133 | Mallin      | ST_CLERK |   3300 |
+|         134 | Rogers      | ST_CLERK |   2900 |
+|         135 | Gee         | ST_CLERK |   2400 |
+|         136 | Philtanker  | ST_CLERK |   2200 |
+|         137 | Ladwig      | ST_CLERK |   3600 |
+|         138 | Stiles      | ST_CLERK |   3200 |
+|         139 | Seo         | ST_CLERK |   2700 |
+|         140 | Patel       | ST_CLERK |   2500 |
+|         141 | Rajs        | ST_CLERK |   3500 |
+|         142 | Davies      | ST_CLERK |   3100 |
+|         143 | Matos       | ST_CLERK |   2600 |
+|         144 | Vargas      | ST_CLERK |   2500 |
+|         180 | Taylor      | SH_CLERK |   3200 |
+|         181 | Fleaur      | SH_CLERK |   3100 |
+|         182 | Sullivan    | SH_CLERK |   2500 |
+|         183 | Geoni       | SH_CLERK |   2800 |
+|         185 | Bull        | SH_CLERK |   4100 |
+|         186 | Dellinger   | SH_CLERK |   3400 |
+|         187 | Cabrio      | SH_CLERK |   3000 |
+|         188 | Chung       | SH_CLERK |   3800 |
+|         189 | Dilly       | SH_CLERK |   3600 |
+|         190 | Gates       | SH_CLERK |   2900 |
+|         191 | Perkins     | SH_CLERK |   2500 |
+|         192 | Bell        | SH_CLERK |   4000 |
+|         193 | Everett     | SH_CLERK |   3900 |
+|         194 | McCain      | SH_CLERK |   3200 |
+|         195 | Jones       | SH_CLERK |   2800 |
+|         196 | Walsh       | SH_CLERK |   3100 |
+|         197 | Feeney      | SH_CLERK |   3000 |
+|         198 | OConnell    | SH_CLERK |   2600 |
+|         199 | Grant       | SH_CLERK |   2600 |
++-------------+-------------+----------+--------+
+44 rows in set
+</code></pre><p>题目：查询平均工资最低的部门id</p><pre><code class="language-mysql">#方式1：
+SELECT department_id
+FROM employees
+GROUP BY department_id
+HAVING AVG(salary) = (
+SELECT MIN(avg_sal)
+FROM (
+        SELECT AVG(salary) avg_sal
+        FROM employees
+        GROUP BY department_id
+    ) dept_avg_sal
+)
+</code></pre><pre><code class="language-mysql">#方式2：
+SELECT department_id
+FROM employees
+GROUP BY department_id
+HAVING AVG(salary) &lt;= ALL (
+        SELECT AVG(salary) avg_sal
+        FROM employees
+        GROUP BY department_id
+);
+
++---------------+
+| department_id |
++---------------+
+|            50 |
++---------------+
+1 row in set
+</code></pre><h3 id="33-空值问题">3.3 空值问题<a href="#33-空值问题" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><pre><code class="language-mysql">SELECT last_name
+FROM employees
+WHERE employee_id NOT IN (
+    SELECT manager_id
+    FROM employees
+);
+
+Empty set
+</code></pre><h2 id="4-相关子查询">4. 相关子查询<a href="#4-相关子查询" class="anchor"><i class="fas fa-hashtag"></i></a></h2></h2><h3 id="41-相关子查询执行流程">4.1 相关子查询执行流程<a href="#41-相关子查询执行流程" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><p>​ 如果子查询的执行依赖于外部查询，通常情况下都是因为子查询中的表用到了外部的表，并进行了条件关联，因此每执行一次外部查询，子查询都要重新计算一次，这样的子查询就称之为 关联子查询 。</p><p>​ 相关子查询按照一行接一行的顺序执行，主查询的每一行都执行一次子查询。</p><p><img data-src="../../assets/images/20210609MysqlSubquery/image-20220516112434650.png" alt="image-20220516112434650" data-proofer-ignore></p><p><img data-src="../../assets/images/20210609MysqlSubquery/image-20220516112659994.png" alt="image-20220516112659994" data-proofer-ignore></p><p>说明：子查询中使用主查询中的列</p><h3 id="42-代码示例">4.2 代码示例<a href="#42-代码示例" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><p>题目：查询员工中，工资大于本部门平均工资的员工的<code class="language-plaintext highlighter-rouge">last_name,salary</code>和其<code class="language-plaintext highlighter-rouge">department_id </code></p><p>方式一：相关子查询</p><p><img data-src="../../assets/images/20210609MysqlSubquery/image-20220516112732480.png" alt="image-20220516112732480" data-proofer-ignore></p><p>方式二：在 FROM 中使用子查询</p><pre><code class="language-mysql">SELECT last_name,salary,e1.department_id
+FROM employees e1,(
+    SELECT department_id,AVG(salary) dept_avg_sal 
+    FROM employees 
+    GROUP BY department_id) e2
+WHERE e1.`department_id` = e2.department_id
+AND e2.dept_avg_sal &lt; e1.`salary`;
+</code></pre><p><code class="language-plaintext highlighter-rouge">from型的子查询：子查询是作为from的一部分，子查询要用()引起来，并且要给这个子查询取别名， 把它当成一张“临时的虚拟的表”来使用。</code></p><p>在ORDER BY 中使用子查询：</p><p><strong>题目：查询员工的id,salary,按照department_name 排序</strong></p><pre><code class="language-mysql">SELECT employee_id,salary
+FROM employees e
+ORDER BY (
+    SELECT department_name
+    FROM departments d
+    WHERE e.`department_id` = d.`department_id`
+) ASC;
+</code></pre><p><strong>题目：若employees表中employee_id与job_history表中employee_id相同的数目不小于2，输出这些相同 id的员工的employee_id,last_name和其job_id</strong></p><pre><code class="language-mysql">SELECT e.employee_id, last_name,e.job_id
+FROM employees e
+WHERE 2 &lt;= (SELECT COUNT(*)
+            FROM job_history
+            WHERE employee_id = e.employee_id);
+       
++-------------+-----------+---------+
+| employee_id | last_name | job_id  |
++-------------+-----------+---------+
+|         101 | Kochhar   | AD_VP   |
+|         176 | Taylor    | SA_REP  |
+|         200 | Whalen    | AD_ASST |
++-------------+-----------+---------+
+3 rows in set
+</code></pre><h3 id="43-exists-与-not-exists关键字">4.3 EXISTS 与 NOT EXISTS关键字<a href="#43-exists-与-not-exists关键字" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><ul><li><p>关联子查询通常也会和 EXISTS操作符一起来使用，用来检查在子查询中是否存在满足条件的行。</p><li><p>如果在子查询中不存在满足条件的行：</p><ul><li>条件返回 FALSE<li>继续在子查询中查找</ul><li><p>如果在子查询中存在满足条件的行：</p><ul><li>不在子查询中继续查找<li>条件返回 TRUE</ul><p>NOT EXISTS关键字表示如果不存在某种条件，则返回TRUE，否则返回FALSE。</p></ul><p><strong>题目：查询公司管理者的employee_id，last_name，job_id，department_id信息</strong></p><p>方法一：</p><pre><code class="language-mysql">SELECT employee_id, last_name, job_id, department_id
+FROM employees e1
+WHERE EXISTS ( SELECT *
+            FROM employees e2
+            WHERE e2.manager_id =
+            e1.employee_id);
+</code></pre><p>方式二：自连接</p><pre><code class="language-mysql">SELECT DISTINCT e1.employee_id, e1.last_name, e1.job_id, e1.department_id
+FROM employees e1 JOIN employees e2
+WHERE e1.employee_id = e2.manager_id;
+</code></pre><p>方式三：</p><pre><code class="language-mysql">SELECT employee_id,last_name,job_id,department_id
+FROM employees
+        WHERE employee_id IN (
+        SELECT DISTINCT manager_id
+        FROM employees
+);
+</code></pre><p><strong>题目：查询departments表中，不存在于employees表中的部门的department_id和department_name</strong></p><pre><code class="language-mysql">SELECT department_id, department_name
+FROM departments d
+WHERE NOT EXISTS (SELECT 'X'
+                    FROM employees
+                    WHERE department_id = d.department_id);
+</code></pre><h2 id="5课后习题">5.课后习题<a href="#5课后习题" class="anchor"><i class="fas fa-hashtag"></i></a></h2></h2><ol><li>查询和Zlotkey相同部门的员工姓名和工资</ol><pre><code class="language-mysql">SELECT last_name ,salary,department_id
+FROM employees e
+WHERE e.department_id IN (SELECT department_id
+                        FROM employees
+                        WHERE last_name = 'Zlotkey');
+                        
++------------+--------+---------------+
+| last_name  | salary | department_id |
++------------+--------+---------------+
+| Russell    |  14000 |            80 |
+| Partners   |  13500 |            80 |
+| Errazuriz  |  12000 |            80 |
+| Cambrault  |  11000 |            80 |
+| Zlotkey    |  10500 |            80 |
+| Tucker     |  10000 |            80 |
+| Bernstein  |   9500 |            80 |
+| Hall       |   9000 |            80 |
+| Olsen      |   8000 |            80 |
+| Cambrault  |   7500 |            80 |
+| Tuvault    |   7000 |            80 |
+| King       |  10000 |            80 |
+| Sully      |   9500 |            80 |
+| McEwen     |   9000 |            80 |
+| Smith      |   8000 |            80 |
+| Doran      |   7500 |            80 |
+| Sewall     |   7000 |            80 |
+| Vishney    |  10500 |            80 |
+| Greene     |   9500 |            80 |
+| Marvins    |   7200 |            80 |
+| Lee        |   6800 |            80 |
+| Ande       |   6400 |            80 |
+| Banda      |   6200 |            80 |
+| Ozer       |  11500 |            80 |
+| Bloom      |  10000 |            80 |
+| Fox        |   9600 |            80 |
+| Smith      |   7400 |            80 |
+| Bates      |   7300 |            80 |
+| Kumar      |   6100 |            80 |
+| Abel       |  11000 |            80 |
+| Hutton     |   8800 |            80 |
+| Taylor     |   8600 |            80 |
+| Livingston |   8400 |            80 |
+| Johnson    |   6200 |            80 |
++------------+--------+---------------+
+</code></pre><ol><li>查询工资比公司平均工资高的员工的员工号、姓名和工资</ol><pre><code class="language-mysql">SELECT employee_id ,last_name,salary
+FROM employees
+WHERE salary &gt;(
+    SELECT AVG(salary)
+    FROM employees
+);
+
++-------------+------------+--------+
+| employee_id | last_name  | salary |
++-------------+------------+--------+
+|         100 | King       |  24000 |
+|         101 | Kochhar    |  17000 |
+|         102 | De Haan    |  17000 |
+|         103 | Hunold     |   9000 |
+|         108 | Greenberg  |  12000 |
+|         109 | Faviet     |   9000 |
+|         110 | Chen       |   8200 |
+|         111 | Sciarra    |   7700 |
+|         112 | Urman      |   7800 |
+|         113 | Popp       |   6900 |
+|         114 | Raphaely   |  11000 |
+|         120 | Weiss      |   8000 |
+|         121 | Fripp      |   8200 |
+|         122 | Kaufling   |   7900 |
+|         123 | Vollman    |   6500 |
+|         145 | Russell    |  14000 |
+|         146 | Partners   |  13500 |
+|         147 | Errazuriz  |  12000 |
+|         148 | Cambrault  |  11000 |
+|         149 | Zlotkey    |  10500 |
+|         150 | Tucker     |  10000 |
+|         151 | Bernstein  |   9500 |
+|         152 | Hall       |   9000 |
+|         153 | Olsen      |   8000 |
+|         154 | Cambrault  |   7500 |
+|         155 | Tuvault    |   7000 |
+|         156 | King       |  10000 |
+|         157 | Sully      |   9500 |
+|         158 | McEwen     |   9000 |
+|         159 | Smith      |   8000 |
+|         160 | Doran      |   7500 |
+|         161 | Sewall     |   7000 |
+|         162 | Vishney    |  10500 |
+|         163 | Greene     |   9500 |
+|         164 | Marvins    |   7200 |
+|         165 | Lee        |   6800 |
+|         168 | Ozer       |  11500 |
+|         169 | Bloom      |  10000 |
+|         170 | Fox        |   9600 |
+|         171 | Smith      |   7400 |
+|         172 | Bates      |   7300 |
+|         174 | Abel       |  11000 |
+|         175 | Hutton     |   8800 |
+|         176 | Taylor     |   8600 |
+|         177 | Livingston |   8400 |
+|         178 | Grant      |   7000 |
+|         201 | Hartstein  |  13000 |
+|         203 | Mavris     |   6500 |
+|         204 | Baer       |  10000 |
+|         205 | Higgins    |  12000 |
+|         206 | Gietz      |   8300 |
++-------------+------------+--------+
+51 rows in set
+</code></pre><ol><li>选择工资大于所有<code class="language-plaintext highlighter-rouge">JOB_ID = 'SA_MAN'</code>的员工工资的员工的last_name，job_id，salary</ol><pre><code class="language-mysql">SELECT last_name,job_id,salary
+FROM employees
+WHERE salary &gt; ALL (
+    SELECT salary 
+    FROM employees 
+    WHERE job_id = 'SA_MAN'
+)
+
++-----------+---------+--------+
+| last_name | job_id  | salary |
++-----------+---------+--------+
+| King      | AD_PRES |  24000 |
+| Kochhar   | AD_VP   |  17000 |
+| De Haan   | AD_VP   |  17000 |
++-----------+---------+--------+
+3 rows in set
+</code></pre><ol><li>查询和姓名中包含字母u的员工在相同部门的员工的员工号、姓名</ol><pre><code class="language-mysql">SELECT employee_id,last_name
+FROM employees 
+WHERE department_id IN (
+    SELECT department_id
+    FROM employees
+    WHERE last_name LIKE "%u%"
+) ;
+
++-------------+-------------+
+| employee_id | last_name   |
++-------------+-------------+
+|         103 | Hunold      |
+|         104 | Ernst       |
+|         105 | Austin      |
+|         106 | Pataballa   |
+|         107 | Lorentz     |
+|         108 | Greenberg   |
+|         109 | Faviet      |
+|         110 | Chen        |
+|         111 | Sciarra     |
+|         112 | Urman       |
+|         113 | Popp        |
+|         114 | Raphaely    |
+|         115 | Khoo        |
+|         116 | Baida       |
+|         117 | Tobias      |
+|         118 | Himuro      |
+|         119 | Colmenares  |
+|         120 | Weiss       |
+|         121 | Fripp       |
+|         122 | Kaufling    |
+|         123 | Vollman     |
+|         124 | Mourgos     |
+|         125 | Nayer       |
+|         126 | Mikkilineni |
+|         127 | Landry      |
+|         128 | Markle      |
+|         129 | Bissot      |
+|         130 | Atkinson    |
+|         131 | Marlow      |
+|         132 | Olson       |
+|         133 | Mallin      |
+|         134 | Rogers      |
+|         135 | Gee         |
+|         136 | Philtanker  |
+|         137 | Ladwig      |
+|         138 | Stiles      |
+|         139 | Seo         |
+|         140 | Patel       |
+|         141 | Rajs        |
+|         142 | Davies      |
+|         143 | Matos       |
+|         144 | Vargas      |
+|         180 | Taylor      |
+|         181 | Fleaur      |
+|         182 | Sullivan    |
+|         183 | Geoni       |
+|         184 | Sarchand    |
+|         185 | Bull        |
+|         186 | Dellinger   |
+|         187 | Cabrio      |
+|         188 | Chung       |
+|         189 | Dilly       |
+|         190 | Gates       |
+|         191 | Perkins     |
+|         192 | Bell        |
+|         193 | Everett     |
+|         194 | McCain      |
+|         195 | Jones       |
+|         196 | Walsh       |
+|         197 | Feeney      |
+|         198 | OConnell    |
+|         199 | Grant       |
+|         145 | Russell     |
+|         146 | Partners    |
+|         147 | Errazuriz   |
+|         148 | Cambrault   |
+|         149 | Zlotkey     |
+|         150 | Tucker      |
+|         151 | Bernstein   |
+|         152 | Hall        |
+|         153 | Olsen       |
+|         154 | Cambrault   |
+|         155 | Tuvault     |
+|         156 | King        |
+|         157 | Sully       |
+|         158 | McEwen      |
+|         159 | Smith       |
+|         160 | Doran       |
+|         161 | Sewall      |
+|         162 | Vishney     |
+|         163 | Greene      |
+|         164 | Marvins     |
+|         165 | Lee         |
+|         166 | Ande        |
+|         167 | Banda       |
+|         168 | Ozer        |
+|         169 | Bloom       |
+|         170 | Fox         |
+|         171 | Smith       |
+|         172 | Bates       |
+|         173 | Kumar       |
+|         174 | Abel        |
+|         175 | Hutton      |
+|         176 | Taylor      |
+|         177 | Livingston  |
+|         179 | Johnson     |
++-------------+-------------+
+96 rows in set
+</code></pre><ol><li>查询在部门的location_id为1700的部门工作的员工的员工号</ol><pre><code class="language-mysql">SELECT employee_id
+FROM employees
+WHERE department_id IN (
+    SELECT department_id 
+    FROM departments
+    WHERE location_id =1700
+);
+
++-------------+
+| employee_id |
++-------------+
+|         200 |
+|         114 |
+|         115 |
+|         116 |
+|         117 |
+|         118 |
+|         119 |
+|         100 |
+|         101 |
+|         102 |
+|         108 |
+|         109 |
+|         110 |
+|         111 |
+|         112 |
+|         113 |
+|         205 |
+|         206 |
++-------------+
+18 rows in set
+</code></pre><ol><li>查询管理者为King的手下员工的员工姓名和工资</ol><pre><code class="language-mysql">SELECT last_name,salary
+FROM employees
+WHERE manager_id IN  (
+	SELECT employee_id
+    FROM employees
+    WHERE last_name = 'King'
+);
+
++-----------+--------+
+| last_name | salary |
++-----------+--------+
+| Kochhar   |  17000 |
+| De Haan   |  17000 |
+| Raphaely  |  11000 |
+| Weiss     |   8000 |
+| Fripp     |   8200 |
+| Kaufling  |   7900 |
+| Vollman   |   6500 |
+| Mourgos   |   5800 |
+| Russell   |  14000 |
+| Partners  |  13500 |
+| Errazuriz |  12000 |
+| Cambrault |  11000 |
+| Zlotkey   |  10500 |
+| Hartstein |  13000 |
++-----------+--------+
+14 rows in set
+</code></pre><ol><li>查询工资最低的员工信息：last_name，salary</ol><pre><code class="language-mysql">SELECT last_name,salary
+FROM employees
+WHERE salary =(
+	SELECT MIN(salary)
+    FROM employees
+);
+
++-----------+--------+
+| last_name | salary |
++-----------+--------+
+| Olson     |   2100 |
++-----------+--------+
+1 row in set
+</code></pre><ol><li>查询平均工资最低的部门信息</ol><pre><code class="language-mysql">SELECT * 
+FROM departments
+WHERE department_id = 
+                    (SELECT department_id
+                     FROM employees
+                     GROUP BY department_id
+                     HAVING AVG(salary)&lt;= ALL (SELECT AVG(salary)
+                                               FROM employees
+                                               GROUP BY department_id));
+                                               
++---------------+-----------------+------------+-------------+
+| department_id | department_name | manager_id | location_id |
++---------------+-----------------+------------+-------------+
+|            50 | Shipping        |        121 |        1500 |
++---------------+-----------------+------------+-------------+
+1 row in set
+</code></pre><ol><li>查询平均工资最低的部门信息和该部门的平均工资</ol><pre><code class="language-mysql">
+SELECT d.*,(SELECT AVG(salary) FROM employees WHERE department_id = d.`department_id`) avg_sal
+FROM departments d
+WHERE department_id = 
+                    (SELECT department_id
+                     FROM employees
+                     GROUP BY department_id
+                     HAVING AVG(salary)&lt;= ALL (SELECT AVG(salary)
+                                               FROM employees
+                                               GROUP BY department_id));
+                                              
++---------------+-----------------+------------+-------------+-------------+
+| department_id | department_name | manager_id | location_id | avg_sal     |
++---------------+-----------------+------------+-------------+-------------+
+|            50 | Shipping        |        121 |        1500 | 3475.555556 |
++---------------+-----------------+------------+-------------+-------------+
+1 row in set
+</code></pre><p>10.查询平均工资最高的job信息</p><pre><code class="language-mysql">SELECT * 
+FROM jobs
+WHERE job_id = (
+    SELECT job_id
+    FROM employees
+    GROUP BY job_id
+    HAVING AVG(salary) = (SELECT MAX(avg_sal)
+                          FROM (SELECT AVG(salary) avg_sal
+                                FROM employees 
+                                GROUP BY (job_id)) t ));
+
++---------+-----------+------------+------------+
+| job_id  | job_title | min_salary | max_salary |
++---------+-----------+------------+------------+
+| AD_PRES | President |      20000 |      40000 |
++---------+-----------+------------+------------+
+1 row in set                          
+</code></pre><ol><li>查询平均工资高于公司平均工资的部门有哪些？</ol><pre><code class="language-mysql">SELECT department_id 
+FROM employees 
+WHERE  department_id IS NOT NULL
+GROUP BY department_id
+HAVING AVG(salary) &gt;  (SELECT AVG(salary)
+                FROM employees 
+               );
+
++---------------+
+| department_id |
++---------------+
+|            20 |
+|            40 |
+|            70 |
+|            80 |
+|            90 |
+|           100 |
+|           110 |
++---------------+
+7 rows in set
+</code></pre><ol><li>查询公司中所有manager的详细信息</ol><pre><code class="language-mysql">SELECT last_name,employee_id,job_id,department_id 
+FROM employees
+WHERE employee_id IN (SELECT DISTINCT manager_id 
+                     FROM employees);
++-----------+-------------+---------+---------------+
+| last_name | employee_id | job_id  | department_id |
++-----------+-------------+---------+---------------+
+| King      |         100 | AD_PRES |            90 |
+| Kochhar   |         101 | AD_VP   |            90 |
+| De Haan   |         102 | AD_VP   |            90 |
+| Hunold    |         103 | IT_PROG |            60 |
+| Greenberg |         108 | FI_MGR  |           100 |
+| Raphaely  |         114 | PU_MAN  |            30 |
+| Weiss     |         120 | ST_MAN  |            50 |
+| Fripp     |         121 | ST_MAN  |            50 |
+| Kaufling  |         122 | ST_MAN  |            50 |
+| Vollman   |         123 | ST_MAN  |            50 |
+| Mourgos   |         124 | ST_MAN  |            50 |
+| Russell   |         145 | SA_MAN  |            80 |
+| Partners  |         146 | SA_MAN  |            80 |
+| Errazuriz |         147 | SA_MAN  |            80 |
+| Cambrault |         148 | SA_MAN  |            80 |
+| Zlotkey   |         149 | SA_MAN  |            80 |
+| Hartstein |         201 | MK_MAN  |            20 |
+| Higgins   |         205 | AC_MGR  |           110 |
++-----------+-------------+---------+---------------+
+18 rows in set                     
+</code></pre><ol><li>比较每个部门的最高工资，找出其中的最低工资是多少?</ol><pre><code class="language-mysql">SELECT department_id
+FROM employees 
+GROUP BY department_id 
+HAVING MAX(salary) = (SELECT MIN(max_sal)
+                      FROM
+                      (SELECT MAX(salary) max_sal
+                       FROM employees
+                       GROUP BY department_id) t);
+</code></pre><ol><li>查询平均工资最高的部门，其manager的详细信息：last_name，department_id，email，salary</ol><pre><code class="language-mysql">SELECT last_name,department_id,email,salary
+FROM employees
+WHERE employee_id  IN (
+    SELECT DISTINCT manager_id 
+    FROM employees
+    WHERE department_id = (
+        SELECT department_id
+        FROM employees
+        GROUP BY department_id
+        HAVING AVG(salary) = (SELECT MAX(avg_sal)
+                              FROM (
+                                  SELECT AVG(salary) avg_sal
+                                  FROM employees e
+                                  GROUP BY department_id 
+                              ) t)));
++-----------+---------------+-------+--------+
+| last_name | department_id | email | salary |
++-----------+---------------+-------+--------+
+| King      |            90 | SKING |  24000 |
++-----------+---------------+-------+--------+
+1 row in set                              
+</code></pre><ol><li>查询部门的部门号，其中不包括<code class="language-plaintext highlighter-rouge">job_id</code>为<code class="language-plaintext highlighter-rouge">ST_CLERK</code>的部门号</ol><pre><code class="language-mysql">SELECT department_id
+FROM departments
+WHERE department_id NOT IN (
+    SELECT DISTINCT department_id
+    FROM employees
+    WHERE job_id = "ST_CLERK");
+    
++---------------+
+| department_id |
++---------------+
+|            10 |
+|            20 |
+|            30 |
+|            40 |
+|            60 |
+|            70 |
+|            80 |
+|            90 |
+|           100 |
+|           110 |
+|           120 |
+|           130 |
+|           140 |
+|           150 |
+|           160 |
+|           170 |
+|           180 |
+|           190 |
+|           200 |
+|           210 |
+|           220 |
+|           230 |
+|           240 |
+|           250 |
+|           260 |
+|           270 |
++---------------+
+26 rows in set    
+</code></pre><ol><li>选择所有没有管理者员工的last_name</ol><pre><code class="language-mysql">SELECT last_name 
+FROM employees
+WHERE manager_id  IS NULL;
+
++-----------+
+| last_name |
++-----------+
+| King      |
++-----------+
+1 row in set
+</code></pre><ol><li>查询员工号、姓名、雇佣时间、工资，其中员工的管理者为<code class="language-plaintext highlighter-rouge">De Haan</code></ol><pre><code class="language-mysql">SELECT employee_id ,last_name,hire_date,salary
+FROM employees 
+WHERE manager_id IN(
+    SELECT employee_id 
+    FROM employees
+    WHERE last_name = "De Haan");
+
++-------------+-----------+------------+--------+
+| employee_id | last_name | hire_date  | salary |
++-------------+-----------+------------+--------+
+|         103 | Hunold    | 1990-01-03 |   9000 |
++-------------+-----------+------------+--------+
+1 row in set
+</code></pre><ol><li>查询工资比本部门平均工资高的员工的员工号、姓名、工资（相关子查询）</ol><pre><code class="language-mysql">SELECT employee_id ,last_name,salary
+FROM employees e1
+WHERE salary &gt;(SELECT AVG(salary)
+               FROM employees e2
+               WHERE e1.`department_id` = e2.`department_id`
+              );
+              
++-------------+-----------+--------+
+| employee_id | last_name | salary |
++-------------+-----------+--------+
+|         100 | King      |  24000 |
+|         103 | Hunold    |   9000 |
+|         104 | Ernst     |   6000 |
+|         108 | Greenberg |  12000 |
+|         109 | Faviet    |   9000 |
+|         114 | Raphaely  |  11000 |
+|         120 | Weiss     |   8000 |
+|         121 | Fripp     |   8200 |
+|         122 | Kaufling  |   7900 |
+|         123 | Vollman   |   6500 |
+|         124 | Mourgos   |   5800 |
+|         137 | Ladwig    |   3600 |
+|         141 | Rajs      |   3500 |
+|         145 | Russell   |  14000 |
+|         146 | Partners  |  13500 |
+|         147 | Errazuriz |  12000 |
+|         148 | Cambrault |  11000 |
+|         149 | Zlotkey   |  10500 |
+|         150 | Tucker    |  10000 |
+|         151 | Bernstein |   9500 |
+|         152 | Hall      |   9000 |
+|         156 | King      |  10000 |
+|         157 | Sully     |   9500 |
+|         158 | McEwen    |   9000 |
+|         162 | Vishney   |  10500 |
+|         163 | Greene    |   9500 |
+|         168 | Ozer      |  11500 |
+|         169 | Bloom     |  10000 |
+|         170 | Fox       |   9600 |
+|         174 | Abel      |  11000 |
+|         184 | Sarchand  |   4200 |
+|         185 | Bull      |   4100 |
+|         188 | Chung     |   3800 |
+|         189 | Dilly     |   3600 |
+|         192 | Bell      |   4000 |
+|         193 | Everett   |   3900 |
+|         201 | Hartstein |  13000 |
+|         205 | Higgins   |  12000 |
++-------------+-----------+--------+
+38 rows in set
+</code></pre><ol><li>查询部门人数大于5的部门名称</ol><pre><code class="language-mysql">SELECT department_name
+FROM departments d
+WHERE 5 &lt;(
+    SELECT COUNT(*)
+    FROM employees e
+    WHERE d.department_id = e.department_id
+);
+
++-----------------+
+| department_name |
++-----------------+
+| Purchasing      |
+| Shipping        |
+| Sales           |
+| Finance         |
++-----------------+
+4 rows in set
+</code></pre><ol><li>查询每个国家下的部门个数大于2的国家编号（相关子查询）</ol><pre><code class="language-mysql">SELECT country_id
+FROM locations l
+WHERE 2 &lt;(
+	SELECT COUNT(*)
+    FROM departments d
+    WHERE l.location_id = d.location_id
+);
+
++------------+
+| country_id |
++------------+
+| US         |
++------------+
+1 row in set
+</code></pre><h2 id="参考链接">参考链接<a href="#参考链接" class="anchor"><i class="fas fa-hashtag"></i></a></h2></h2><p>1<a href="https://www.bilibili.com/video/BV1iq4y1u7vj?p=48&amp;spm_id_from=333.33.header_right.history_list.click">MySQL数据库教程天花板，mysql安装到mysql高级，强！硬！</a></p></div><div class="post-tail-wrapper text-muted"><div class="post-meta mb-3"> <i class="far fa-folder-open fa-fw mr-1"></i> <a href='/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/'>数据库</a></div><div class="post-tags"> <i class="fa fa-tags fa-fw mr-1"></i> <a href="/tags/mysql/" class="post-tag no-text-decoration" >MySQL</a></div><div class="post-tail-bottom d-flex justify-content-between align-items-center mt-3 pt-5 pb-2"><div class="license-wrapper"> 本文由作者按照 <a href="https://creativecommons.org/licenses/by/4.0/"> CC BY 4.0 </a> 进行授权</div><div class="share-wrapper"> <span class="share-label text-muted mr-1">分享</span> <span class="share-icons"> <a href="https://twitter.com/intent/tweet?text=MySQL子查询 - Technical Blogs&url=https://carmanzheng.github.io//posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E5%AD%90%E6%9F%A5%E8%AF%A2/" data-toggle="tooltip" data-placement="top" title="Twitter" target="_blank" rel="noopener" aria-label="Twitter"> <i class="fa-fw fab fa-twitter"></i> </a> <a href="https://www.facebook.com/sharer/sharer.php?title=MySQL子查询 - Technical Blogs&u=https://carmanzheng.github.io//posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E5%AD%90%E6%9F%A5%E8%AF%A2/" data-toggle="tooltip" data-placement="top" title="Facebook" target="_blank" rel="noopener" aria-label="Facebook"> <i class="fa-fw fab fa-facebook-square"></i> </a> <a href="https://telegram.me/share?text=MySQL子查询 - Technical Blogs&url=https://carmanzheng.github.io//posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E5%AD%90%E6%9F%A5%E8%AF%A2/" data-toggle="tooltip" data-placement="top" title="Telegram" target="_blank" rel="noopener" aria-label="Telegram"> <i class="fa-fw fab fa-telegram"></i> </a> <i id="copy-link" class="fa-fw fas fa-link small" data-toggle="tooltip" data-placement="top" title="分享链接" title-succeed="链接已复制！"> </i> </span></div></div></div></div></div><div id="panel-wrapper" class="col-xl-3 pl-2 text-muted topbar-down"><div class="access"><div id="access-lastmod" class="post"><div class="panel-heading">最近更新</div><ul class="post-content pl-0 pb-1 ml-1 mt-2"><li><a href="/posts/Kubernetes%E6%A6%82%E8%BF%B0/">Kubernetes</a><li><a href="/posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E7%B4%A2%E5%BC%95%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">MySQL存储引擎</a><li><a href="/posts/Linux%E5%9F%BA%E7%A1%80/">Linux基础</a><li><a href="/posts/Python-%E5%A4%9A%E8%BF%9B%E7%A8%8B%E5%A4%9A%E7%BA%BF%E7%A8%8B/">Python基操-多进程与多线程</a><li><a href="/posts/%E5%89%8D%E7%AB%AF-Vue%E8%B7%AF%E7%94%B1%E4%B8%8EVuex/">前端 Vue路由与vuex</a></ul></div><div id="access-tags"><div class="panel-heading">热门标签</div><div class="d-flex flex-wrap mt-3 mb-1 mr-3"> <a class="post-tag" href="/tags/mysql/">MySQL</a> <a class="post-tag" href="/tags/python%E5%9F%BA%E6%93%8D/">Python基操</a> <a class="post-tag" href="/tags/%E5%89%8D%E7%AB%AFjs/">前端JS</a> <a class="post-tag" href="/tags/%E5%89%8D%E7%AB%AFvue/">前端Vue</a> <a class="post-tag" href="/tags/%E5%89%8D%E7%AB%AFcss/">前端CSS</a> <a class="post-tag" href="/tags/devops/">DevOps</a> <a class="post-tag" href="/tags/linux%E5%9F%BA%E7%A1%80/">Linux基础</a> <a class="post-tag" href="/tags/%E5%89%8D%E7%AB%AFhtml/">前端HTML</a> <a class="post-tag" href="/tags/github/">Github</a> <a class="post-tag" href="/tags/%E5%AE%A2%E6%88%B7%E7%AB%AF%E5%BC%80%E5%8F%91/">客户端开发</a></div></div></div><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@1.0.1/dist/bootstrap-toc.min.js"></script><div id="toc-wrapper" class="pl-0 pr-4 mb-5"><div class="panel-heading pl-3 pt-2 mb-2">文章内容</div><nav id="toc" data-toggle="toc"></nav></div></div></div><div class="row"><div class="col-12 col-lg-11 col-xl-8"><div id="tail-wrapper" class="pl-1 pr-1 pl-sm-2 pr-sm-2 pl-md-4 pr-md-4"><div id="related-posts" class="mt-5 mb-2 mb-sm-4"><h3 class="pt-2 mt-1 mb-4 ml-1" data-toc-skip>相关文章</h3><div class="card-deck mb-4"><div class="card"> <a href="/posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E7%B4%A2%E5%BC%95%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/"><div class="card-body"> <em class="timeago small" date="2021-07-06 00:00:00 +0800" >2021-07-06</em><h3 class="pt-0 mt-1 mb-3" data-toc-skip>MySQL存储引擎</h3><div class="text-muted small"><p> 1.为什么使用索引 假如给数据使用 二叉树 这样的数据结构进行存储，如下图所示 2. 索引及其优缺点 2.1 索引概述 MySQL官方对索引的定义为：索引（Index）是帮助MySQL高效获取数据的数据结构。 索引的本质：索引是数据结构。你可以简单理解为“排好序的快速查找数据结构”，满足特定查找算法。 这些数据结构以某种方式指向数据， 这样就可以在这些数据结构的基础上实现 ...</p></div></div></a></div><div class="card"> <a href="/posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E5%9F%BA%E7%A1%80/"><div class="card-body"> <em class="timeago small" date="2021-06-01 00:00:00 +0800" >2021-06-01</em><h3 class="pt-0 mt-1 mb-3" data-toc-skip>MySQL基础</h3><div class="text-muted small"><p> 1. 数据库功能 ​ 持久化(persistence)：把数据保存到可掉电式存储设备中以供之后使用。大多数情况下，特别是企业级应用，数据持久化意味着将内存中的数据保存到硬盘上加以”固化”，而持久化的实现过程大多 通过各种关系数据库来完成。 ​ 持久化的主要作用是将内存中的数据存储在关系型数据库中，当然也可以存储在磁盘文件、XML数 据文件中。 2.数据库与数据库管理系统 2....</p></div></div></a></div><div class="card"> <a href="/posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E5%AE%89%E8%A3%85/"><div class="card-body"> <em class="timeago small" date="2021-06-02 00:00:00 +0800" >2021-06-02</em><h3 class="pt-0 mt-1 mb-3" data-toc-skip>MySQL安装</h3><div class="text-muted small"><p> 1. 下载软件 官网：https://www.mysql.com 下载地址：https://dev.mysql.com/downloads/windows/installer/8.0.html MySQL Community Server 社区版本，开源免费，自由下载，但不提供官方技术支持，适用于 大多数普通用户。 MySQL Enterprise Edition 企业版本，...</p></div></div></a></div></div></div><div class="post-navigation d-flex justify-content-between"> <a href="/posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E8%81%9A%E5%90%88%E5%87%BD%E6%95%B0/" class="btn btn-outline-primary" prompt="上一篇"><p>MySQL聚合函数</p></a> <a href="/posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E5%88%9B%E5%BB%BA-%E4%BF%AE%E6%94%B9%E4%B8%8E%E5%88%A0%E9%99%A4/" class="btn btn-outline-primary" prompt="下一篇"><p>MySQL创建、修改与删除</p></a></div></div></div></div><footer class="d-flex w-100 justify-content-center"><div class="d-flex justify-content-between align-items-center text-muted"><div class="footer-left"><p class="mb-0"> © 2022 <a href="https://github.com/carmanzheng">carmanzheng</a>. <span data-toggle="tooltip" data-placement="top" title="除非另有说明，本网站上的博客文章均由作者按照知识共享署名 4.0 国际 (CC BY 4.0) 许可协议进行授权。">保留部分权利。</span></p></div><div class="footer-right"><p class="mb-0"> 本站由 <a href="https://jekyllrb.com" target="_blank" rel="noopener">Jekyll</a> 生成，采用 <a href="https://github.com/cotes2020/jekyll-theme-chirpy" target="_blank" rel="noopener">Chirpy</a> 主题。</p></div></div></footer></div><div id="search-result-wrapper" class="d-flex justify-content-center unloaded"><div class="col-12 col-sm-11 post-content"><div id="search-hints"><div id="access-tags"><div class="panel-heading">热门标签</div><div class="d-flex flex-wrap mt-3 mb-1 mr-3"> <a class="post-tag" href="/tags/mysql/">MySQL</a> <a class="post-tag" href="/tags/python%E5%9F%BA%E6%93%8D/">Python基操</a> <a class="post-tag" href="/tags/%E5%89%8D%E7%AB%AFjs/">前端JS</a> <a class="post-tag" href="/tags/%E5%89%8D%E7%AB%AFvue/">前端Vue</a> <a class="post-tag" href="/tags/%E5%89%8D%E7%AB%AFcss/">前端CSS</a> <a class="post-tag" href="/tags/devops/">DevOps</a> <a class="post-tag" href="/tags/linux%E5%9F%BA%E7%A1%80/">Linux基础</a> <a class="post-tag" href="/tags/%E5%89%8D%E7%AB%AFhtml/">前端HTML</a> <a class="post-tag" href="/tags/github/">Github</a> <a class="post-tag" href="/tags/%E5%AE%A2%E6%88%B7%E7%AB%AF%E5%BC%80%E5%8F%91/">客户端开发</a></div></div></div><div id="search-results" class="d-flex flex-wrap justify-content-center text-muted mt-3"></div></div></div></div><div id="mask"></div><a id="back-to-top" href="#" aria-label="back-to-top" class="btn btn-lg btn-box-shadow" role="button"> <i class="fas fa-angle-up"></i> </a> <script src="https://cdn.jsdelivr.net/npm/simple-jekyll-search@1.10.0/dest/simple-jekyll-search.min.js"></script> <script> SimpleJekyllSearch({ searchInput: document.getElementById('search-input'), resultsContainer: document.getElementById('search-results'), json: '/assets/js/data/search.json', searchResultTemplate: '<div class="pl-1 pr-1 pl-sm-2 pr-sm-2 pl-lg-4 pr-lg-4 pl-xl-0 pr-xl-0"> <a href="{url}">{title}</a><div class="post-meta d-flex flex-column flex-sm-row text-muted mt-1 mb-1"> {categories} {tags}</div><p>{snippet}</p></div>', noResultsText: '<p class="mt-5">搜索结果为空</p>', templateMiddleware: function(prop, value, template) { if (prop === 'categories') { if (value === '') { return `${value}`; } else { return `<div class="mr-sm-4"><i class="far fa-folder fa-fw"></i>${value}</div>`; } } if (prop === 'tags') { if (value === '') { return `${value}`; } else { return `<div><i class="fa fa-tag fa-fw"></i>${value}</div>`; } } } }); </script> <script src="https://cdn.jsdelivr.net/combine/npm/lozad/dist/lozad.min.js,npm/magnific-popup@1/dist/jquery.magnific-popup.min.js,npm/clipboard@2/dist/clipboard.min.js"></script> <script defer src="/assets/js/dist/post.min.js"></script> <script src="https://cdn.jsdelivr.net/combine/npm/popper.js@1.16.1,npm/bootstrap@4/dist/js/bootstrap.min.js"></script> <script defer src="/app.js"></script> <script defer src="https://www.googletagmanager.com/gtag/js?id="></script> <script> document.addEventListener("DOMContentLoaded", function(event) { window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', ''); }); </script>

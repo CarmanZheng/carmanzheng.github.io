@@ -1,0 +1,338 @@
+<!DOCTYPE html><html lang="zh-CN" ><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><meta name="day-prompt" content="天前"><meta name="hour-prompt" content="小时前"><meta name="minute-prompt" content="分钟前"><meta name="justnow-prompt" content="刚刚"><meta name="generator" content="Jekyll v4.2.1" /><meta property="og:title" content="MySQL聚合函数" /><meta property="og:locale" content="zh_CN" /><meta name="description" content="​ 我们上一章讲到了 SQL 单行函数。实际上 SQL 函数还有一类，叫做聚合（或聚集、分组）函数，它是对 一组数据进行汇总的函数，输入的是一组数据的集合，输出的是单个值。" /><meta property="og:description" content="​ 我们上一章讲到了 SQL 单行函数。实际上 SQL 函数还有一类，叫做聚合（或聚集、分组）函数，它是对 一组数据进行汇总的函数，输入的是一组数据的集合，输出的是单个值。" /><link rel="canonical" href="https://carmanzheng.github.io//posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E8%81%9A%E5%90%88%E5%87%BD%E6%95%B0/" /><meta property="og:url" content="https://carmanzheng.github.io//posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E8%81%9A%E5%90%88%E5%87%BD%E6%95%B0/" /><meta property="og:site_name" content="Technical Blogs" /><meta property="og:type" content="article" /><meta property="article:published_time" content="2021-06-08T00:00:00+08:00" /><meta name="twitter:card" content="summary" /><meta property="twitter:title" content="MySQL聚合函数" /><meta name="twitter:site" content="@twitter_username" /><meta name="google-site-verification" content="google_meta_tag_verification" /> <script type="application/ld+json"> {"description":"​ 我们上一章讲到了 SQL 单行函数。实际上 SQL 函数还有一类，叫做聚合（或聚集、分组）函数，它是对 一组数据进行汇总的函数，输入的是一组数据的集合，输出的是单个值。","headline":"MySQL聚合函数","dateModified":"2022-05-17T16:51:45+08:00","datePublished":"2021-06-08T00:00:00+08:00","url":"https://carmanzheng.github.io//posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E8%81%9A%E5%90%88%E5%87%BD%E6%95%B0/","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://carmanzheng.github.io//posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E8%81%9A%E5%90%88%E5%87%BD%E6%95%B0/"},"@context":"https://schema.org"}</script><title>MySQL聚合函数 | Technical Blogs</title><link rel="apple-touch-icon" sizes="180x180" href="/assets/img/favicons/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicons/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicons/favicon-16x16.png"><link rel="manifest" href="/assets/img/favicons/site.webmanifest"><link rel="shortcut icon" href="/assets/img/favicons/favicon.ico"><meta name="apple-mobile-web-app-title" content="Technical Blogs"><meta name="application-name" content="Technical Blogs"><meta name="msapplication-TileColor" content="#da532c"><meta name="msapplication-config" content="/assets/img/favicons/browserconfig.xml"><meta name="theme-color" content="#ffffff"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"><link rel="dns-prefetch" href="https://fonts.gstatic.com"><link rel="preconnect" href="https://www.google-analytics.com" crossorigin="use-credentials"><link rel="dns-prefetch" href="https://www.google-analytics.com"><link rel="preconnect" href="https://www.googletagmanager.com" crossorigin="anonymous"><link rel="dns-prefetch" href="https://www.googletagmanager.com"><link rel="preconnect" href="https://cdn.jsdelivr.net"><link rel="dns-prefetch" href="https://cdn.jsdelivr.net"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.11.2/css/all.min.css"><link rel="stylesheet" href="/assets/css/style.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@1.0.1/dist/bootstrap-toc.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/magnific-popup@1.1.0/dist/magnific-popup.min.css"> <script src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script> <script type="text/javascript"> class ModeToggle { static get MODE_KEY() { return "mode"; } static get DARK_MODE() { return "dark"; } static get LIGHT_MODE() { return "light"; } static get ID() { return "mode-toggle"; } constructor() { if (this.hasMode) { if (this.isDarkMode) { if (!this.isSysDarkPrefer) { this.setDark(); } } else { if (this.isSysDarkPrefer) { this.setLight(); } } } let self = this; /* always follow the system prefers */ this.sysDarkPrefers.addEventListener("change", () => { if (self.hasMode) { if (self.isDarkMode) { if (!self.isSysDarkPrefer) { self.setDark(); } } else { if (self.isSysDarkPrefer) { self.setLight(); } } self.clearMode(); } self.notify(); }); } /* constructor() */ get sysDarkPrefers() { return window.matchMedia("(prefers-color-scheme: dark)"); } get isSysDarkPrefer() { return this.sysDarkPrefers.matches; } get isDarkMode() { return this.mode === ModeToggle.DARK_MODE; } get isLightMode() { return this.mode === ModeToggle.LIGHT_MODE; } get hasMode() { return this.mode != null; } get mode() { return sessionStorage.getItem(ModeToggle.MODE_KEY); } /* get the current mode on screen */ get modeStatus() { if (this.isDarkMode || (!this.hasMode && this.isSysDarkPrefer)) { return ModeToggle.DARK_MODE; } else { return ModeToggle.LIGHT_MODE; } } setDark() { $('html').attr(ModeToggle.MODE_KEY, ModeToggle.DARK_MODE); sessionStorage.setItem(ModeToggle.MODE_KEY, ModeToggle.DARK_MODE); } setLight() { $('html').attr(ModeToggle.MODE_KEY, ModeToggle.LIGHT_MODE); sessionStorage.setItem(ModeToggle.MODE_KEY, ModeToggle.LIGHT_MODE); } clearMode() { $('html').removeAttr(ModeToggle.MODE_KEY); sessionStorage.removeItem(ModeToggle.MODE_KEY); } /* Notify another plugins that the theme mode has changed */ notify() { window.postMessage({ direction: ModeToggle.ID, message: this.modeStatus }, "*"); } } /* ModeToggle */ const toggle = new ModeToggle(); function flipMode() { if (toggle.hasMode) { if (toggle.isSysDarkPrefer) { if (toggle.isLightMode) { toggle.clearMode(); } else { toggle.setLight(); } } else { if (toggle.isDarkMode) { toggle.clearMode(); } else { toggle.setDark(); } } } else { if (toggle.isSysDarkPrefer) { toggle.setLight(); } else { toggle.setDark(); } } toggle.notify(); } /* flipMode() */ </script><body data-spy="scroll" data-target="#toc"><div id="sidebar" class="d-flex flex-column align-items-end" lang="zh-CN"><div class="profile-wrapper text-center"><div id="avatar"> <a href="/" alt="avatar" class="mx-auto"> <img src="/assets/img/favicons/android-chrome-192x192.png" alt="avatar" onerror="this.style.display='none'"> </a></div><div class="site-title mt-3"> <a href="/">Technical Blogs</a></div><div class="site-subtitle font-italic">Learning by Doing, Sharing for more!</div></div><ul class="w-100"><li class="nav-item"> <a href="/" class="nav-link"> <i class="fa-fw fas fa-home ml-xl-3 mr-xl-3 unloaded"></i> <span>首页</span> </a><li class="nav-item"> <a href="/categories/" class="nav-link"> <i class="fa-fw fas fa-stream ml-xl-3 mr-xl-3 unloaded"></i> <span>分类</span> </a><li class="nav-item"> <a href="/tags/" class="nav-link"> <i class="fa-fw fas fa-tag ml-xl-3 mr-xl-3 unloaded"></i> <span>标签</span> </a><li class="nav-item"> <a href="/archives/" class="nav-link"> <i class="fa-fw fas fa-archive ml-xl-3 mr-xl-3 unloaded"></i> <span>归档</span> </a><li class="nav-item"> <a href="/about/" class="nav-link"> <i class="fa-fw fas fa-info-circle ml-xl-3 mr-xl-3 unloaded"></i> <span>关于</span> </a></ul><div class="sidebar-bottom mt-auto d-flex flex-wrap justify-content-center align-items-center"> <button class="mode-toggle btn" aria-label="Switch Mode"> <i class="fas fa-adjust"></i> </button> <span class="icon-border"></span> <a href="https://github.com/Carmanzheng" aria-label="github" target="_blank" rel="noopener"> <i class="fab fa-github"></i> </a> <a href="https://twitter.com/twitter_username" aria-label="twitter" target="_blank" rel="noopener"> <i class="fab fa-twitter"></i> </a> <a href=" javascript:location.href = 'mailto:' + ['zhengkan1993','gmail.com'].join('@')" aria-label="email" > <i class="fas fa-envelope"></i> </a> <a href="/feed.xml" aria-label="rss" > <i class="fas fa-rss"></i> </a></div></div><div id="topbar-wrapper" class="row justify-content-center topbar-down"><div id="topbar" class="col-11 d-flex h-100 align-items-center justify-content-between"> <span id="breadcrumb"> <span> <a href="/"> 首页 </a> </span> <span>MySQL聚合函数</span> </span> <i id="sidebar-trigger" class="fas fa-bars fa-fw"></i><div id="topbar-title"> 文章</div><i id="search-trigger" class="fas fa-search fa-fw"></i> <span id="search-wrapper" class="align-items-center"> <i class="fas fa-search fa-fw"></i> <input class="form-control" id="search-input" type="search" aria-label="search" autocomplete="off" placeholder="搜索..."> <i class="fa fa-times-circle fa-fw" id="search-cleaner"></i> </span> <span id="search-cancel" >取消</span></div></div><div id="main-wrapper"><div id="main"><div class="row"><div id="core-wrapper" class="col-12 col-lg-11 col-xl-8"><div class="post pl-1 pr-1 pl-sm-2 pr-sm-2 pl-md-4 pr-md-4"><h1 data-toc-skip>MySQL聚合函数</h1><div class="post-meta text-muted"><div> 作者 <em> <a href="https://github.com/carmanzheng">carmanzheng</a> </em></div><div class="d-flex"><div> <span> 发表于 <em class="timeago" date="2021-06-08 00:00:00 +0800" data-toggle="tooltip" data-placement="bottom" title="2021-06-08, 00:00 +0800" >2021-06-08</em> </span> <span> 更新于 <em class="timeago" date="2022-05-17 16:51:45 +0800 " data-toggle="tooltip" data-placement="bottom" title="2022-05-17, 16:51 +0800" >05-17</em> </span> <span class="readtime" data-toggle="tooltip" data-placement="bottom" title="3892 字"> <em>21 分钟</em>阅读</span></div></div></div><div class="post-content"><p>​ 我们上一章讲到了 SQL 单行函数。实际上 SQL 函数还有一类，叫做聚合（或聚集、分组）函数，它是对 一组数据进行汇总的函数，输入的是一组数据的集合，输出的是单个值。</p><h2 id="1-聚合函数介绍">1. 聚合函数介绍<a href="#1-聚合函数介绍" class="anchor"><i class="fas fa-hashtag"></i></a></h2></h2><h3 id="11-什么是聚合函数">1.1 什么是聚合函数<a href="#11-什么是聚合函数" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><p>​ 聚合函数作用于一组数据，并对一组数据返回一个值。</p><p><img data-src="../../assets/images/20210608Mysql_juhe/image-20220513105715293.png" alt="image-20220513105715293" data-proofer-ignore></p><h3 id="12-avg和sum函数">1.2 AVG和SUM函数<a href="#12-avg和sum函数" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><p>​ 可以对数值型数据使用AVG 和 SUM 函数。</p><pre><code class="language-mysql">SELECT AVG(salary), MAX(salary),MIN(salary), SUM(salary)
+FROM employees
+WHERE job_id LIKE '%REP%';
+
++-------------+-------------+-------------+-------------+
+| AVG(salary) | MAX(salary) | MIN(salary) | SUM(salary) |
++-------------+-------------+-------------+-------------+
+| 8272.727273 |       11500 |        6000 |   273000.00 |
++-------------+-------------+-------------+-------------+
+1 row in set
+</code></pre><h3 id="13-min和max函数">1.3 MIN和MAX函数<a href="#13-min和max函数" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><p>可以对任意数据类型的数据使用 MIN 和 MAX 函数。</p><pre><code class="language-mysql">SELECT MIN(hire_date), MAX(hire_date)
+FROM employees;
+
++----------------+----------------+
+| MIN(hire_date) | MAX(hire_date) |
++----------------+----------------+
+| 1987-06-17     | 2000-04-21     |
++----------------+----------------+
+1 row in set
+</code></pre><h3 id="14-count函数">1.4 COUNT函数<a href="#14-count函数" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><p>COUNT(*)返回表中记录总数，适用于任意数据类型。</p><pre><code class="language-mysql">SELECT COUNT(*)
+FROM employees
+WHERE department_id = 50;
+
++----------+
+| COUNT(*) |
++----------+
+|       45 |
++----------+
+1 row in set
+</code></pre><ul><li>问题：用count(*)，count(1)，count(列名)谁好呢?</ul><p>​ 其实，对于MyISAM引擎的表是没有区别的。这种引擎内部有一计数器在维护着行数。</p><p>​ Innodb引擎的表用<code class="language-plaintext highlighter-rouge">count(*),count(1)直接读行数，复杂度是O(n)</code>，因为innodb真的要去数一遍。但好于具体的count(列名)。</p><ul><li>问题：能不能使用count(列名)替换count(*)?</ul><p>​ 不要使用 count(列名)来替代 count(*) ， count(*) 是 SQL92 定义的标准统计行数的语法，跟数据库无关，跟 NULL 和非 NULL 无关。 说明：<strong>count(*)会统计值为 NULL 的行，而 count(列名)不会统计此列为 NULL 值的行。</strong></p><p>举例：计算平均奖金率</p><pre><code class="language-mysql"># 考虑空值的情况
+SELECT SUM(commission_pct)/COUNT(IFNULL(commission_pct,1))
+FROM employees;
+</code></pre><h2 id="2-group-by">2. GROUP BY<a href="#2-group-by" class="anchor"><i class="fas fa-hashtag"></i></a></h2></h2><h3 id="21-基本使用">2.1 基本使用<a href="#21-基本使用" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><p><img data-src="../../assets/images/20210608Mysql_juhe/image-20220513111034339.png" alt="image-20220513111034339" data-proofer-ignore></p><p>可以使用GROUP BY子句将表中的数据分成若干组</p><pre><code class="language-mysql">SELECT column, group_function(column)
+FROM table
+[WHERE condition]
+[GROUP BY group_by_expression]
+[ORDER BY column];
+</code></pre><p>明确：WHERE一定放在FROM后面</p><p>在SELECT列表中所有未包含在组函数中的列都应该包含在 GROUP BY子句中</p><pre><code class="language-mysql">SELECT department_id, AVG(salary)
+FROM employees
+GROUP BY department_id ;
+
++---------------+--------------+
+| department_id | AVG(salary)  |
++---------------+--------------+
+| NULL          |  7000.000000 |
+|            10 |  4400.000000 |
+|            20 |  9500.000000 |
+|            30 |  4150.000000 |
+|            40 |  6500.000000 |
+|            50 |  3475.555556 |
+|            60 |  5760.000000 |
+|            70 | 10000.000000 |
+|            80 |  8955.882353 |
+|            90 | 19333.333333 |
+|           100 |  8600.000000 |
+|           110 | 10150.000000 |
++---------------+--------------+
+12 rows in set
+</code></pre><p>包含在 GROUP BY 子句中的列不必包含在SELECT 列表中</p><pre><code class="language-mysql">SELECT AVG(salary)
+FROM employees
+GROUP BY department_id ;
+
++--------------+
+| AVG(salary)  |
++--------------+
+|  7000.000000 |
+|  4400.000000 |
+|  9500.000000 |
+|  4150.000000 |
+|  6500.000000 |
+|  3475.555556 |
+|  5760.000000 |
+| 10000.000000 |
+|  8955.882353 |
+| 19333.333333 |
+|  8600.000000 |
+| 10150.000000 |
++--------------+
+12 rows in set
+</code></pre><h3 id="22-使用多个列分组">2.2 使用多个列分组<a href="#22-使用多个列分组" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><p><img data-src="../../assets/images/20210608Mysql_juhe/image-20220513111354627.png" alt="image-20220513111354627" data-proofer-ignore></p><pre><code class="language-mysql">SELECT department_id dept_id, job_id, SUM(salary)
+FROM employees
+GROUP BY department_id, job_id ;
+
++---------+------------+-------------+
+| dept_id | job_id     | SUM(salary) |
++---------+------------+-------------+
+|      90 | AD_PRES    |    24000.00 |
+|      90 | AD_VP      |    34000.00 |
+|      60 | IT_PROG    |    28800.00 |
+|     100 | FI_MGR     |    12000.00 |
+|     100 | FI_ACCOUNT |    39600.00 |
+|      30 | PU_MAN     |    11000.00 |
+|      30 | PU_CLERK   |    13900.00 |
+|      50 | ST_MAN     |    36400.00 |
+|      50 | ST_CLERK   |    55700.00 |
+|      80 | SA_MAN     |    61000.00 |
+|      80 | SA_REP     |   243500.00 |
+| NULL    | SA_REP     |     7000.00 |
+|      50 | SH_CLERK   |    64300.00 |
+|      10 | AD_ASST    |     4400.00 |
+|      20 | MK_MAN     |    13000.00 |
+|      20 | MK_REP     |     6000.00 |
+|      40 | HR_REP     |     6500.00 |
+|      70 | PR_REP     |    10000.00 |
+|     110 | AC_MGR     |    12000.00 |
+|     110 | AC_ACCOUNT |     8300.00 |
++---------+------------+-------------+
+20 rows in set
+</code></pre><h3 id="23-group-by中使用with-rollup">2.3 GROUP BY中使用WITH ROLLUP<a href="#23-group-by中使用with-rollup" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><p>​ 使用 WITH ROLLUP 关键字之后，在所有查询出的分组记录之后增加一条记录，该记录计算查询出的所 有记录的总和，即统计记录数量。</p><pre><code class="language-mysql">SELECT department_id,AVG(salary)
+FROM employees
+WHERE department_id &gt; 80
+GROUP BY department_id WITH ROLLUP;
+
++---------------+--------------+
+| department_id | AVG(salary)  |
++---------------+--------------+
+|            90 | 19333.333333 |
+|           100 |  8600.000000 |
+|           110 | 10150.000000 |
+| NULL          | 11809.090909 |
++---------------+--------------+
+4 rows in set
+</code></pre><p>注意： 当使用ROLLUP时，不能同时使用ORDER BY子句进行结果排序，即ROLLUP和ORDER BY是互相排斥 的。</p><h2 id="3-having">3. HAVING<a href="#3-having" class="anchor"><i class="fas fa-hashtag"></i></a></h2></h2><h3 id="31-基本使用">3.1 基本使用<a href="#31-基本使用" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><p><img data-src="../../assets/images/20210608Mysql_juhe/image-20220513143303888.png" alt="image-20220513143303888" data-proofer-ignore></p><p>过滤分组：HAVING子句</p><ul><li><ol><li>行已经被分组。</ol><li><ol><li>使用了聚合函数。</ol><li><ol><li>满足HAVING 子句中条件的分组将被显示。</ol><li><ol><li><strong>HAVING 不能单独使用，必须要跟 GROUP BY 一起使用。</strong></ol></ul><pre><code class="language-mysql">mysql&gt; SELECT department_id, MAX(salary)
+FROM employees
+GROUP BY department_id
+HAVING MAX(salary)&gt;10000 ;
++---------------+-------------+
+| department_id | MAX(salary) |
++---------------+-------------+
+|            20 |       13000 |
+|            30 |       11000 |
+|            80 |       14000 |
+|            90 |       24000 |
+|           100 |       12000 |
+|           110 |       12000 |
++---------------+-------------+
+6 rows in set
+</code></pre><h3 id="32-where和having的对比">3.2 WHERE和HAVING的对比<a href="#32-where和having的对比" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><p><strong>区别1：</strong></p><p>​ **WHERE 可以直接使用表中的字段作为筛选条件，但不能使用分组中的计算函数作为筛选条件； **</p><p>​ <strong>HAVING 必须要与 GROUP BY 配合使用，可以把分组计算的函数和分组字段作为筛选条件。</strong></p><p>​ 这决定了，在需要对数据进行分组统计的时候，HAVING 可以完成 WHERE 不能完成的任务。这是因为， 在查询语法结构中，WHERE 在 GROUP BY 之前，所以无法对分组结果进行筛选。HAVING 在 GROUP BY 之 后，可以使用分组字段和分组中的计算函数，对分组的结果集进行筛选，这个功能是 WHERE 无法完成 的。另外，WHERE排除的记录不再包括在分组中。</p><p><strong>区别2：</strong></p><p>​ **如果需要通过连接从关联表中获取需要的数据，WHERE 是先筛选后连接，而 HAVING 是先连接 后筛选。 **</p><p>​ 这一点，就决定了在关联查询中，WHERE 比 HAVING 更高效。因为 WHERE 可以先筛选，用一 个筛选后的较小数据集和关联表进行连接，这样占用的资源比较少，执行效率也比较高。HAVING 则需要 先把结果集准备好，也就是用未被筛选的数据集进行关联，然后对这个大的数据集进行筛选，这样占用 的资源就比较多，执行效率也较低。</p><p><strong>开发中的选择：</strong></p>WHERE 和 HAVING 也不是互相排斥的，我们可以在一个查询里面同时使用 WHERE 和 HAVING。包含分组 统计函数的条件用 HAVING，普通条件用 WHERE。这样，我们就既利用了 WHERE 条件的高效快速，又发挥了 HAVING 可以使用包含分组统计函数的查询条件的优点。当数据量特别大的时候，运行效率会有很大的差别。<h2 id="4-select的执行过程">4. SELECT的执行过程<a href="#4-select的执行过程" class="anchor"><i class="fas fa-hashtag"></i></a></h2></h2><h3 id="41-查询的结构">4.1 查询的结构<a href="#41-查询的结构" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><pre><code class="language-mysql">#方式1：
+SELECT ...,....,...
+FROM ...,...,....
+WHERE 多表的连接条件
+AND 不包含组函数的过滤条件
+GROUP BY ...,...
+HAVING 包含组函数的过滤条件
+ORDER BY ... ASC/DESC
+LIMIT ...,...
+#方式2：
+SELECT ...,....,...
+FROM ... JOIN ...
+ON 多表的连接条件
+JOIN ...
+ON ...
+WHERE 不包含组函数的过滤条件
+AND/OR 不包含组函数的过滤条件
+GROUP BY ...,...
+HAVING 包含组函数的过滤条件
+ORDER BY ... ASC/DESC
+LIMIT ...,...
+#其中：
+#（1）from：从哪些表中筛选
+#（2）on：关联多表查询时，去除笛卡尔积
+#（3）where：从表中筛选的条件
+#（4）group by：分组依据
+#（5）having：在统计结果中再次筛选
+#（6）order by：排序
+#（7）limit：分页
+</code></pre><h3 id="42-select执行顺序">4.2 SELECT执行顺序<a href="#42-select执行顺序" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><p>你需要记住 SELECT 查询时的两个顺序：</p><p><strong>1. 关键字的顺序是不能颠倒的</strong></p><pre><code class="language-mysql">SELECT ... FROM ... WHERE ... GROUP BY ... HAVING ... ORDER BY ... LIMIT...
+</code></pre><p><strong>2.SELECT 语句的执行顺序（在 MySQL 和 Oracle 中，SELECT 执行顺序基本相同）：</strong></p><pre><code class="language-mysql">FROM -&gt; WHERE -&gt; GROUP BY -&gt; HAVING -&gt; SELECT 的字段 -&gt; DISTINCT -&gt; ORDER BY -&gt; LIMIT
+</code></pre><p>比如你写了一个 SQL 语句，那么它的关键字顺序和执行顺序是下面这样的：</p><pre><code class="language-mysql">SELECT DISTINCT player_id, player_name, count(*) as num # 顺序 5
+FROM player JOIN team ON player.team_id = team.team_id # 顺序 1
+WHERE height &gt; 1.80 # 顺序 2
+GROUP BY player.team_id # 顺序 3
+HAVING num &gt; 2 # 顺序 4
+ORDER BY num DESC # 顺序 6
+LIMIT 2 # 顺序 7
+</code></pre><p>​ 在 SELECT 语句执行这些步骤的时候，每个步骤都会产生一个 虚拟表 ，然后将这个虚拟表传入下一个步骤中作为输入。需要注意的是，这些步骤隐含在 SQL 的执行过程中，对于我们来说是不可见的。</p><h3 id="43-sql-的执行原理">4.3 SQL 的执行原理<a href="#43-sql-的执行原理" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><p>SELECT 是先执行 FROM 这一步的。在这个阶段，如果是多张表联查，还会经历下面的几个步骤：</p><ol><li>首先先通过 CROSS JOIN 求笛卡尔积，相当于得到虚拟表 vt（virtual table）1-1；<li>通过 ON 进行筛选，在虚拟表 <code class="language-plaintext highlighter-rouge">vt1-1</code> 的基础上进行筛选，得到虚拟表 <code class="language-plaintext highlighter-rouge">vt1-2</code>；<li>添加外部行。如果我们使用的是左连接、右链接或者全连接，就会涉及到外部行，也就是在虚拟 表<code class="language-plaintext highlighter-rouge"> vt1-2</code> 的基础上增加外部行，得到虚拟表<code class="language-plaintext highlighter-rouge">vt1-3</code>。</ol><p>当然如果我们操作的是两张以上的表，还会重复上面的步骤，直到所有表都被处理完为止。这个过程得 到是我们的原始数据。</p><p>​ 当我们拿到了查询数据表的原始数据，也就是最终的虚拟表 <code class="language-plaintext highlighter-rouge">vt1 </code>，就可以在此基础上再进行 <code class="language-plaintext highlighter-rouge">WHERE 阶段</code> 。在这个阶段中，会根据 <code class="language-plaintext highlighter-rouge">vt1</code> 表的结果进行筛选过滤，得到虚拟表<code class="language-plaintext highlighter-rouge"> vt2</code> 。</p><p>​ 然后进入第三步和第四步，也就是 GROUP 和 HAVING 阶段 。在这个阶段中，实际上是在虚拟表 vt2 的 基础上进行分组和分组过滤，得到中间的虚拟表 <code class="language-plaintext highlighter-rouge">vt3 </code>和 <code class="language-plaintext highlighter-rouge">vt4</code> 。 当我们完成了条件筛选部分之后，就可以筛选表中提取的字段，也就是进入到 SELECT 和 DISTINCT 阶段 。</p><p>​ 首先在 SELECT 阶段会提取想要的字段，然后在 DISTINCT 阶段过滤掉重复的行，分别得到中间的虚拟表<code class="language-plaintext highlighter-rouge"> vt5-1</code> 和 <code class="language-plaintext highlighter-rouge">vt5-2 </code>。 当我们提取了想要的字段数据之后，就可以按照指定的字段进行排序，也就是 ORDER BY 阶段 ，得到 虚拟表 vt6 。</p><p>​ 最后在<code class="language-plaintext highlighter-rouge"> vt6 </code>的基础上，取出指定行的记录，也就是 LIMIT 阶段 ，得到最终的结果，对应的是虚拟表 <code class="language-plaintext highlighter-rouge">vt7 </code>。 当然我们在写 SELECT 语句的时候，不一定存在所有的关键字，相应的阶段就会省略。 同时因为 SQL 是一门类似英语的结构化查询语言，所以我们在写 SELECT 语句的时候，还要注意相应的 关键字顺序，所谓底层运行的原理，就是我们刚才讲到的执行顺序</p><h2 id="5课后练习">5.课后练习<a href="#5课后练习" class="anchor"><i class="fas fa-hashtag"></i></a></h2></h2><ol><li><p>where字句可否使用组函数进行过滤?</p><p><code class="language-plaintext highlighter-rouge">No!</code></p><li><p>查询公司员工的工资最大值、最小值、平均值和总和</p></ol><pre><code class="language-mysql">SELECT MAX(salary) max_sal,MIN(salary) min_sal,AVG(salary) avg_sal,SUM(salary) sum_sal
+FROM employees;
+
++---------+---------+-------------+-----------+
+| max_sal | min_sal | avg_sal     | sum_sal   |
++---------+---------+-------------+-----------+
+|   24000 |    2100 | 6461.682243 | 691400.00 |
++---------+---------+-------------+-----------+
+1 row in set
+
+</code></pre><ol><li>查询各job_id的员工工资的最大值、最小值、平均值和总和</ol><pre><code class="language-mysql">SELECT job_id,MAX(salary) max_sal,MIN(salary) min_sal,AVG(salary) avg_sal,SUM(salary) sum_sal
+FROM employees
+GROUP BY job_id;
+
++------------+---------+---------+--------------+-----------+
+| job_id     | max_sal | min_sal | avg_sal      | sum_sal   |
++------------+---------+---------+--------------+-----------+
+| AC_ACCOUNT |    8300 |    8300 |  8300.000000 |   8300.00 |
+| AC_MGR     |   12000 |   12000 | 12000.000000 |  12000.00 |
+| AD_ASST    |    4400 |    4400 |  4400.000000 |   4400.00 |
+| AD_PRES    |   24000 |   24000 | 24000.000000 |  24000.00 |
+| AD_VP      |   17000 |   17000 | 17000.000000 |  34000.00 |
+| FI_ACCOUNT |    9000 |    6900 |  7920.000000 |  39600.00 |
+| FI_MGR     |   12000 |   12000 | 12000.000000 |  12000.00 |
+| HR_REP     |    6500 |    6500 |  6500.000000 |   6500.00 |
+| IT_PROG    |    9000 |    4200 |  5760.000000 |  28800.00 |
+| MK_MAN     |   13000 |   13000 | 13000.000000 |  13000.00 |
+| MK_REP     |    6000 |    6000 |  6000.000000 |   6000.00 |
+| PR_REP     |   10000 |   10000 | 10000.000000 |  10000.00 |
+| PU_CLERK   |    3100 |    2500 |  2780.000000 |  13900.00 |
+| PU_MAN     |   11000 |   11000 | 11000.000000 |  11000.00 |
+| SA_MAN     |   14000 |   10500 | 12200.000000 |  61000.00 |
+| SA_REP     |   11500 |    6100 |  8350.000000 | 250500.00 |
+| SH_CLERK   |    4200 |    2500 |  3215.000000 |  64300.00 |
+| ST_CLERK   |    3600 |    2100 |  2785.000000 |  55700.00 |
+| ST_MAN     |    8200 |    5800 |  7280.000000 |  36400.00 |
++------------+---------+---------+--------------+-----------+
+19 rows in set
+</code></pre><ol><li>选择各个job_id的员工人数</ol><pre><code class="language-mysql">SELECT job_id,COUNT(*)
+FROM employees
+GROUP BY job_id;
+
++------------+----------+
+| job_id     | COUNT(*) |
++------------+----------+
+| AC_ACCOUNT |        1 |
+| AC_MGR     |        1 |
+| AD_ASST    |        1 |
+| AD_PRES    |        1 |
+| AD_VP      |        2 |
+| FI_ACCOUNT |        5 |
+| FI_MGR     |        1 |
+| HR_REP     |        1 |
+| IT_PROG    |        5 |
+| MK_MAN     |        1 |
+| MK_REP     |        1 |
+| PR_REP     |        1 |
+| PU_CLERK   |        5 |
+| PU_MAN     |        1 |
+| SA_MAN     |        5 |
+| SA_REP     |       30 |
+| SH_CLERK   |       20 |
+| ST_CLERK   |       20 |
+| ST_MAN     |        5 |
++------------+----------+
+19 rows in set
+</code></pre><ol><li>查询员工最高工资和最低工资的差距（DIFFERENCE)</ol><pre><code class="language-mysql">SELECT MAX(salary) - MIN(salary) "DIFFERENCE"
+FROM employees;
+
++------------+
+| DIFFERENCE |
++------------+
+|   21900.00 |
++------------+
+1 row in set
+</code></pre><ol><li>查询各个管理者手下员工的最低工资，其中最低工资不能低于6000，没有管理者的员工不计算在内</ol><pre><code class="language-mysql">SELECT manager_id,MIN(salary)
+FROM employees
+WHERE manager_id IS NOT NULL
+GROUP BY manager_id
+HAVING MIN(salary) &gt;= 6000;
+
++------------+-------------+
+| manager_id | MIN(salary) |
++------------+-------------+
+|        102 |        9000 |
+|        108 |        6900 |
+|        145 |        7000 |
+|        146 |        7000 |
+|        147 |        6200 |
+|        148 |        6100 |
+|        149 |        6200 |
+|        201 |        6000 |
+|        205 |        8300 |
++------------+-------------+
+9 rows in set
+</code></pre><ol><li>查询所有部门的名字、location_id、部门数量和平均工资，并按平均工资降序</ol><pre><code class="language-mysql">SELECT department_name,d.location_id,COUNT(employee_id),AVG(salary)
+FROM departments d LEFT JOIN employees e
+ON d.`department_id` = e.`department_id`
+GROUP BY department_name,location_id
+
++----------------------+-------------+--------------------+--------------+
+| department_name      | location_id | COUNT(employee_id) | AVG(salary)  |
++----------------------+-------------+--------------------+--------------+
+| Administration       |        1700 |                  1 |  4400.000000 |
+| Marketing            |        1800 |                  2 |  9500.000000 |
+| Purchasing           |        1700 |                  6 |  4150.000000 |
+| Human Resources      |        2400 |                  1 |  6500.000000 |
+| Shipping             |        1500 |                 45 |  3475.555556 |
+| IT                   |        1400 |                  5 |  5760.000000 |
+| Public Relations     |        2700 |                  1 | 10000.000000 |
+| Sales                |        2500 |                 34 |  8955.882353 |
+| Executive            |        1700 |                  3 | 19333.333333 |
+| Finance              |        1700 |                  6 |  8600.000000 |
+| Accounting           |        1700 |                  2 | 10150.000000 |
+| Treasury             |        1700 |                  0 | NULL         |
+| Corporate Tax        |        1700 |                  0 | NULL         |
+| Control And Credit   |        1700 |                  0 | NULL         |
+| Shareholder Services |        1700 |                  0 | NULL         |
+| Benefits             |        1700 |                  0 | NULL         |
+| Manufacturing        |        1700 |                  0 | NULL         |
+| Construction         |        1700 |                  0 | NULL         |
+| Contracting          |        1700 |                  0 | NULL         |
+| Operations           |        1700 |                  0 | NULL         |
+| IT Support           |        1700 |                  0 | NULL         |
+| NOC                  |        1700 |                  0 | NULL         |
+| IT Helpdesk          |        1700 |                  0 | NULL         |
+| Government Sales     |        1700 |                  0 | NULL         |
+| Retail Sales         |        1700 |                  0 | NULL         |
+| Recruiting           |        1700 |                  0 | NULL         |
+| Payroll              |        1700 |                  0 | NULL         |
++----------------------+-------------+--------------------+--------------+
+27 rows in set
+</code></pre><ol><li>查询每个工种、每个部门的部门名，工种名和最低工资</ol><pre><code class="language-mysql">SELECT d.department_name,e.job_id,MIN(salary)
+FROM departments d LEFT JOIN employees e
+ON d.`department_id` = e.`department_id`
+GROUP BY job_id;
+
++------------------+------------+-------------+
+| department_name  | job_id     | MIN(salary) |
++------------------+------------+-------------+
+| Administration   | AD_ASST    |        4400 |
+| Marketing        | MK_MAN     |       13000 |
+| Marketing        | MK_REP     |        6000 |
+| Purchasing       | PU_MAN     |       11000 |
+| Purchasing       | PU_CLERK   |        2500 |
+| Human Resources  | HR_REP     |        6500 |
+| Shipping         | ST_MAN     |        5800 |
+| Shipping         | ST_CLERK   |        2100 |
+| Shipping         | SH_CLERK   |        2500 |
+| IT               | IT_PROG    |        4200 |
+| Public Relations | PR_REP     |       10000 |
+| Sales            | SA_MAN     |       10500 |
+| Sales            | SA_REP     |        6100 |
+| Executive        | AD_PRES    |       24000 |
+| Executive        | AD_VP      |       17000 |
+| Finance          | FI_MGR     |       12000 |
+| Finance          | FI_ACCOUNT |        6900 |
+| Accounting       | AC_MGR     |       12000 |
+| Accounting       | AC_ACCOUNT |        8300 |
+| Treasury         | NULL       | NULL        |
++------------------+------------+-------------+
+20 rows in set
+</code></pre><h2 id="参考链接">参考链接<a href="#参考链接" class="anchor"><i class="fas fa-hashtag"></i></a></h2></h2><p>1.<a href="https://www.bilibili.com/video/BV1iq4y1u7vj?p=41&amp;spm_id_from=pageDriver">MySQL数据库教程天花板，mysql安装到mysql高级，强！硬！</a></p></div><div class="post-tail-wrapper text-muted"><div class="post-meta mb-3"> <i class="far fa-folder-open fa-fw mr-1"></i> <a href='/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/'>数据库</a></div><div class="post-tags"> <i class="fa fa-tags fa-fw mr-1"></i> <a href="/tags/mysql/" class="post-tag no-text-decoration" >MySQL</a></div><div class="post-tail-bottom d-flex justify-content-between align-items-center mt-3 pt-5 pb-2"><div class="license-wrapper"> 本文由作者按照 <a href="https://creativecommons.org/licenses/by/4.0/"> CC BY 4.0 </a> 进行授权</div><div class="share-wrapper"> <span class="share-label text-muted mr-1">分享</span> <span class="share-icons"> <a href="https://twitter.com/intent/tweet?text=MySQL聚合函数 - Technical Blogs&url=https://carmanzheng.github.io//posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E8%81%9A%E5%90%88%E5%87%BD%E6%95%B0/" data-toggle="tooltip" data-placement="top" title="Twitter" target="_blank" rel="noopener" aria-label="Twitter"> <i class="fa-fw fab fa-twitter"></i> </a> <a href="https://www.facebook.com/sharer/sharer.php?title=MySQL聚合函数 - Technical Blogs&u=https://carmanzheng.github.io//posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E8%81%9A%E5%90%88%E5%87%BD%E6%95%B0/" data-toggle="tooltip" data-placement="top" title="Facebook" target="_blank" rel="noopener" aria-label="Facebook"> <i class="fa-fw fab fa-facebook-square"></i> </a> <a href="https://telegram.me/share?text=MySQL聚合函数 - Technical Blogs&url=https://carmanzheng.github.io//posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E8%81%9A%E5%90%88%E5%87%BD%E6%95%B0/" data-toggle="tooltip" data-placement="top" title="Telegram" target="_blank" rel="noopener" aria-label="Telegram"> <i class="fa-fw fab fa-telegram"></i> </a> <i id="copy-link" class="fa-fw fas fa-link small" data-toggle="tooltip" data-placement="top" title="分享链接" title-succeed="链接已复制！"> </i> </span></div></div></div></div></div><div id="panel-wrapper" class="col-xl-3 pl-2 text-muted topbar-down"><div class="access"><div id="access-lastmod" class="post"><div class="panel-heading">最近更新</div><ul class="post-content pl-0 pb-1 ml-1 mt-2"><li><a href="/posts/Kubernetes%E6%A6%82%E8%BF%B0/">Kubernetes</a><li><a href="/posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E7%B4%A2%E5%BC%95%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">MySQL存储引擎</a><li><a href="/posts/Linux%E5%9F%BA%E7%A1%80/">Linux基础</a><li><a href="/posts/Python-%E5%A4%9A%E8%BF%9B%E7%A8%8B%E5%A4%9A%E7%BA%BF%E7%A8%8B/">Python基操-多进程与多线程</a><li><a href="/posts/%E5%89%8D%E7%AB%AF-Vue%E8%B7%AF%E7%94%B1%E4%B8%8EVuex/">前端 Vue路由与vuex</a></ul></div><div id="access-tags"><div class="panel-heading">热门标签</div><div class="d-flex flex-wrap mt-3 mb-1 mr-3"> <a class="post-tag" href="/tags/mysql/">MySQL</a> <a class="post-tag" href="/tags/python%E5%9F%BA%E6%93%8D/">Python基操</a> <a class="post-tag" href="/tags/%E5%89%8D%E7%AB%AFjs/">前端JS</a> <a class="post-tag" href="/tags/%E5%89%8D%E7%AB%AFvue/">前端Vue</a> <a class="post-tag" href="/tags/%E5%89%8D%E7%AB%AFcss/">前端CSS</a> <a class="post-tag" href="/tags/devops/">DevOps</a> <a class="post-tag" href="/tags/linux%E5%9F%BA%E7%A1%80/">Linux基础</a> <a class="post-tag" href="/tags/%E5%89%8D%E7%AB%AFhtml/">前端HTML</a> <a class="post-tag" href="/tags/github/">Github</a> <a class="post-tag" href="/tags/%E5%AE%A2%E6%88%B7%E7%AB%AF%E5%BC%80%E5%8F%91/">客户端开发</a></div></div></div><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@1.0.1/dist/bootstrap-toc.min.js"></script><div id="toc-wrapper" class="pl-0 pr-4 mb-5"><div class="panel-heading pl-3 pt-2 mb-2">文章内容</div><nav id="toc" data-toggle="toc"></nav></div></div></div><div class="row"><div class="col-12 col-lg-11 col-xl-8"><div id="tail-wrapper" class="pl-1 pr-1 pl-sm-2 pr-sm-2 pl-md-4 pr-md-4"><div id="related-posts" class="mt-5 mb-2 mb-sm-4"><h3 class="pt-2 mt-1 mb-4 ml-1" data-toc-skip>相关文章</h3><div class="card-deck mb-4"><div class="card"> <a href="/posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E7%B4%A2%E5%BC%95%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/"><div class="card-body"> <em class="timeago small" date="2021-07-06 00:00:00 +0800" >2021-07-06</em><h3 class="pt-0 mt-1 mb-3" data-toc-skip>MySQL存储引擎</h3><div class="text-muted small"><p> 1.为什么使用索引 假如给数据使用 二叉树 这样的数据结构进行存储，如下图所示 2. 索引及其优缺点 2.1 索引概述 MySQL官方对索引的定义为：索引（Index）是帮助MySQL高效获取数据的数据结构。 索引的本质：索引是数据结构。你可以简单理解为“排好序的快速查找数据结构”，满足特定查找算法。 这些数据结构以某种方式指向数据， 这样就可以在这些数据结构的基础上实现 ...</p></div></div></a></div><div class="card"> <a href="/posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E5%9F%BA%E7%A1%80/"><div class="card-body"> <em class="timeago small" date="2021-06-01 00:00:00 +0800" >2021-06-01</em><h3 class="pt-0 mt-1 mb-3" data-toc-skip>MySQL基础</h3><div class="text-muted small"><p> 1. 数据库功能 ​ 持久化(persistence)：把数据保存到可掉电式存储设备中以供之后使用。大多数情况下，特别是企业级应用，数据持久化意味着将内存中的数据保存到硬盘上加以”固化”，而持久化的实现过程大多 通过各种关系数据库来完成。 ​ 持久化的主要作用是将内存中的数据存储在关系型数据库中，当然也可以存储在磁盘文件、XML数 据文件中。 2.数据库与数据库管理系统 2....</p></div></div></a></div><div class="card"> <a href="/posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E5%AE%89%E8%A3%85/"><div class="card-body"> <em class="timeago small" date="2021-06-02 00:00:00 +0800" >2021-06-02</em><h3 class="pt-0 mt-1 mb-3" data-toc-skip>MySQL安装</h3><div class="text-muted small"><p> 1. 下载软件 官网：https://www.mysql.com 下载地址：https://dev.mysql.com/downloads/windows/installer/8.0.html MySQL Community Server 社区版本，开源免费，自由下载，但不提供官方技术支持，适用于 大多数普通用户。 MySQL Enterprise Edition 企业版本，...</p></div></div></a></div></div></div><div class="post-navigation d-flex justify-content-between"> <a href="/posts/%E6%95%B0%E6%8D%AE%E5%BA%93-Mysql%E5%87%BD%E6%95%B0/" class="btn btn-outline-primary" prompt="上一篇"><p>MySQL函数</p></a> <a href="/posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E5%AD%90%E6%9F%A5%E8%AF%A2/" class="btn btn-outline-primary" prompt="下一篇"><p>MySQL子查询</p></a></div></div></div></div><footer class="d-flex w-100 justify-content-center"><div class="d-flex justify-content-between align-items-center text-muted"><div class="footer-left"><p class="mb-0"> © 2022 <a href="https://github.com/carmanzheng">carmanzheng</a>. <span data-toggle="tooltip" data-placement="top" title="除非另有说明，本网站上的博客文章均由作者按照知识共享署名 4.0 国际 (CC BY 4.0) 许可协议进行授权。">保留部分权利。</span></p></div><div class="footer-right"><p class="mb-0"> 本站由 <a href="https://jekyllrb.com" target="_blank" rel="noopener">Jekyll</a> 生成，采用 <a href="https://github.com/cotes2020/jekyll-theme-chirpy" target="_blank" rel="noopener">Chirpy</a> 主题。</p></div></div></footer></div><div id="search-result-wrapper" class="d-flex justify-content-center unloaded"><div class="col-12 col-sm-11 post-content"><div id="search-hints"><div id="access-tags"><div class="panel-heading">热门标签</div><div class="d-flex flex-wrap mt-3 mb-1 mr-3"> <a class="post-tag" href="/tags/mysql/">MySQL</a> <a class="post-tag" href="/tags/python%E5%9F%BA%E6%93%8D/">Python基操</a> <a class="post-tag" href="/tags/%E5%89%8D%E7%AB%AFjs/">前端JS</a> <a class="post-tag" href="/tags/%E5%89%8D%E7%AB%AFvue/">前端Vue</a> <a class="post-tag" href="/tags/%E5%89%8D%E7%AB%AFcss/">前端CSS</a> <a class="post-tag" href="/tags/devops/">DevOps</a> <a class="post-tag" href="/tags/linux%E5%9F%BA%E7%A1%80/">Linux基础</a> <a class="post-tag" href="/tags/%E5%89%8D%E7%AB%AFhtml/">前端HTML</a> <a class="post-tag" href="/tags/github/">Github</a> <a class="post-tag" href="/tags/%E5%AE%A2%E6%88%B7%E7%AB%AF%E5%BC%80%E5%8F%91/">客户端开发</a></div></div></div><div id="search-results" class="d-flex flex-wrap justify-content-center text-muted mt-3"></div></div></div></div><div id="mask"></div><a id="back-to-top" href="#" aria-label="back-to-top" class="btn btn-lg btn-box-shadow" role="button"> <i class="fas fa-angle-up"></i> </a> <script src="https://cdn.jsdelivr.net/npm/simple-jekyll-search@1.10.0/dest/simple-jekyll-search.min.js"></script> <script> SimpleJekyllSearch({ searchInput: document.getElementById('search-input'), resultsContainer: document.getElementById('search-results'), json: '/assets/js/data/search.json', searchResultTemplate: '<div class="pl-1 pr-1 pl-sm-2 pr-sm-2 pl-lg-4 pr-lg-4 pl-xl-0 pr-xl-0"> <a href="{url}">{title}</a><div class="post-meta d-flex flex-column flex-sm-row text-muted mt-1 mb-1"> {categories} {tags}</div><p>{snippet}</p></div>', noResultsText: '<p class="mt-5">搜索结果为空</p>', templateMiddleware: function(prop, value, template) { if (prop === 'categories') { if (value === '') { return `${value}`; } else { return `<div class="mr-sm-4"><i class="far fa-folder fa-fw"></i>${value}</div>`; } } if (prop === 'tags') { if (value === '') { return `${value}`; } else { return `<div><i class="fa fa-tag fa-fw"></i>${value}</div>`; } } } }); </script> <script src="https://cdn.jsdelivr.net/combine/npm/lozad/dist/lozad.min.js,npm/magnific-popup@1/dist/jquery.magnific-popup.min.js,npm/clipboard@2/dist/clipboard.min.js"></script> <script defer src="/assets/js/dist/post.min.js"></script> <script src="https://cdn.jsdelivr.net/combine/npm/popper.js@1.16.1,npm/bootstrap@4/dist/js/bootstrap.min.js"></script> <script defer src="/app.js"></script> <script defer src="https://www.googletagmanager.com/gtag/js?id="></script> <script> document.addEventListener("DOMContentLoaded", function(event) { window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', ''); }); </script>

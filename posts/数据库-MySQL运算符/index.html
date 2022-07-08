@@ -1,0 +1,276 @@
+<!DOCTYPE html><html lang="zh-CN" ><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><meta name="day-prompt" content="天前"><meta name="hour-prompt" content="小时前"><meta name="minute-prompt" content="分钟前"><meta name="justnow-prompt" content="刚刚"><meta name="generator" content="Jekyll v4.2.1" /><meta property="og:title" content="MySQL运算符" /><meta property="og:locale" content="zh_CN" /><meta name="description" content="1. 算术运算符" /><meta property="og:description" content="1. 算术运算符" /><link rel="canonical" href="https://carmanzheng.github.io//posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E8%BF%90%E7%AE%97%E7%AC%A6/" /><meta property="og:url" content="https://carmanzheng.github.io//posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E8%BF%90%E7%AE%97%E7%AC%A6/" /><meta property="og:site_name" content="Technical Blogs" /><meta property="og:type" content="article" /><meta property="article:published_time" content="2021-06-04T00:00:00+08:00" /><meta name="twitter:card" content="summary" /><meta property="twitter:title" content="MySQL运算符" /><meta name="twitter:site" content="@twitter_username" /><meta name="google-site-verification" content="google_meta_tag_verification" /> <script type="application/ld+json"> {"description":"1. 算术运算符","headline":"MySQL运算符","dateModified":"2021-06-04T00:00:00+08:00","datePublished":"2021-06-04T00:00:00+08:00","url":"https://carmanzheng.github.io//posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E8%BF%90%E7%AE%97%E7%AC%A6/","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://carmanzheng.github.io//posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E8%BF%90%E7%AE%97%E7%AC%A6/"},"@context":"https://schema.org"}</script><title>MySQL运算符 | Technical Blogs</title><link rel="apple-touch-icon" sizes="180x180" href="/assets/img/favicons/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicons/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicons/favicon-16x16.png"><link rel="manifest" href="/assets/img/favicons/site.webmanifest"><link rel="shortcut icon" href="/assets/img/favicons/favicon.ico"><meta name="apple-mobile-web-app-title" content="Technical Blogs"><meta name="application-name" content="Technical Blogs"><meta name="msapplication-TileColor" content="#da532c"><meta name="msapplication-config" content="/assets/img/favicons/browserconfig.xml"><meta name="theme-color" content="#ffffff"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"><link rel="dns-prefetch" href="https://fonts.gstatic.com"><link rel="preconnect" href="https://www.google-analytics.com" crossorigin="use-credentials"><link rel="dns-prefetch" href="https://www.google-analytics.com"><link rel="preconnect" href="https://www.googletagmanager.com" crossorigin="anonymous"><link rel="dns-prefetch" href="https://www.googletagmanager.com"><link rel="preconnect" href="https://cdn.jsdelivr.net"><link rel="dns-prefetch" href="https://cdn.jsdelivr.net"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.11.2/css/all.min.css"><link rel="stylesheet" href="/assets/css/style.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@1.0.1/dist/bootstrap-toc.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/magnific-popup@1.1.0/dist/magnific-popup.min.css"> <script src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script> <script type="text/javascript"> class ModeToggle { static get MODE_KEY() { return "mode"; } static get DARK_MODE() { return "dark"; } static get LIGHT_MODE() { return "light"; } static get ID() { return "mode-toggle"; } constructor() { if (this.hasMode) { if (this.isDarkMode) { if (!this.isSysDarkPrefer) { this.setDark(); } } else { if (this.isSysDarkPrefer) { this.setLight(); } } } let self = this; /* always follow the system prefers */ this.sysDarkPrefers.addEventListener("change", () => { if (self.hasMode) { if (self.isDarkMode) { if (!self.isSysDarkPrefer) { self.setDark(); } } else { if (self.isSysDarkPrefer) { self.setLight(); } } self.clearMode(); } self.notify(); }); } /* constructor() */ get sysDarkPrefers() { return window.matchMedia("(prefers-color-scheme: dark)"); } get isSysDarkPrefer() { return this.sysDarkPrefers.matches; } get isDarkMode() { return this.mode === ModeToggle.DARK_MODE; } get isLightMode() { return this.mode === ModeToggle.LIGHT_MODE; } get hasMode() { return this.mode != null; } get mode() { return sessionStorage.getItem(ModeToggle.MODE_KEY); } /* get the current mode on screen */ get modeStatus() { if (this.isDarkMode || (!this.hasMode && this.isSysDarkPrefer)) { return ModeToggle.DARK_MODE; } else { return ModeToggle.LIGHT_MODE; } } setDark() { $('html').attr(ModeToggle.MODE_KEY, ModeToggle.DARK_MODE); sessionStorage.setItem(ModeToggle.MODE_KEY, ModeToggle.DARK_MODE); } setLight() { $('html').attr(ModeToggle.MODE_KEY, ModeToggle.LIGHT_MODE); sessionStorage.setItem(ModeToggle.MODE_KEY, ModeToggle.LIGHT_MODE); } clearMode() { $('html').removeAttr(ModeToggle.MODE_KEY); sessionStorage.removeItem(ModeToggle.MODE_KEY); } /* Notify another plugins that the theme mode has changed */ notify() { window.postMessage({ direction: ModeToggle.ID, message: this.modeStatus }, "*"); } } /* ModeToggle */ const toggle = new ModeToggle(); function flipMode() { if (toggle.hasMode) { if (toggle.isSysDarkPrefer) { if (toggle.isLightMode) { toggle.clearMode(); } else { toggle.setLight(); } } else { if (toggle.isDarkMode) { toggle.clearMode(); } else { toggle.setDark(); } } } else { if (toggle.isSysDarkPrefer) { toggle.setLight(); } else { toggle.setDark(); } } toggle.notify(); } /* flipMode() */ </script><body data-spy="scroll" data-target="#toc"><div id="sidebar" class="d-flex flex-column align-items-end" lang="zh-CN"><div class="profile-wrapper text-center"><div id="avatar"> <a href="/" alt="avatar" class="mx-auto"> <img src="/assets/img/favicons/android-chrome-192x192.png" alt="avatar" onerror="this.style.display='none'"> </a></div><div class="site-title mt-3"> <a href="/">Technical Blogs</a></div><div class="site-subtitle font-italic">Learning by Doing, Sharing for more!</div></div><ul class="w-100"><li class="nav-item"> <a href="/" class="nav-link"> <i class="fa-fw fas fa-home ml-xl-3 mr-xl-3 unloaded"></i> <span>首页</span> </a><li class="nav-item"> <a href="/categories/" class="nav-link"> <i class="fa-fw fas fa-stream ml-xl-3 mr-xl-3 unloaded"></i> <span>分类</span> </a><li class="nav-item"> <a href="/tags/" class="nav-link"> <i class="fa-fw fas fa-tag ml-xl-3 mr-xl-3 unloaded"></i> <span>标签</span> </a><li class="nav-item"> <a href="/archives/" class="nav-link"> <i class="fa-fw fas fa-archive ml-xl-3 mr-xl-3 unloaded"></i> <span>归档</span> </a><li class="nav-item"> <a href="/about/" class="nav-link"> <i class="fa-fw fas fa-info-circle ml-xl-3 mr-xl-3 unloaded"></i> <span>关于</span> </a></ul><div class="sidebar-bottom mt-auto d-flex flex-wrap justify-content-center align-items-center"> <button class="mode-toggle btn" aria-label="Switch Mode"> <i class="fas fa-adjust"></i> </button> <span class="icon-border"></span> <a href="https://github.com/Carmanzheng" aria-label="github" target="_blank" rel="noopener"> <i class="fab fa-github"></i> </a> <a href="https://twitter.com/twitter_username" aria-label="twitter" target="_blank" rel="noopener"> <i class="fab fa-twitter"></i> </a> <a href=" javascript:location.href = 'mailto:' + ['zhengkan1993','gmail.com'].join('@')" aria-label="email" > <i class="fas fa-envelope"></i> </a> <a href="/feed.xml" aria-label="rss" > <i class="fas fa-rss"></i> </a></div></div><div id="topbar-wrapper" class="row justify-content-center topbar-down"><div id="topbar" class="col-11 d-flex h-100 align-items-center justify-content-between"> <span id="breadcrumb"> <span> <a href="/"> 首页 </a> </span> <span>MySQL运算符</span> </span> <i id="sidebar-trigger" class="fas fa-bars fa-fw"></i><div id="topbar-title"> 文章</div><i id="search-trigger" class="fas fa-search fa-fw"></i> <span id="search-wrapper" class="align-items-center"> <i class="fas fa-search fa-fw"></i> <input class="form-control" id="search-input" type="search" aria-label="search" autocomplete="off" placeholder="搜索..."> <i class="fa fa-times-circle fa-fw" id="search-cleaner"></i> </span> <span id="search-cancel" >取消</span></div></div><div id="main-wrapper"><div id="main"><div class="row"><div id="core-wrapper" class="col-12 col-lg-11 col-xl-8"><div class="post pl-1 pr-1 pl-sm-2 pr-sm-2 pl-md-4 pr-md-4"><h1 data-toc-skip>MySQL运算符</h1><div class="post-meta text-muted"><div> 作者 <em> <a href="https://github.com/carmanzheng">carmanzheng</a> </em></div><div class="d-flex"><div> <span> 发表于 <em class="timeago" date="2021-06-04 00:00:00 +0800" data-toggle="tooltip" data-placement="bottom" title="2021-06-04, 00:00 +0800" >2021-06-04</em> </span> <span class="readtime" data-toggle="tooltip" data-placement="bottom" title="5040 字"> <em>28 分钟</em>阅读</span></div></div></div><div class="post-content"><h2 id="1-算术运算符">1. 算术运算符<a href="#1-算术运算符" class="anchor"><i class="fas fa-hashtag"></i></a></h2></h2><p>​ 算术运算符主要用于数学运算，其可以连接运算符前后的两个数值或表达式，对数值或表达式进行加 （+）、减（-）、乘（*）、除（/）和取模（%）运算。</p><p><img data-src="../../assets/images/20210604Mysql_calculate/image-20220510154300014.png" alt="image-20220510154300014" data-proofer-ignore></p><h3 id="1加法与减法运算符">1．加法与减法运算符<a href="#1加法与减法运算符" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><pre><code class="language-mysql">mysql&gt; SELECT 100, 100 + 0, 100 - 0, 100 + 50, 100 + 50 -30, 100 + 35.5, 100 - 35.5
+FROM dual;
++-----+---------+---------+----------+--------------+------------+------------+
+| 100 | 100 + 0 | 100 - 0 | 100 + 50 | 100 + 50 -30 | 100 + 35.5 | 100 - 35.5 |
++-----+---------+---------+----------+--------------+------------+------------+
+| 100 | 100 | 100 | 150 | 120 | 135.5 | 64.5 |
++-----+---------+---------+----------+--------------+------------+------------+
+1 row in set (0.00 sec)
+</code></pre><ul><li>一个整数类型的值对整数进行加法和减法操作，结果还是一个整数；<li>一个整数类型的值对浮点数进行加法和减法操作，结果是一个浮点数；<li>加法和减法的优先级相同，进行先加后减操作与进行先减后加操作的结果是一样的；<li>在Java中，<code class="language-plaintext highlighter-rouge">+</code>的左右两边如果有字符串，那么表示字符串的拼接。但是在MySQL中<code class="language-plaintext highlighter-rouge">+</code>只表示数值相加。<strong>如果遇到非数值类型，先尝试转成数值，如果转失败，就按0计算</strong>。（补充：MySQL 中字符串拼接要使用字符串函数CONCAT()实现）</ul><h3 id="2乘法与除法运算符">2．乘法与除法运算符<a href="#2乘法与除法运算符" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><pre><code class="language-mysql">mysql&gt; SELECT 100, 100 * 1, 100 * 1.0, 100 / 1.0, 100 / 2,100 + 2 * 5 / 2,100 /3, 100
+DIV 0 FROM dual;
++-----+---------+-----------+-----------+---------+-----------------+---------+-------
+----+
+| 100 | 100 * 1 | 100 * 1.0 | 100 / 1.0 | 100 / 2 | 100 + 2 * 5 / 2 | 100 /3 | 100
+DIV 0 |
++-----+---------+-----------+-----------+---------+-----------------+---------+-------
+----+
+| 100 | 100 | 100.0 | 100.0000 | 50.0000 | 105.0000 | 33.3333 |
+NULL |
++-----+---------+-----------+-----------+---------+-----------------+---------+-------
+----+
+1 row in set (0.00 sec)
+</code></pre><pre><code class="language-mysql">#计算出员工的年基本工资
+SELECT employee_id,salary,salary * 12 annual_sal
+FROM employees;
+</code></pre><p>由运算结果可以得出如下结论：</p><ul><li>一个数乘以整数1和除以整数1后仍得原数；<li>一个数乘以浮点数1和除以浮点数1后变成浮点数，数值与原数相等；<li>一个数除以整数后，不管是否能除尽，结果都为一个浮点数；<li>一个数除以另一个数，除不尽时，结果为一个浮点数，并保留到小数点后4位；<li>乘法和除法的优先级相同，进行先乘后除操作与先除后乘操作，得出的结果相同。<li><strong>在数学运算中，0不能用作除数，在MySQL中，一个数除以0为NULL</strong>。</ul><h3 id="3求模求余运算符">3．求模（求余）运算符<a href="#3求模求余运算符" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><p>将t22表中的字段i对3和5进行求模（求余）运算。</p><pre><code class="language-mysql">mysql&gt; SELECT 12 % 3, 12 MOD 5 FROM dual;
++--------+----------+
+| 12 % 3 | 12 MOD 5 |
++--------+----------+
+| 0 	| 2 		|
++--------+----------+
+1 row in set (0.00 sec)
+</code></pre><pre><code class="language-mysql"># 筛选出employee_id是偶数的员工
+SELECT * FROM employees
+WHERE employee_id MOD 2 = 0;
+</code></pre><p>可以看到，100对3求模后的结果为3，对5求模后的结果为0。</p><h2 id="2-比较运算符">2. 比较运算符<a href="#2-比较运算符" class="anchor"><i class="fas fa-hashtag"></i></a></h2></h2><p>​ 比较运算符用来对表达式左边的操作数和右边的操作数进行比较，比较的结果为真则返回1，比较的结果 为假则返回0，其他情况则返回NULL。</p><p>​ 比较运算符经常被用来作为SELECT查询语句的条件来使用，返回符合条件的结果记录。</p><p><img data-src="../../assets/images/20210604Mysql_calculate/image-20220510155355372.png" alt="image-20220510155355372" style="zoom:80%;" data-proofer-ignore></p><h3 id="1-等号运算符">1. 等号运算符<a href="#1-等号运算符" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><p>​ 等号运算符（=）判断等号两边的值、字符串或表达式是否相等，如果相等则返回1，不相等则返回 0。</p><p>在使用等号运算符时，遵循如下规则：</p><ul><li>如果等号两边的值、字符串或表达式都为字符串，则MySQL会按照字符串进行比较，其比较的 是每个字符串中字符的ANSI编码是否相等。<li>如果等号两边的值都是整数，则MySQL会按照整数来比较两个值的大小。<li>如果等号两边的值一个是整数，另一个是字符串，则MySQL会将字符串转化为数字进行比较。<li><strong>如果等号两边的值、字符串或表达式中有一个为NULL，则比较结果为NULL</strong>。</ul><p>对比：SQL中赋值符号使用 : <code class="language-plaintext highlighter-rouge">=</code></p><pre><code class="language-mysql">mysql&gt; SELECT 1 = 1, 1 = '1', 1 = 0, 'a' = 'a', (5 + 3) = (2 + 6), '' = NULL , NULL =
+NULL;
++-------+---------+-------+-----------+-------------------+-----------+-------------+
+| 1 = 1 | 1 = '1' | 1 = 0 | 'a' = 'a' | (5 + 3) = (2 + 6) | '' = NULL | NULL = NULL |
++-------+---------+-------+-----------+-------------------+-----------+-------------+
+| 1 	| 1 	 | 0 	 | 1 	     | 1 			    | NULL 	    | NULL 		 |
++-------+---------+-------+-----------+-------------------+-----------+-------------+
+1 row in set (0.00 sec)
+</code></pre><pre><code class="language-mysql">#查询salary=10000，注意在Java中比较是==
+SELECT employee_id,salary FROM employees WHERE salary = 10000;
+</code></pre><h3 id="2-安全等于运算符">2. 安全等于运算符<a href="#2-安全等于运算符" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><p>​ 安全等于运算符（&lt;=&gt;）与等于运算符（=）的作用是相似的， <strong>唯一的区别 是‘&lt;=&gt;’可 以用来对NULL进行判断</strong>。</p><p>在两个操作数均为NULL时，其返回值为1，而不为NULL；</p><p><strong>当一个操作数为NULL 时，其返回值为0，而不为NULL</strong>。</p><p><strong>安全等于运算符就是为NULL而生</strong></p><pre><code class="language-mysql">mysql&gt; SELECT 1 &lt;=&gt; '1', 1 &lt;=&gt; 0, 'a' &lt;=&gt; 'a', (5 + 3) &lt;=&gt; (2 + 6), '' &lt;=&gt; NULL,NULL
+&lt;=&gt; NULL FROM dual;
++-----------+---------+-------------+---------------------+-------------+---------------+
+| 1 &lt;=&gt; '1' | 1 &lt;=&gt; 0 | 'a' &lt;=&gt; 'a' | (5 + 3) &lt;=&gt; (2 + 6) | '' &lt;=&gt; NULL | NULL &lt;=&gt;NULL |
++-----------+---------+-------------+---------------------+-------------+---------------+
+| 1 		| 0 	 | 			1 | 				1  | 		  0 |			1 |
++-----------+---------+-------------+---------------------+-------------+---------------+
+1 row in set (0.00 sec)
+</code></pre><h3 id="3-不等于运算符">3. 不等于运算符<a href="#3-不等于运算符" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><p>​ 不等于运算符（<code class="language-plaintext highlighter-rouge">&lt;&gt;和!=</code>）用于判断两边的数字、字符串或者表达式的值是否不相等， 如果不相等则返回1，相等则返回0。不等于运算符不能判断NULL值。<strong>如果两边的值有任意一个为NULL， 或两边都为NULL，则结果为NULL</strong>。 SQL语句示例如下：</p><pre><code class="language-mysql">mysql&gt; SELECT 1 &lt;&gt; 1, 1 != 2, 'a' != 'b', (3+4) &lt;&gt; (2+6), 'a' != NULL, NULL &lt;&gt; NULL;
++--------+--------+------------+----------------+-------------+--------------+
+| 1 &lt;&gt; 1 | 1 != 2 | 'a' != 'b' | (3+4) &lt;&gt; (2+6) | 'a' != NULL | NULL &lt;&gt; NULL |
++--------+--------+------------+----------------+-------------+--------------+
+| 0 	| 1	 	 | 1 	      | 1 	           | NULL 		| NULL 		   |
++--------+--------+------------+----------------+-------------+--------------+
+1 row in set (0.00 sec)
+</code></pre><h3 id="4--空运算符">4. 空运算符<a href="#4--空运算符" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><p>​ 空运算符（<code class="language-plaintext highlighter-rouge">IS NULL或者ISNULL</code>）判断一个值是否为NULL，如果为NULL则返回1，否则返回 0。 SQL语句示例如下：</p><pre><code class="language-mysql">mysql&gt; SELECT NULL IS NULL, ISNULL(NULL), ISNULL('a'), 1 IS NULL;
++--------------+--------------+-------------+-----------+
+| NULL IS NULL | ISNULL(NULL) | ISNULL('a') | 1 IS NULL |
++--------------+--------------+-------------+-----------+
+| 1 		  | 1			 | 0 		  | 0		 |
++--------------+--------------+-------------+-----------+
+1 row in set (0.00 sec)
+</code></pre><pre><code class="language-mysql">#查询commission_pct等于NULL。比较如下的四种写法
+SELECT employee_id,commission_pct FROM employees WHERE commission_pct IS NULL;
+SELECT employee_id,commission_pct FROM employees WHERE commission_pct &lt;=&gt; NULL;
+SELECT employee_id,commission_pct FROM employees WHERE ISNULL(commission_pct);
+SELECT employee_id,commission_pct FROM employees WHERE commission_pct = NULL;
+</code></pre><pre><code class="language-mysql">SELECT last_name, manager_id
+FROM employees
+WHERE manager_id IS NULL;
+</code></pre><h3 id="5-非空运算符">5. 非空运算符<a href="#5-非空运算符" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><p>​ 非空运算符（IS NOT NULL）判断一个值是否不为NULL，如果不为NULL则返回1，否则返 回0。 SQL语句示例如下：</p><pre><code class="language-mysql">mysql&gt; SELECT NULL IS NOT NULL, 'a' IS NOT NULL, 1 IS NOT NULL;
++------------------+-----------------+---------------+
+| NULL IS NOT NULL | 'a' IS NOT NULL | 1 IS NOT NULL |
++------------------+-----------------+---------------+
+| 0 			  | 1 			   | 1 		      |
++------------------+-----------------+---------------+
+1 row in set (0.01 sec)
+</code></pre><h3 id="6-最小值运算符">6. 最小值运算符<a href="#6-最小值运算符" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><p>​ 语法格式为：LEAST(值1，值2，…，值n)。</p><p>​ 其中，“值n”表示参数列表中有n个值。在有 两个或多个参数的情况下，返回最小值。</p><pre><code class="language-mysql">mysql&gt; SELECT LEAST (1,0,2), LEAST('b','a','c'), LEAST(1,NULL,2);
++---------------+--------------------+-----------------+
+| LEAST (1,0,2) | LEAST('b','a','c') | LEAST(1,NULL,2) |
++---------------+--------------------+-----------------+
+| 0 		   | a 			       | NULL 			|
++---------------+--------------------+-----------------+
+1 row in set (0.00 sec)
+</code></pre><p>​ 由结果可以看到，当参数是整数或者浮点数时，LEAST将返回其中最小的值；当参数为字符串时，返回字 母表中顺序最靠前的字符；<strong>当比较值列表中有NULL时，不能判断大小，返回值为NULL</strong>。</p><h3 id="7-最大值运算符">7. 最大值运算符<a href="#7-最大值运算符" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><p>​ 语法格式为：GREATEST(值1，值2，…，值n)。</p><p>​ 其中，n表示参数列表中有n个值。当有 两个或多个参数时，返回值为最大值。假如任意一个自变量为NULL，则GREATEST()的返回值为NULL。</p><pre><code class="language-mysql">mysql&gt; SELECT GREATEST(1,0,2), GREATEST('b','a','c'), GREATEST(1,NULL,2);
++-----------------+-----------------------+--------------------+
+| GREATEST(1,0,2) | GREATEST('b','a','c') | GREATEST(1,NULL,2) |
++-----------------+-----------------------+--------------------+
+| 2 			 | c 				    | NULL 			    |
++-----------------+-----------------------+--------------------+
+1 row in set (0.00 sec)
+</code></pre><p>​ 由结果可以看到，当参数中是整数或者浮点数时，GREATEST将返回其中最大的值；当参数为字符串时， 返回字母表中顺序最靠后的字符；当比较值列表中有NULL时，不能判断大小，返回值为NULL。</p><h3 id="8-between-and运算符">8. BETWEEN AND运算符<a href="#8-between-and运算符" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3>BETWEEN运算符使用的格式通常为<code class="language-plaintext highlighter-rouge">SELECT D FROM TABLE WHERE C BETWEEN A AND B</code>，此时，当C大于或等于A，并且C小于或等于B时，结果为1，否则结果为0。<strong>【包含边界】</strong><pre><code class="language-mysql">mysql&gt; SELECT 1 BETWEEN 0 AND 1, 10 BETWEEN 11 AND 12, 'b' BETWEEN 'a' AND 'c'; 
++-------------------+----------------------+-------------------------+
+| 1 BETWEEN 0 AND 1 | 10 BETWEEN 11 AND 12 | 'b' BETWEEN 'a' AND 'c' |
++-------------------+----------------------+-------------------------+
+| 1 				| 0 				| 1 					|
++-------------------+----------------------+-------------------------+
+1 row in set (0.00 sec)
+</code></pre><pre><code class="language-mysql">SELECT last_name, salary
+FROM employees
+WHERE salary BETWEEN 2500 AND 3500;
+</code></pre><h3 id="9--in运算符">9. IN运算符<a href="#9--in运算符" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><p>​ IN运算符用于判断给定的值是否是IN列表中的一个值，如果是则返回1，否则返回0。如果给定的值为NULL，或者IN列表中存在NULL，则结果为NULL。</p><pre><code class="language-mysql">mysql&gt; SELECT 'a' IN ('a','b','c'), 1 IN (2,3), NULL IN ('a','b'), 'a' IN ('a', NULL);
++----------------------+------------+-------------------+--------------------+
+| 'a' IN ('a','b','c') | 1 IN (2,3) | NULL IN ('a','b') | 'a' IN ('a', NULL) |
++----------------------+------------+-------------------+--------------------+
+| 1 				 | 0 		  | NULL 			 | 1 				|
++----------------------+------------+-------------------+--------------------+
+1 row in set (0.00 sec)
+</code></pre><pre><code class="language-mysql">SELECT employee_id, last_name, salary, manager_id
+FROM employees
+WHERE manager_id IN (100, 101, 201);
+</code></pre><h3 id="10-not-in运算符">10. NOT IN运算符<a href="#10-not-in运算符" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><p>​ NOT IN运算符用于判断给定的值是否不是IN列表中的一个值，如果不是IN列表中的一 个值，则返回1，否则返回0。</p><pre><code class="language-mysql">mysql&gt; SELECT 'a' NOT IN ('a','b','c'), 1 NOT IN (2,3);
++--------------------------+----------------+
+| 'a' NOT IN ('a','b','c') | 1 NOT IN (2,3) |
++--------------------------+----------------+
+| 0 					| 1 			 |
++--------------------------+----------------+
+1 row in set (0.00 sec)
+</code></pre><h3 id="11-like运算符">11. LIKE运算符<a href="#11-like运算符" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><p>​ LIKE运算符主要用来匹配字符串，通常用于模糊匹配，如果满足条件则返回1，否则返回 0。如果给定的值或者匹配条件为NULL，则返回结果为NULL。</p><p>​ LIKE运算符通常使用如下通配符：</p><pre><code class="language-mysql">%：匹配0个或多个字符。
+_：只能匹配一个字符。
+</code></pre><pre><code class="language-mysql">mysql&gt; SELECT NULL LIKE 'abc', 'abc' LIKE NULL;
++-----------------+-----------------+
+| NULL LIKE 'abc' | 'abc' LIKE NULL |
++-----------------+-----------------+
+| NULL 			 | NULL 		  |
++-----------------+-----------------+
+1 row in set (0.00 sec)
+</code></pre><pre><code class="language-mysql">SELECT first_name
+FROM employees
+WHERE first_name LIKE 'S%';
+</code></pre><pre><code class="language-mysql">SELECT last_name
+FROM employees
+WHERE last_name LIKE '_o%';
+</code></pre><p>ESCAPE</p><p>​ 回避特殊符号的：使用转义符。例如：将<code class="language-plaintext highlighter-rouge">[%]</code>转为<code class="language-plaintext highlighter-rouge">[$%]</code>、<code class="language-plaintext highlighter-rouge">[]</code>转为<code class="language-plaintext highlighter-rouge">[$]</code>，然后再加上<code class="language-plaintext highlighter-rouge">[ESCAPE‘$’]</code>即可。</p><p>举例：要求第二个字符为<code class="language-plaintext highlighter-rouge">_</code></p><pre><code class="language-mysql">SELECT job_id
+FROM jobs
+WHERE job_id LIKE "IT\_%";
+</code></pre><p>如果使用\表示转义，要省略ESCAPE。MySQL中如果不用\，则要加上ESCAPE。</p><pre><code class="language-mysql">SELECT job_id
+FROM jobs
+WHERE job_id LIKE 'IT$_%' escape '$';
+</code></pre><h3 id="12-regexp运算符">12. REGEXP运算符<a href="#12-regexp运算符" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3>REGEXP运算符用来匹配字符串，语法格式为： expr REGEXP 匹配条件 。<p>如果expr满足匹配条件，返回 1；如果不满足，则返回0。若expr或匹配条件任意一个为NULL，则结果为NULL。</p><pre><code class="language-mysql">（1）‘^’匹配以该字符后面的字符开头的字符串。
+（2）‘$’匹配以该字符前面的字符结尾的字符串。
+（3）‘.’匹配任何一个单字符。
+（4）“[...]”匹配在方括号内的任何字符。例如，“[abc]”匹配“a”或“b”或“c”。为了命名字符的范围，使用一
+个‘-’。“[a-z]”匹配任何字母，而“[0-9]”匹配任何数字。
+（5）‘*’匹配零个或多个在它前面的字符。例如，“x*”匹配任何数量的‘x’字符，“[0-9]*”匹配任何数量的数字，
+而“*”匹配任何数量的任何字符。
+</code></pre><h2 id="3逻辑运算符">3.逻辑运算符<a href="#3逻辑运算符" class="anchor"><i class="fas fa-hashtag"></i></a></h2></h2><p>​ 逻辑运算符主要用来判断表达式的真假，在MySQL中，逻辑运算符的返回结果为1、0或者NULL。</p><p>MySQL中支持4种逻辑运算符如下：</p><p><img data-src="../../assets/images/20210604Mysql_calculate/image-20220511151201059.png" alt="image-20220511151201059" data-proofer-ignore></p><h3 id="1----逻辑非运算符">1. 逻辑非运算符<a href="#1----逻辑非运算符" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><p>逻辑非（NOT或!）运算符表示当给定的值为0时返回1；当给定的值为非0值时返回0； 当给定的值为NULL时，返回NULL。</p><pre><code class="language-mysql">mysql&gt; SELECT NOT 1, NOT 0, NOT(1+1), NOT !1, NOT NULL;
++-------+-------+----------+--------+----------+
+| NOT 1 | NOT 0 | NOT(1+1) | NOT !1 | NOT NULL |
++-------+-------+----------+--------+----------+
+| 0 	| 1 	| 0 	  | 1 	   | NULL 	  |
++-------+-------+----------+--------+----------+
+1 row in set, 1 warning (0.00 sec)
+</code></pre><pre><code class="language-mysql">SELECT last_name, job_id
+FROM employees
+WHERE job_id NOT IN ('IT_PROG', 'ST_CLERK', 'SA_REP');
+</code></pre><h3 id="2-逻辑与运算符">2. 逻辑与运算符<a href="#2-逻辑与运算符" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><p>​ 逻辑与（AND或&amp;&amp;）运算符是当给定的所有值均为非0值，并且都不为NULL时，返回 1；当给定的一个值或者多个值为0时则返回0；否则返回NULL。</p><pre><code class="language-mysql">mysql&gt; SELECT 1 AND -1, 0 AND 1, 0 AND NULL, 1 AND NULL;
++----------+---------+------------+------------+
+| 1 AND -1 | 0 AND 1 | 0 AND NULL | 1 AND NULL |
++----------+---------+------------+------------+
+| 1 		| 0 	| 0 		| NULL 		|
++----------+---------+------------+------------+
+1 row in set (0.00 sec)
+</code></pre><pre><code class="language-mysql">SELECT employee_id, last_name, job_id, salary
+FROM employees
+WHERE salary &gt;=10000
+AND job_id LIKE '%MAN%';
+</code></pre><h3 id="3-逻辑或运算符">3. 逻辑或运算符<a href="#3-逻辑或运算符" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><div class="table-wrapper"><table><tbody><tr><td>​ 逻辑或（OR或<td> <td>）运算符是当给定的值都不为NULL，并且任何一个值为非0值时，则返 回1，否则返回0；当一个值为NULL，并且另一个值为非0值时，返回1，否则返回NULL；当两个值都为 NULL时，返回NULL。</table></div><pre><code class="language-mysql">mysql&gt; SELECT 1 OR -1, 1 OR 0, 1 OR NULL, 0 || NULL, NULL || NULL;
++---------+--------+-----------+-----------+--------------+
+| 1 OR -1 | 1 OR 0 | 1 OR NULL | 0 || NULL | NULL || NULL |
++---------+--------+-----------+-----------+--------------+
+| 1 	  | 1 	   | 1 		  | NULL 	  | NULL 		|
++---------+--------+-----------+-----------+--------------+
+1 row in set, 2 warnings (0.00 sec)
+</code></pre><pre><code class="language-mysql">#查询基本薪资不在9000-12000之间的员工编号和基本薪资
+SELECT employee_id,salary FROM employees
+WHERE NOT (salary &gt;= 9000 AND salary &lt;= 12000);
+SELECT employee_id,salary FROM employees
+WHERE salary &lt;9000 OR salary &gt; 12000;
+SELECT employee_id,salary FROM employees
+WHERE salary NOT BETWEEN 9000 AND 12000;
+</code></pre><pre><code class="language-mysql">SELECT employee_id, last_name, job_id, salary
+FROM employees
+WHERE salary &gt;= 10000
+OR job_id LIKE '%MAN%';
+</code></pre><p>注意： OR可以和AND一起使用，但是在使用时要注意两者的优先级，由于AND的优先级高于OR，因此先 对AND两边的操作数进行操作，再与OR中的操作数结合。</p><h3 id="4-逻辑异或运算符">4. 逻辑异或运算符<a href="#4-逻辑异或运算符" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><p>​ 逻辑异或（XOR）运算符是当给定的值中任意一个值为NULL时，则返回NULL；如果 两个非NULL的值都是0或者都不等于0时，则返回0；如果一个值为0，另一个值不为0时，则返回1。</p><pre><code class="language-mysql">mysql&gt; SELECT 1 XOR -1, 1 XOR 0, 0 XOR 0, 1 XOR NULL, 1 XOR 1 XOR 1, 0 XOR 0 XOR 0;
++----------+---------+---------+------------+---------------+---------------+
+| 1 XOR -1 | 1 XOR 0 | 0 XOR 0 | 1 XOR NULL | 1 XOR 1 XOR 1 | 0 XOR 0 XOR 0 |
++----------+---------+---------+------------+---------------+---------------+
+| 0 	   | 1       | 0       | NULL       | 1             | 0             |
++----------+---------+---------+------------+---------------+---------------+
+1 row in set (0.00 sec)
+</code></pre><pre><code class="language-mysql">select last_name,department_id,salary
+from employees
+where department_id in (10,20) XOR salary &gt; 8000;
+</code></pre><h2 id="4-位运算符">4. 位运算符<a href="#4-位运算符" class="anchor"><i class="fas fa-hashtag"></i></a></h2></h2><p>​ 位运算符是在二进制数上进行计算的运算符。位运算符会先将操作数变成二进制数，然后进行位运算， 最后将计算结果从二进制变回十进制数。</p><p>​ MySQL支持的位运算符如下：</p><p><img data-src="../../assets/images/20210604Mysql_calculate/image-20220511154011022.png" alt="image-20220511154011022" data-proofer-ignore></p><h3 id="1按位与运算符">1．按位与运算符<a href="#1按位与运算符" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><p>​ 按位与（&amp;）运算符将给定值对应的二进制数逐位进行逻辑与运算。当给定值对应的二 进制位的数值都为1时，则该位返回1，否则返回0。</p><pre><code class="language-mysql">mysql&gt; SELECT 1 &amp; 10, 20 &amp; 30;
++--------+---------+
+| 1 &amp; 10 | 20 &amp; 30 |
++--------+---------+
+| 0 | 20 |
++--------+---------+
+1 row in set (0.00 sec)
+</code></pre><p>​ 1的二进制数为0001，10的二进制数为1010，所以1 &amp; 10的结果为0000，对应的十进制数为0。20的二进制 数为10100，30的二进制数为11110，所以20 &amp; 30的结果为10100，对应的十进制数为20。</p><h3 id="2-按位或运算符">2. 按位或运算符<a href="#2-按位或运算符" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3>按位或（|）运算符将给定的值对应的二进制数逐位进行逻辑或运算。当给定值对应的 二进制位的数值有一个或两个为1时，则该位返回1，否则返回0。<pre><code class="language-mysql">mysql&gt; SELECT 1 | 10, 20 | 30;
++--------+---------+
+| 1 | 10 | 20 | 30 |
++--------+---------+
+| 11 	 | 30 	  |
++--------+---------+
+1 row in set (0.00 sec
+</code></pre><div class="table-wrapper"><table><tbody><tr><td>​ 1的二进制数为0001，10的二进制数为1010，所以1<td>10的结果为1011，对应的十进制数为11。20的二进 制数为10100，30的二进制数为11110，所以20<td>30的结果为11110，对应的十进制数为30。</table></div><h3 id="3-按位异或运算符">3. 按位异或运算符<a href="#3-按位异或运算符" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><p>​ 按位异或（^）运算符将给定的值对应的二进制数逐位进行逻辑异或运算。当给定值 对应的二进制位的数值不同时，则该位返回1，否则返回0。</p><pre><code class="language-mysql">mysql&gt; SELECT 1 ^ 10, 20 ^ 30;
++--------+---------+
+| 1 ^ 10 | 20 ^ 30 |
++--------+---------+
+| 11 | 10 |
++--------+---------+
+1 row in set (0.00 sec)
+</code></pre><p>​ 1的二进制数为0001，10的二进制数为1010，所以1 ^ 10的结果为1011，对应的十进制数为11。20的二进 制数为10100，30的二进制数为11110，所以20 ^ 30的结果为01010，对应的十进制数为10。 再举例：</p><pre><code class="language-mysql">mysql&gt; SELECT 12 &amp; 5, 12 | 5,12 ^ 5 FROM DUAL;
++--------+--------+--------+
+| 12 &amp; 5 | 12 | 5 | 12 ^ 5 |
++--------+--------+--------+
+| 4 	 | 13 	  | 9 	  |
++--------+--------+--------+
+1 row in set (0.00 sec)
+</code></pre><p><img data-src="../../assets/images/20210604Mysql_calculate/image-20220511154952018.png" alt="image-20220511154952018" data-proofer-ignore></p><h3 id="4-按位取反运算符">4. 按位取反运算符<a href="#4-按位取反运算符" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><p>​ 按位取反（~）运算符将给定的值的二进制数逐位进行取反操作，即将1变为0，将0变 为1。</p><pre><code class="language-mysql">mysql&gt; SELECT 10 &amp; ~1;
++---------+
+| 10 &amp; ~1 |
++---------+
+| 10 	  |
++---------+
+1 row in set (0.00 sec)
+</code></pre><p>​ 由于按位取反（~）运算符的优先级高于按位与（&amp;）运算符的优先级，所以10 &amp; ~1，首先，对数字1进 行按位取反操作，结果除了最低位为0，其他位都为1，然后与10进行按位与操作，结果为10。</p><h3 id="5-按位右移运算符">5. 按位右移运算符<a href="#5-按位右移运算符" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><p>​ 按位右移（»）运算符将给定的值的二进制数的所有位右移指定的位数。右移指定的 位数后，右边低位的数值被移出并丢弃，左边高位空出的位置用0补齐。</p><pre><code class="language-mysql">mysql&gt; SELECT 1 &gt;&gt; 2, 4 &gt;&gt; 2;
++--------+--------+
+| 1 &gt;&gt; 2 | 4 &gt;&gt; 2 |
++--------+--------+
+| 0 	 | 1 	 |
++--------+--------+
+1 row in set (0.00 sec)
+</code></pre><p>​ 1的二进制数为0000 0001，右移2位为0000 0000，对应的十进制数为0。4的二进制数为0000 0100，右移2 位为0000 0001，对应的十进制数为1。</p><h3 id="6-按位左移运算符">6. 按位左移运算符<a href="#6-按位左移运算符" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3>按位左移（«）运算符将给定的值的二进制数的所有位左移指定的位数。左移指定的 位数后，左边高位的数值被移出并丢弃，右边低位空出的位置用0补齐<pre><code class="language-mysql">mysql&gt; SELECT 1 &lt;&lt; 2, 4 &lt;&lt; 2;
++--------+--------+
+| 1 &lt;&lt; 2 | 4 &lt;&lt; 2 |
++--------+--------+
+| 4 	| 16 	|
++--------+--------+
+1 row in set (0.00 sec)
+</code></pre><p>​ 1的二进制数为0000 0001，左移两位为0000 0100，对应的十进制数为4。4的二进制数为0000 0100，左移 两位为0001 0000，对应的十进制数为16。</p><h2 id="5-练习">5. 练习<a href="#5-练习" class="anchor"><i class="fas fa-hashtag"></i></a></h2></h2><ol><li>选择工资不在5000到12000的员工的姓名和工资</ol><pre><code class="language-mysql">SELECT last_name,salary
+FROM employees
+WHERE salary between 5000 and 12000;
+</code></pre><ol><li>选择在20或50号部门工作的员工姓名和部门号</ol><pre><code class="language-mysql">SELECT last_name ,department_id 
+FROM employees
+WHERE department_id IN(20,50);
+</code></pre><ol><li>选择公司中没有管理者的员工姓名和job_id</ol><pre><code class="language-mysql">SELECT last_name,job_id,manager_id
+FROM employees
+WHERE manage_id &lt;=&gt; NULL;
+</code></pre><ol><li>选择公司中有奖金的员工姓名，工资和奖金级别</ol><pre><code class="language-mysql">SELECT last_name,salary,commission_pct
+FROM employees
+WHERE NOT commission_pct &lt;=&gt; NULL;
+</code></pre><ol><li>选择姓名中有字母a和k的员工姓名</ol><pre><code class="language-mysql">SELECT last_name 
+FROM employees
+WHERE last_name LIKE "%a%k%" OR LIKE "%k%a%";
+</code></pre><ol><li>选择员工姓名的第三个字母为a的员工姓名</ol><pre><code class="language-mysql">SELECT last_name
+FROM employees
+WHERE last_name LIKE "__a%";
+</code></pre><ol><li>显示出表employees中first_name以e结尾的员工信息</ol><pre><code class="language-mysql">SELECT first_name,last_name
+FROM employees
+WHERE first_name LIKE '%e';
+</code></pre><ol><li>显示出表employees部门编号在80-100之间的姓名、工种</ol><pre><code class="language-mysql">SELECT last_name,job_id
+FROM employees
+WHERE department_id between 80 and 100;
+</code></pre><ol><li>显示表employees的manage_id是100,101,110的员工姓名、工资、管理者id</ol><pre><code class="language-mysql">SELECT last_name,salary，manager_id 
+FROM employees
+WHERE manager_id IN(100,101,110);
+</code></pre></div><div class="post-tail-wrapper text-muted"><div class="post-meta mb-3"> <i class="far fa-folder-open fa-fw mr-1"></i> <a href='/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/'>数据库</a></div><div class="post-tags"> <i class="fa fa-tags fa-fw mr-1"></i> <a href="/tags/mysql/" class="post-tag no-text-decoration" >MySQL</a></div><div class="post-tail-bottom d-flex justify-content-between align-items-center mt-3 pt-5 pb-2"><div class="license-wrapper"> 本文由作者按照 <a href="https://creativecommons.org/licenses/by/4.0/"> CC BY 4.0 </a> 进行授权</div><div class="share-wrapper"> <span class="share-label text-muted mr-1">分享</span> <span class="share-icons"> <a href="https://twitter.com/intent/tweet?text=MySQL运算符 - Technical Blogs&url=https://carmanzheng.github.io//posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E8%BF%90%E7%AE%97%E7%AC%A6/" data-toggle="tooltip" data-placement="top" title="Twitter" target="_blank" rel="noopener" aria-label="Twitter"> <i class="fa-fw fab fa-twitter"></i> </a> <a href="https://www.facebook.com/sharer/sharer.php?title=MySQL运算符 - Technical Blogs&u=https://carmanzheng.github.io//posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E8%BF%90%E7%AE%97%E7%AC%A6/" data-toggle="tooltip" data-placement="top" title="Facebook" target="_blank" rel="noopener" aria-label="Facebook"> <i class="fa-fw fab fa-facebook-square"></i> </a> <a href="https://telegram.me/share?text=MySQL运算符 - Technical Blogs&url=https://carmanzheng.github.io//posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E8%BF%90%E7%AE%97%E7%AC%A6/" data-toggle="tooltip" data-placement="top" title="Telegram" target="_blank" rel="noopener" aria-label="Telegram"> <i class="fa-fw fab fa-telegram"></i> </a> <i id="copy-link" class="fa-fw fas fa-link small" data-toggle="tooltip" data-placement="top" title="分享链接" title-succeed="链接已复制！"> </i> </span></div></div></div></div></div><div id="panel-wrapper" class="col-xl-3 pl-2 text-muted topbar-down"><div class="access"><div id="access-lastmod" class="post"><div class="panel-heading">最近更新</div><ul class="post-content pl-0 pb-1 ml-1 mt-2"><li><a href="/posts/Kubernetes%E6%A6%82%E8%BF%B0/">Kubernetes</a><li><a href="/posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E7%B4%A2%E5%BC%95%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">MySQL存储引擎</a><li><a href="/posts/Linux%E5%9F%BA%E7%A1%80/">Linux基础</a><li><a href="/posts/Python-%E5%A4%9A%E8%BF%9B%E7%A8%8B%E5%A4%9A%E7%BA%BF%E7%A8%8B/">Python基操-多进程与多线程</a><li><a href="/posts/%E5%89%8D%E7%AB%AF-Vue%E8%B7%AF%E7%94%B1%E4%B8%8EVuex/">前端 Vue路由与vuex</a></ul></div><div id="access-tags"><div class="panel-heading">热门标签</div><div class="d-flex flex-wrap mt-3 mb-1 mr-3"> <a class="post-tag" href="/tags/mysql/">MySQL</a> <a class="post-tag" href="/tags/python%E5%9F%BA%E6%93%8D/">Python基操</a> <a class="post-tag" href="/tags/%E5%89%8D%E7%AB%AFjs/">前端JS</a> <a class="post-tag" href="/tags/%E5%89%8D%E7%AB%AFvue/">前端Vue</a> <a class="post-tag" href="/tags/%E5%89%8D%E7%AB%AFcss/">前端CSS</a> <a class="post-tag" href="/tags/devops/">DevOps</a> <a class="post-tag" href="/tags/linux%E5%9F%BA%E7%A1%80/">Linux基础</a> <a class="post-tag" href="/tags/%E5%89%8D%E7%AB%AFhtml/">前端HTML</a> <a class="post-tag" href="/tags/github/">Github</a> <a class="post-tag" href="/tags/%E5%AE%A2%E6%88%B7%E7%AB%AF%E5%BC%80%E5%8F%91/">客户端开发</a></div></div></div><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@1.0.1/dist/bootstrap-toc.min.js"></script><div id="toc-wrapper" class="pl-0 pr-4 mb-5"><div class="panel-heading pl-3 pt-2 mb-2">文章内容</div><nav id="toc" data-toggle="toc"></nav></div></div></div><div class="row"><div class="col-12 col-lg-11 col-xl-8"><div id="tail-wrapper" class="pl-1 pr-1 pl-sm-2 pr-sm-2 pl-md-4 pr-md-4"><div id="related-posts" class="mt-5 mb-2 mb-sm-4"><h3 class="pt-2 mt-1 mb-4 ml-1" data-toc-skip>相关文章</h3><div class="card-deck mb-4"><div class="card"> <a href="/posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E7%B4%A2%E5%BC%95%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/"><div class="card-body"> <em class="timeago small" date="2021-07-06 00:00:00 +0800" >2021-07-06</em><h3 class="pt-0 mt-1 mb-3" data-toc-skip>MySQL存储引擎</h3><div class="text-muted small"><p> 1.为什么使用索引 假如给数据使用 二叉树 这样的数据结构进行存储，如下图所示 2. 索引及其优缺点 2.1 索引概述 MySQL官方对索引的定义为：索引（Index）是帮助MySQL高效获取数据的数据结构。 索引的本质：索引是数据结构。你可以简单理解为“排好序的快速查找数据结构”，满足特定查找算法。 这些数据结构以某种方式指向数据， 这样就可以在这些数据结构的基础上实现 ...</p></div></div></a></div><div class="card"> <a href="/posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E5%9F%BA%E7%A1%80/"><div class="card-body"> <em class="timeago small" date="2021-06-01 00:00:00 +0800" >2021-06-01</em><h3 class="pt-0 mt-1 mb-3" data-toc-skip>MySQL基础</h3><div class="text-muted small"><p> 1. 数据库功能 ​ 持久化(persistence)：把数据保存到可掉电式存储设备中以供之后使用。大多数情况下，特别是企业级应用，数据持久化意味着将内存中的数据保存到硬盘上加以”固化”，而持久化的实现过程大多 通过各种关系数据库来完成。 ​ 持久化的主要作用是将内存中的数据存储在关系型数据库中，当然也可以存储在磁盘文件、XML数 据文件中。 2.数据库与数据库管理系统 2....</p></div></div></a></div><div class="card"> <a href="/posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E5%AE%89%E8%A3%85/"><div class="card-body"> <em class="timeago small" date="2021-06-02 00:00:00 +0800" >2021-06-02</em><h3 class="pt-0 mt-1 mb-3" data-toc-skip>MySQL安装</h3><div class="text-muted small"><p> 1. 下载软件 官网：https://www.mysql.com 下载地址：https://dev.mysql.com/downloads/windows/installer/8.0.html MySQL Community Server 社区版本，开源免费，自由下载，但不提供官方技术支持，适用于 大多数普通用户。 MySQL Enterprise Edition 企业版本，...</p></div></div></a></div></div></div><div class="post-navigation d-flex justify-content-between"> <a href="/posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E5%9F%BA%E6%9C%ACSELECT%E8%AF%AD%E5%8F%A5/" class="btn btn-outline-primary" prompt="上一篇"><p>MySQL基本SELECT语句</p></a> <a href="/posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E6%8E%92%E5%BA%8F%E5%92%8C%E5%88%86%E9%A1%B5/" class="btn btn-outline-primary" prompt="下一篇"><p>MySQL排序和分页</p></a></div></div></div></div><footer class="d-flex w-100 justify-content-center"><div class="d-flex justify-content-between align-items-center text-muted"><div class="footer-left"><p class="mb-0"> © 2022 <a href="https://github.com/carmanzheng">carmanzheng</a>. <span data-toggle="tooltip" data-placement="top" title="除非另有说明，本网站上的博客文章均由作者按照知识共享署名 4.0 国际 (CC BY 4.0) 许可协议进行授权。">保留部分权利。</span></p></div><div class="footer-right"><p class="mb-0"> 本站由 <a href="https://jekyllrb.com" target="_blank" rel="noopener">Jekyll</a> 生成，采用 <a href="https://github.com/cotes2020/jekyll-theme-chirpy" target="_blank" rel="noopener">Chirpy</a> 主题。</p></div></div></footer></div><div id="search-result-wrapper" class="d-flex justify-content-center unloaded"><div class="col-12 col-sm-11 post-content"><div id="search-hints"><div id="access-tags"><div class="panel-heading">热门标签</div><div class="d-flex flex-wrap mt-3 mb-1 mr-3"> <a class="post-tag" href="/tags/mysql/">MySQL</a> <a class="post-tag" href="/tags/python%E5%9F%BA%E6%93%8D/">Python基操</a> <a class="post-tag" href="/tags/%E5%89%8D%E7%AB%AFjs/">前端JS</a> <a class="post-tag" href="/tags/%E5%89%8D%E7%AB%AFvue/">前端Vue</a> <a class="post-tag" href="/tags/%E5%89%8D%E7%AB%AFcss/">前端CSS</a> <a class="post-tag" href="/tags/devops/">DevOps</a> <a class="post-tag" href="/tags/linux%E5%9F%BA%E7%A1%80/">Linux基础</a> <a class="post-tag" href="/tags/%E5%89%8D%E7%AB%AFhtml/">前端HTML</a> <a class="post-tag" href="/tags/github/">Github</a> <a class="post-tag" href="/tags/%E5%AE%A2%E6%88%B7%E7%AB%AF%E5%BC%80%E5%8F%91/">客户端开发</a></div></div></div><div id="search-results" class="d-flex flex-wrap justify-content-center text-muted mt-3"></div></div></div></div><div id="mask"></div><a id="back-to-top" href="#" aria-label="back-to-top" class="btn btn-lg btn-box-shadow" role="button"> <i class="fas fa-angle-up"></i> </a> <script src="https://cdn.jsdelivr.net/npm/simple-jekyll-search@1.10.0/dest/simple-jekyll-search.min.js"></script> <script> SimpleJekyllSearch({ searchInput: document.getElementById('search-input'), resultsContainer: document.getElementById('search-results'), json: '/assets/js/data/search.json', searchResultTemplate: '<div class="pl-1 pr-1 pl-sm-2 pr-sm-2 pl-lg-4 pr-lg-4 pl-xl-0 pr-xl-0"> <a href="{url}">{title}</a><div class="post-meta d-flex flex-column flex-sm-row text-muted mt-1 mb-1"> {categories} {tags}</div><p>{snippet}</p></div>', noResultsText: '<p class="mt-5">搜索结果为空</p>', templateMiddleware: function(prop, value, template) { if (prop === 'categories') { if (value === '') { return `${value}`; } else { return `<div class="mr-sm-4"><i class="far fa-folder fa-fw"></i>${value}</div>`; } } if (prop === 'tags') { if (value === '') { return `${value}`; } else { return `<div><i class="fa fa-tag fa-fw"></i>${value}</div>`; } } } }); </script> <script src="https://cdn.jsdelivr.net/combine/npm/lozad/dist/lozad.min.js,npm/magnific-popup@1/dist/jquery.magnific-popup.min.js,npm/clipboard@2/dist/clipboard.min.js"></script> <script defer src="/assets/js/dist/post.min.js"></script> <script src="https://cdn.jsdelivr.net/combine/npm/popper.js@1.16.1,npm/bootstrap@4/dist/js/bootstrap.min.js"></script> <script defer src="/app.js"></script> <script defer src="https://www.googletagmanager.com/gtag/js?id="></script> <script> document.addEventListener("DOMContentLoaded", function(event) { window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', ''); }); </script>

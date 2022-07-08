@@ -1,0 +1,527 @@
+<!DOCTYPE html><html lang="zh-CN" ><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><meta name="day-prompt" content="天前"><meta name="hour-prompt" content="小时前"><meta name="minute-prompt" content="分钟前"><meta name="justnow-prompt" content="刚刚"><meta name="generator" content="Jekyll v4.2.1" /><meta property="og:title" content="JS-ES6新增语法" /><meta property="og:locale" content="zh_CN" /><meta name="description" content="1.ES6相关概念（★★）" /><meta property="og:description" content="1.ES6相关概念（★★）" /><link rel="canonical" href="https://carmanzheng.github.io//posts/%E5%89%8D%E7%AB%AF-JSES6%E6%96%B0%E5%A2%9E%E8%AF%AD%E6%B3%95/" /><meta property="og:url" content="https://carmanzheng.github.io//posts/%E5%89%8D%E7%AB%AF-JSES6%E6%96%B0%E5%A2%9E%E8%AF%AD%E6%B3%95/" /><meta property="og:site_name" content="Technical Blogs" /><meta property="og:type" content="article" /><meta property="article:published_time" content="2021-05-16T00:00:00+08:00" /><meta name="twitter:card" content="summary" /><meta property="twitter:title" content="JS-ES6新增语法" /><meta name="twitter:site" content="@twitter_username" /><meta name="google-site-verification" content="google_meta_tag_verification" /> <script type="application/ld+json"> {"description":"1.ES6相关概念（★★）","headline":"JS-ES6新增语法","dateModified":"2022-04-26T19:15:35+08:00","datePublished":"2021-05-16T00:00:00+08:00","url":"https://carmanzheng.github.io//posts/%E5%89%8D%E7%AB%AF-JSES6%E6%96%B0%E5%A2%9E%E8%AF%AD%E6%B3%95/","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://carmanzheng.github.io//posts/%E5%89%8D%E7%AB%AF-JSES6%E6%96%B0%E5%A2%9E%E8%AF%AD%E6%B3%95/"},"@context":"https://schema.org"}</script><title>JS-ES6新增语法 | Technical Blogs</title><link rel="apple-touch-icon" sizes="180x180" href="/assets/img/favicons/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicons/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicons/favicon-16x16.png"><link rel="manifest" href="/assets/img/favicons/site.webmanifest"><link rel="shortcut icon" href="/assets/img/favicons/favicon.ico"><meta name="apple-mobile-web-app-title" content="Technical Blogs"><meta name="application-name" content="Technical Blogs"><meta name="msapplication-TileColor" content="#da532c"><meta name="msapplication-config" content="/assets/img/favicons/browserconfig.xml"><meta name="theme-color" content="#ffffff"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"><link rel="dns-prefetch" href="https://fonts.gstatic.com"><link rel="preconnect" href="https://www.google-analytics.com" crossorigin="use-credentials"><link rel="dns-prefetch" href="https://www.google-analytics.com"><link rel="preconnect" href="https://www.googletagmanager.com" crossorigin="anonymous"><link rel="dns-prefetch" href="https://www.googletagmanager.com"><link rel="preconnect" href="https://cdn.jsdelivr.net"><link rel="dns-prefetch" href="https://cdn.jsdelivr.net"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.11.2/css/all.min.css"><link rel="stylesheet" href="/assets/css/style.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@1.0.1/dist/bootstrap-toc.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/magnific-popup@1.1.0/dist/magnific-popup.min.css"> <script src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script> <script type="text/javascript"> class ModeToggle { static get MODE_KEY() { return "mode"; } static get DARK_MODE() { return "dark"; } static get LIGHT_MODE() { return "light"; } static get ID() { return "mode-toggle"; } constructor() { if (this.hasMode) { if (this.isDarkMode) { if (!this.isSysDarkPrefer) { this.setDark(); } } else { if (this.isSysDarkPrefer) { this.setLight(); } } } let self = this; /* always follow the system prefers */ this.sysDarkPrefers.addEventListener("change", () => { if (self.hasMode) { if (self.isDarkMode) { if (!self.isSysDarkPrefer) { self.setDark(); } } else { if (self.isSysDarkPrefer) { self.setLight(); } } self.clearMode(); } self.notify(); }); } /* constructor() */ get sysDarkPrefers() { return window.matchMedia("(prefers-color-scheme: dark)"); } get isSysDarkPrefer() { return this.sysDarkPrefers.matches; } get isDarkMode() { return this.mode === ModeToggle.DARK_MODE; } get isLightMode() { return this.mode === ModeToggle.LIGHT_MODE; } get hasMode() { return this.mode != null; } get mode() { return sessionStorage.getItem(ModeToggle.MODE_KEY); } /* get the current mode on screen */ get modeStatus() { if (this.isDarkMode || (!this.hasMode && this.isSysDarkPrefer)) { return ModeToggle.DARK_MODE; } else { return ModeToggle.LIGHT_MODE; } } setDark() { $('html').attr(ModeToggle.MODE_KEY, ModeToggle.DARK_MODE); sessionStorage.setItem(ModeToggle.MODE_KEY, ModeToggle.DARK_MODE); } setLight() { $('html').attr(ModeToggle.MODE_KEY, ModeToggle.LIGHT_MODE); sessionStorage.setItem(ModeToggle.MODE_KEY, ModeToggle.LIGHT_MODE); } clearMode() { $('html').removeAttr(ModeToggle.MODE_KEY); sessionStorage.removeItem(ModeToggle.MODE_KEY); } /* Notify another plugins that the theme mode has changed */ notify() { window.postMessage({ direction: ModeToggle.ID, message: this.modeStatus }, "*"); } } /* ModeToggle */ const toggle = new ModeToggle(); function flipMode() { if (toggle.hasMode) { if (toggle.isSysDarkPrefer) { if (toggle.isLightMode) { toggle.clearMode(); } else { toggle.setLight(); } } else { if (toggle.isDarkMode) { toggle.clearMode(); } else { toggle.setDark(); } } } else { if (toggle.isSysDarkPrefer) { toggle.setLight(); } else { toggle.setDark(); } } toggle.notify(); } /* flipMode() */ </script><body data-spy="scroll" data-target="#toc"><div id="sidebar" class="d-flex flex-column align-items-end" lang="zh-CN"><div class="profile-wrapper text-center"><div id="avatar"> <a href="/" alt="avatar" class="mx-auto"> <img src="/assets/img/favicons/android-chrome-192x192.png" alt="avatar" onerror="this.style.display='none'"> </a></div><div class="site-title mt-3"> <a href="/">Technical Blogs</a></div><div class="site-subtitle font-italic">Learning by Doing, Sharing for more!</div></div><ul class="w-100"><li class="nav-item"> <a href="/" class="nav-link"> <i class="fa-fw fas fa-home ml-xl-3 mr-xl-3 unloaded"></i> <span>首页</span> </a><li class="nav-item"> <a href="/categories/" class="nav-link"> <i class="fa-fw fas fa-stream ml-xl-3 mr-xl-3 unloaded"></i> <span>分类</span> </a><li class="nav-item"> <a href="/tags/" class="nav-link"> <i class="fa-fw fas fa-tag ml-xl-3 mr-xl-3 unloaded"></i> <span>标签</span> </a><li class="nav-item"> <a href="/archives/" class="nav-link"> <i class="fa-fw fas fa-archive ml-xl-3 mr-xl-3 unloaded"></i> <span>归档</span> </a><li class="nav-item"> <a href="/about/" class="nav-link"> <i class="fa-fw fas fa-info-circle ml-xl-3 mr-xl-3 unloaded"></i> <span>关于</span> </a></ul><div class="sidebar-bottom mt-auto d-flex flex-wrap justify-content-center align-items-center"> <button class="mode-toggle btn" aria-label="Switch Mode"> <i class="fas fa-adjust"></i> </button> <span class="icon-border"></span> <a href="https://github.com/Carmanzheng" aria-label="github" target="_blank" rel="noopener"> <i class="fab fa-github"></i> </a> <a href="https://twitter.com/twitter_username" aria-label="twitter" target="_blank" rel="noopener"> <i class="fab fa-twitter"></i> </a> <a href=" javascript:location.href = 'mailto:' + ['zhengkan1993','gmail.com'].join('@')" aria-label="email" > <i class="fas fa-envelope"></i> </a> <a href="/feed.xml" aria-label="rss" > <i class="fas fa-rss"></i> </a></div></div><div id="topbar-wrapper" class="row justify-content-center topbar-down"><div id="topbar" class="col-11 d-flex h-100 align-items-center justify-content-between"> <span id="breadcrumb"> <span> <a href="/"> 首页 </a> </span> <span>JS-ES6新增语法</span> </span> <i id="sidebar-trigger" class="fas fa-bars fa-fw"></i><div id="topbar-title"> 文章</div><i id="search-trigger" class="fas fa-search fa-fw"></i> <span id="search-wrapper" class="align-items-center"> <i class="fas fa-search fa-fw"></i> <input class="form-control" id="search-input" type="search" aria-label="search" autocomplete="off" placeholder="搜索..."> <i class="fa fa-times-circle fa-fw" id="search-cleaner"></i> </span> <span id="search-cancel" >取消</span></div></div><div id="main-wrapper"><div id="main"><div class="row"><div id="core-wrapper" class="col-12 col-lg-11 col-xl-8"><div class="post pl-1 pr-1 pl-sm-2 pr-sm-2 pl-md-4 pr-md-4"><h1 data-toc-skip>JS-ES6新增语法</h1><div class="post-meta text-muted"><div> 作者 <em> <a href="https://github.com/carmanzheng">carmanzheng</a> </em></div><div class="d-flex"><div> <span> 发表于 <em class="timeago" date="2021-05-16 00:00:00 +0800" data-toggle="tooltip" data-placement="bottom" title="2021-05-16, 00:00 +0800" >2021-05-16</em> </span> <span> 更新于 <em class="timeago" date="2022-04-26 19:15:35 +0800 " data-toggle="tooltip" data-placement="bottom" title="2022-04-26, 19:15 +0800" >04-26</em> </span> <span class="readtime" data-toggle="tooltip" data-placement="bottom" title="3463 字"> <em>19 分钟</em>阅读</span></div></div></div><div class="post-content"><h2 id="1es6相关概念">1.ES6相关概念（★★）<a href="#1es6相关概念" class="anchor"><i class="fas fa-hashtag"></i></a></h2></h2><p>​ ES 的全称是 ECMAScript , 它是由 ECMA 国际标准化组织,制定的一项脚本语言的标准化规范。</p><p>每一次标准的诞生都意味着语言的完善，功能的加强。JavaScript语言本身也有一些令人不满意的地方。</p><ul><li>变量提升特性增加了程序运行时的不可预测性<li>语法过于松散，实现相同的功能，不同的人可能会写出不同的代码</ul><h2 id="2es6新增语法">2.ES6新增语法<a href="#2es6新增语法" class="anchor"><i class="fas fa-hashtag"></i></a></h2></h2><h3 id="21-let">2.1 let（★★★）<a href="#21-let" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><p>​ ES6中新增了用于声明变量的关键字，let声明的变量只在所处于的<strong>块级有效</strong></p><div class="language-js highlighter-rouge"><div class="code-header"> <span label-text="JavaScript"><i class="fas fa-code small"></i></span> <button aria-label="copy" title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre><td class="rouge-code"><pre><span class="k">if</span> <span class="p">(</span><span class="kc">true</span><span class="p">)</span> <span class="p">{</span> 
+    <span class="kd">let</span> <span class="nx">a</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">a</span><span class="p">)</span> <span class="c1">// a is not defined</span>
+</pre></table></code></div></div><p>注意：let——块级作用域，var——全局作用域。</p><div class="language-js highlighter-rouge"><div class="code-header"> <span label-text="JavaScript"><i class="fas fa-code small"></i></span> <button aria-label="copy" title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+</pre><td class="rouge-code"><pre><span class="c1">// 利用let声明的变量会绑定在这个块级作用域，不会受外界的影响</span>
+<span class="kd">var</span> <span class="nx">tmp</span> <span class="o">=</span> <span class="mi">123</span><span class="p">;</span>
+<span class="k">if</span> <span class="p">(</span><span class="kc">true</span><span class="p">)</span> <span class="p">{</span> 
+    <span class="kd">let</span> <span class="nx">tmp</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">abc</span><span class="dl">'</span><span class="p">;</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">内部tmp：</span><span class="dl">"</span><span class="o">+</span><span class="nx">tmp</span><span class="p">)</span>
+<span class="p">}</span> 
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">外部tmp：</span><span class="dl">"</span><span class="o">+</span><span class="nx">tmp</span><span class="p">)</span>
+<span class="c1">//内部tmp：abc</span>
+<span class="c1">//外部tmp：123</span>
+</pre></table></code></div></div><h3 id="22-const">2.2 const（★★★）<a href="#22-const" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><p>​ const用于声明常量，即值（内存地址）不能变化的量。</p><div class="language-js highlighter-rouge"><div class="code-header"> <span label-text="JavaScript"><i class="fas fa-code small"></i></span> <button aria-label="copy" title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+</pre><td class="rouge-code"><pre><span class="c1">// 块级作用域</span>
+<span class="k">if</span> <span class="p">(</span><span class="kc">true</span><span class="p">)</span> <span class="p">{</span> 
+    <span class="kd">const</span> <span class="nx">a</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">a</span><span class="p">)</span> <span class="c1">// a is not defined</span>
+</pre></table></code></div></div><div class="language-js highlighter-rouge"><div class="code-header"> <span label-text="JavaScript"><i class="fas fa-code small"></i></span> <button aria-label="copy" title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre><td class="rouge-code"><pre><span class="c1">// 声明时候必须赋值（不赋值报错）</span>
+<span class="kd">const</span> <span class="nx">PI</span><span class="p">;</span> <span class="c1">// Uncaught SyntaxError: Missing initializer in const declaration</span>
+</pre></table></code></div></div><div class="language-js highlighter-rouge"><div class="code-header"> <span label-text="JavaScript"><i class="fas fa-code small"></i></span> <button aria-label="copy" title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+</pre><td class="rouge-code"><pre><span class="c1">// 常量赋值后不能更改（更改报错）</span>
+<span class="kd">const</span> <span class="nx">PI</span> <span class="o">=</span> <span class="mf">3.14</span><span class="p">;</span>
+<span class="nx">PI</span> <span class="o">=</span> <span class="mi">100</span><span class="p">;</span> <span class="c1">//Uncaught TypeError: Assignment to constant variable.</span>
+
+<span class="kd">const</span> <span class="nx">ary</span> <span class="o">=</span> <span class="p">[</span><span class="mi">100</span><span class="p">,</span> <span class="mi">200</span><span class="p">];</span>
+<span class="nx">ary</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">a</span><span class="dl">'</span><span class="p">;</span>
+<span class="nx">ary</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">b</span><span class="dl">'</span><span class="p">;</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">ary</span><span class="p">);</span> <span class="c1">// ['a', 'b']; </span>
+<span class="nx">ary</span> <span class="o">=</span> <span class="p">[</span><span class="dl">'</span><span class="s1">a</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">b</span><span class="dl">'</span><span class="p">];</span> <span class="c1">// Assignment to constant variable.</span>
+</pre></table></code></div></div><p>let、const、var 的区别</p><ul><li>使用 var 声明的变量，其作用域为该语句所在的函数内，且存在变量提升现象<li>使用 let 声明的变量，其作用域为该语句所在的<strong>代码块</strong>内，不存在变量提升<li>使用 const 声明的是常量，在后面出现的代码中不能再修改该常量的值</ul><p><img data-src="../../assets/images/20210516jsES6/var&amp;let&amp;const区别.png" alt="" data-proofer-ignore></p><h3 id="23-解构赋值">2.3 解构赋值（★★★）<a href="#23-解构赋值" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><p>​ ES6中允许从数组中提取值，按照对应位置，对变量赋值，对象也可以实现解构 (这个和python一样)。</p><div class="language-js highlighter-rouge"><div class="code-header"> <span label-text="JavaScript"><i class="fas fa-code small"></i></span> <button aria-label="copy" title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+</pre><td class="rouge-code"><pre><span class="c1">// 数组解构 </span>
+<span class="kd">let</span> <span class="p">[</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">,</span> <span class="nx">c</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">];</span>
+ <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">a</span><span class="p">)</span><span class="c1">//1</span>
+ <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">b</span><span class="p">)</span><span class="c1">//2</span>
+ <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">c</span><span class="p">)</span><span class="c1">//3</span>
+<span class="c1">// 如果解构不成功，变量的值为undefined</span>
+</pre></table></code></div></div><div class="language-js highlighter-rouge"><div class="code-header"> <span label-text="JavaScript"><i class="fas fa-code small"></i></span> <button aria-label="copy" title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+</pre><td class="rouge-code"><pre><span class="c1">// 对象解构 </span>
+<span class="kd">let</span> <span class="nx">person</span> <span class="o">=</span> <span class="p">{</span> <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">zhangsan</span><span class="dl">'</span><span class="p">,</span> <span class="na">age</span><span class="p">:</span> <span class="mi">20</span> <span class="p">};</span> 
+<span class="kd">let</span> <span class="p">{</span> <span class="nx">name</span><span class="p">,</span> <span class="nx">age</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">person</span><span class="p">;</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">name</span><span class="p">);</span> <span class="c1">// 'zhangsan' </span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">age</span><span class="p">);</span> <span class="c1">// 20</span>
+
+<span class="kd">let</span> <span class="p">{</span><span class="na">name</span><span class="p">:</span> <span class="nx">myName</span><span class="p">,</span> <span class="na">age</span><span class="p">:</span> <span class="nx">myAge</span><span class="p">}</span> <span class="o">=</span> <span class="nx">person</span><span class="p">;</span> <span class="c1">// myName myAge 属于别名</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">myName</span><span class="p">);</span> <span class="c1">// 'zhangsan' </span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">myAge</span><span class="p">);</span> <span class="c1">// 20</span>
+
+</pre></table></code></div></div><ul><li>解构赋值就是把数据结构分解，然后给变量进行赋值<li>如果结构不成功，变量跟数值个数不匹配的时候，变量的值为undefined<li><strong>数组解构</strong>用中括号包裹，多个变量用逗号隔开；<strong>对象解构</strong>用花括号包裹，多个变量用逗号隔开<li>利用解构赋值能够让我们方便的去取对象中的属性跟方法</ul><h3 id="24-箭头函数">2.4 箭头函数（★★★）<a href="#24-箭头函数" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><p>​ ES6中新增的定义函数的方式。</p><div class="language-js highlighter-rouge"><div class="code-header"> <span label-text="JavaScript"><i class="fas fa-code small"></i></span> <button aria-label="copy" title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre><td class="rouge-code"><pre><span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{}</span> 		  <span class="c1">//()：代表是函数； =&gt;：必须要的符号，指向哪一个代码块；{}：函数体</span>
+<span class="kd">const</span> <span class="nx">fn</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{}</span><span class="c1">//代表把一个函数赋值给fn</span>
+</pre></table></code></div></div><div class="language-js highlighter-rouge"><div class="code-header"> <span label-text="JavaScript"><i class="fas fa-code small"></i></span> <button aria-label="copy" title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+</pre><td class="rouge-code"><pre><span class="kd">function</span> <span class="nx">sum</span><span class="p">(</span><span class="nx">num1</span><span class="p">,</span> <span class="nx">num2</span><span class="p">)</span> <span class="p">{</span> 
+    <span class="k">return</span> <span class="nx">num1</span> <span class="o">+</span> <span class="nx">num2</span><span class="p">;</span> 
+<span class="p">}</span>
+
+<span class="c1">// es6写法</span>
+<span class="c1">// 函数体中只有一句代码，且代码的执行结果就是返回值，可以省略大括号</span>
+<span class="kd">const</span> <span class="nx">sum</span> <span class="o">=</span> <span class="p">(</span><span class="nx">num1</span><span class="p">,</span> <span class="nx">num2</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">num1</span> <span class="o">+</span> <span class="nx">num2</span><span class="p">;</span> 
+</pre></table></code></div></div><div class="language-js highlighter-rouge"><div class="code-header"> <span label-text="JavaScript"><i class="fas fa-code small"></i></span> <button aria-label="copy" title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+</pre><td class="rouge-code"><pre><span class="kd">function</span> <span class="nx">fn</span> <span class="p">(</span><span class="nx">v</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">v</span><span class="p">;</span>
+<span class="p">}</span> 
+
+<span class="c1">// es6写法</span>
+<span class="c1">// 如果形参只有一个，可以省略小括号</span>
+<span class="kd">const</span> <span class="nx">fn</span> <span class="o">=</span> <span class="nx">v</span> <span class="o">=&gt;</span> <span class="nx">v</span><span class="p">;</span>
+</pre></table></code></div></div><div class="language-js highlighter-rouge"><div class="code-header"> <span label-text="JavaScript"><i class="fas fa-code small"></i></span> <button aria-label="copy" title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+</pre><td class="rouge-code"><pre><span class="kd">const</span> <span class="nx">obj</span> <span class="o">=</span> <span class="p">{</span> <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">张三</span><span class="dl">'</span><span class="p">}</span> 
+<span class="kd">function</span> <span class="nx">fn</span> <span class="p">()</span> <span class="p">{</span> 
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="k">this</span><span class="p">);</span><span class="c1">// this 指向 是obj对象</span>
+    <span class="k">return</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span> 
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="k">this</span><span class="p">);</span> <span class="c1">//this 指向 的是箭头函数定义的位置，那么这个箭头函数定义在fn里面，而这个fn指向是的obj对象，所以这个this也指向是obj对象</span>
+    <span class="p">}</span> 
+<span class="p">}</span> 
+<span class="kd">const</span> <span class="nx">resFn</span> <span class="o">=</span> <span class="nx">fn</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">obj</span><span class="p">);</span> 
+<span class="nx">resFn</span><span class="p">();</span>
+
+<span class="c1">// 上面两个this均指向obj</span>
+</pre></table></code></div></div><ul><li>箭头函数中不绑定this，箭头函数中的this指向是它所定义的位置。箭头函数的this指向箭头函数被创建时，外部作用域的this指向的对象。<li>箭头函数的优点在于解决了this执行环境所造成的一些问题。比如：解决了匿名函数this指向的问题（<strong>匿名函数的执行环境具有全局性</strong>），包括setTimeout和setInterval中使用this所造成的问题<li><strong>对象没有作用域</strong></ul><div class="language-js highlighter-rouge"><div class="code-header"> <span label-text="JavaScript"><i class="fas fa-code small"></i></span> <button aria-label="copy" title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+</pre><td class="rouge-code"><pre><span class="kd">var</span> <span class="nx">age</span> <span class="o">=</span> <span class="mi">100</span><span class="p">;</span>
+
+<span class="kd">var</span> <span class="nx">obj</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="na">age</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
+    <span class="na">say</span><span class="p">:</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="nx">alert</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">age</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nx">obj</span><span class="p">.</span><span class="nx">say</span><span class="p">();</span>  <span class="c1">//箭头函数this指向的是被声明的作用域里面，而对象没有作用域的，所以箭头函数虽然在对象中被定义，但是this指向的是全局作用域</span>
+</pre></table></code></div></div><div class="language-js highlighter-rouge"><div class="code-header"> <span label-text="JavaScript"><i class="fas fa-code small"></i></span> <button aria-label="copy" title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+</pre><td class="rouge-code"><pre><span class="kd">var</span> <span class="nx">name</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">xx</span><span class="dl">'</span><span class="p">;</span>
+<span class="kd">let</span> <span class="nx">fun1</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="kd">let</span> <span class="nx">name</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">lmm</span><span class="dl">'</span><span class="p">;</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="k">this</span><span class="p">);</span> <span class="c1">// Window {window: Window, self: Window, document: document, name: "xx", location: Location, …}</span>
+    <span class="kd">let</span> <span class="nx">normalGetName</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">name: </span><span class="dl">'</span><span class="p">,</span> <span class="nx">name</span><span class="p">);</span>    <span class="c1">// name:  lmm</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">this.name: </span><span class="dl">'</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">name</span><span class="p">);</span>  <span class="c1">// this.name:  xx</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>  <span class="c1">// Window {window: Window, self: Window, document: document, name: "xx", location: Location, …}</span>
+    <span class="p">}</span>
+    <span class="kd">let</span> <span class="nx">arrowGetName</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">name: </span><span class="dl">'</span><span class="p">,</span> <span class="nx">name</span><span class="p">);</span>    <span class="c1">// name:  lmm</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">this.name: </span><span class="dl">'</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">name</span><span class="p">);</span>  <span class="c1">// this.name:  xx</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>  <span class="c1">// Window {window: Window, self: Window, document: document, name: "xx", location: Location, …}</span>
+    <span class="p">}</span>
+    <span class="nx">normalGetName</span><span class="p">();</span>
+    <span class="nx">arrowGetName</span><span class="p">();</span>
+<span class="p">};</span>
+
+<span class="nx">fun1</span><span class="p">();</span>
+</pre></table></code></div></div><p>​ JS中查找变量是按照链式作用域来查找，即先找自己的作用域是否有该变量，如无继续向父作用域找，直到全局作用域window，如果都没有则报错抛出异常。</p><p>箭头函数的作用域作用</p><p><strong>传统的非箭头函数</strong></p><p><img data-src="../../assets/images/20210516jsES6/71.png" alt="img" data-proofer-ignore></p><p><strong>现在，箭头函数完全修复了this的指向，this总是指向词法作用域，也就是外层调用者Person</strong></p><p><img data-src="../../assets/images/20210516jsES6/70.png" alt="img" data-proofer-ignore></p><h3 id="25-剩余参数">2.5 剩余参数（★★）<a href="#25-剩余参数" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><p>​ 剩余参数语法允许我们将一个不定数量的参数表示为一个数组。（同python中的<code class="language-plaintext highlighter-rouge">*args</code>,<code class="language-plaintext highlighter-rouge">**kwargs</code>)</p><div class="language-js highlighter-rouge"><div class="code-header"> <span label-text="JavaScript"><i class="fas fa-code small"></i></span> <button aria-label="copy" title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+</pre><td class="rouge-code"><pre><span class="kd">function</span> <span class="nx">sum</span> <span class="p">(</span><span class="nx">first</span><span class="p">,</span> <span class="p">...</span><span class="nx">args</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">first</span><span class="p">);</span> <span class="c1">// 10</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">args</span><span class="p">);</span> <span class="c1">// [20, 30] </span>
+<span class="p">}</span>
+<span class="nx">sum</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
+</pre></table></code></div></div><p>剩余参数解构</p><div class="language-js highlighter-rouge"><div class="code-header"> <span label-text="JavaScript"><i class="fas fa-code small"></i></span> <button aria-label="copy" title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre><td class="rouge-code"><pre><span class="kd">let</span> <span class="nx">students</span> <span class="o">=</span> <span class="p">[</span><span class="dl">'</span><span class="s1">wangwu</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">zhangsan</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">lisi</span><span class="dl">'</span><span class="p">];</span>
+<span class="kd">let</span> <span class="p">[</span><span class="nx">s1</span><span class="p">,</span> <span class="p">...</span><span class="nx">s2</span><span class="p">]</span> <span class="o">=</span> <span class="nx">students</span><span class="p">;</span> 
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">s1</span><span class="p">);</span>  <span class="c1">// 'wangwu' </span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">s2</span><span class="p">);</span>  <span class="c1">// ['zhangsan', 'lisi']</span>
+</pre></table></code></div></div><h2 id="3es6-的内置对象扩展">3.ES6 的内置对象扩展<a href="#3es6-的内置对象扩展" class="anchor"><i class="fas fa-hashtag"></i></a></h2></h2><h3 id="31-array-扩展">3.1 Array 扩展（★★）<a href="#31-array-扩展" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><p>扩展运算符可以将数组或者对象转为用逗号分隔的参数序列</p><div class="language-js highlighter-rouge"><div class="code-header"> <span label-text="JavaScript"><i class="fas fa-code small"></i></span> <button aria-label="copy" title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre><td class="rouge-code"><pre><span class="kd">let</span> <span class="nx">ary</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">];</span>
+<span class="p">[...</span><span class="nx">ary</span><span class="p">]</span>  <span class="c1">// [1, 2, 3]</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">([...</span><span class="nx">ary</span><span class="p">]);</span>    <span class="c1">// 1 2 3,相当于下面的代码</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]);</span>
+</pre></table></code></div></div><p>数组合并</p><div class="language-js highlighter-rouge"><div class="code-header"> <span label-text="JavaScript"><i class="fas fa-code small"></i></span> <button aria-label="copy" title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+</pre><td class="rouge-code"><pre><span class="c1">// 方法一 </span>
+ <span class="kd">let</span> <span class="nx">ary1</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">];</span>
+ <span class="kd">let</span> <span class="nx">ary2</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">];</span>
+ <span class="kd">let</span> <span class="nx">ary3</span> <span class="o">=</span> <span class="p">[...</span><span class="nx">ary1</span><span class="p">,</span> <span class="p">...</span><span class="nx">ary2</span><span class="p">];</span>
+ <span class="c1">// 方法二 </span>
+ <span class="nx">ary1</span><span class="p">.</span><span class="nx">push</span><span class="p">(...</span><span class="nx">ary2</span><span class="p">);</span>
+</pre></table></code></div></div><p>数组遍历</p><div class="language-js highlighter-rouge"><div class="code-header"> <span label-text="JavaScript"><i class="fas fa-code small"></i></span> <button aria-label="copy" title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre><td class="rouge-code"><pre><span class="kd">let</span> <span class="nx">oDivs</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementsByTagName</span><span class="p">(</span><span class="dl">'</span><span class="s1">div</span><span class="dl">'</span><span class="p">);</span> 
+<span class="nx">oDivs</span> <span class="o">=</span> <span class="p">[...</span><span class="nx">oDivs</span><span class="p">];</span>
+</pre></table></code></div></div><h4 id="311-构造函数方法arrayfrom">3.1.1 构造函数方法：Array.from()<a href="#311-构造函数方法arrayfrom" class="anchor"><i class="fas fa-hashtag"></i></a></h4></h4><p>将伪数组或可遍历对象转换为真正的数组</p><div class="language-javascript highlighter-rouge"><div class="code-header"> <span label-text="JavaScript"><i class="fas fa-code small"></i></span> <button aria-label="copy" title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+</pre><td class="rouge-code"><pre><span class="c1">//定义一个集合</span>
+<span class="kd">let</span> <span class="nx">arrayLike</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="dl">'</span><span class="s1">0</span><span class="dl">'</span><span class="p">:</span> <span class="dl">'</span><span class="s1">a</span><span class="dl">'</span><span class="p">,</span>
+    <span class="dl">'</span><span class="s1">1</span><span class="dl">'</span><span class="p">:</span> <span class="dl">'</span><span class="s1">b</span><span class="dl">'</span><span class="p">,</span>
+    <span class="dl">'</span><span class="s1">2</span><span class="dl">'</span><span class="p">:</span> <span class="dl">'</span><span class="s1">c</span><span class="dl">'</span><span class="p">,</span>
+    <span class="na">length</span><span class="p">:</span> <span class="mi">3</span>
+<span class="p">};</span> 
+<span class="c1">//转成数组</span>
+<span class="kd">let</span> <span class="nx">arr2</span> <span class="o">=</span> <span class="nb">Array</span><span class="p">.</span><span class="k">from</span><span class="p">(</span><span class="nx">arrayLike</span><span class="p">);</span> <span class="c1">// ['a', 'b', 'c']</span>
+</pre></table></code></div></div><p>方法还可以接受第二个参数，作用类似于数组的map方法，用来对每个元素进行处理，将处理后的值放入返回的数组</p><div class="language-javascript highlighter-rouge"><div class="code-header"> <span label-text="JavaScript"><i class="fas fa-code small"></i></span> <button aria-label="copy" title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+</pre><td class="rouge-code"><pre><span class="kd">let</span> <span class="nx">arrayLike</span> <span class="o">=</span> <span class="p">{</span> 
+    <span class="dl">"</span><span class="s2">0</span><span class="dl">"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">1</span><span class="dl">"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">length</span><span class="dl">"</span><span class="p">:</span> <span class="mi">2</span>
+<span class="p">}</span>
+<span class="kd">let</span> <span class="nx">newAry</span> <span class="o">=</span> <span class="nb">Array</span><span class="p">.</span><span class="k">from</span><span class="p">(</span><span class="nx">arrayLike</span><span class="p">,</span> <span class="nx">item</span> <span class="o">=&gt;</span> <span class="nx">item</span> <span class="o">*</span><span class="mi">2</span><span class="p">)</span><span class="c1">//[2,4]</span>
+</pre></table></code></div></div><p>注意：如果是对象，那么属性需要写对应的索引</p><h4 id="312-实例方法find">3.1.2 实例方法：find()<a href="#312-实例方法find" class="anchor"><i class="fas fa-hashtag"></i></a></h4></h4><p>用于找出第一个符合条件的数组成员，如果没有找到返回undefined</p><div class="language-javascript highlighter-rouge"><div class="code-header"> <span label-text="JavaScript"><i class="fas fa-code small"></i></span> <button aria-label="copy" title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+</pre><td class="rouge-code"><pre><span class="kd">let</span> <span class="nx">ary</span> <span class="o">=</span> <span class="p">[{</span>
+    <span class="na">id</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">张三</span><span class="dl">'</span>
+<span class="p">},</span> <span class="p">{</span> 
+    <span class="na">id</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">李四</span><span class="dl">'</span>
+<span class="p">}];</span> 
+<span class="kd">let</span> <span class="nx">target</span> <span class="o">=</span> <span class="nx">ary</span><span class="p">.</span><span class="nx">find</span><span class="p">((</span><span class="nx">item</span><span class="p">,</span> <span class="nx">index</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">item</span><span class="p">.</span><span class="nx">id</span> <span class="o">==</span> <span class="mi">2</span><span class="p">);</span><span class="c1">//找数组里面符合条件的值，当数组中元素id等于2的查找出来，注意，只会匹配第一个</span>
+</pre></table></code></div></div><h4 id="313-实例方法findindex">3.1.3 实例方法：findIndex()<a href="#313-实例方法findindex" class="anchor"><i class="fas fa-hashtag"></i></a></h4></h4><p>用于找出第一个符合条件的数组成员的位置，如果没有找到返回-1</p><div class="language-javascript highlighter-rouge"><div class="code-header"> <span label-text="JavaScript"><i class="fas fa-code small"></i></span> <button aria-label="copy" title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre><td class="rouge-code"><pre><span class="kd">let</span> <span class="nx">ary</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">15</span><span class="p">];</span>
+<span class="kd">let</span> <span class="nx">index</span> <span class="o">=</span> <span class="nx">ary</span><span class="p">.</span><span class="nx">findIndex</span><span class="p">((</span><span class="nx">value</span><span class="p">,</span> <span class="nx">index</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">value</span> <span class="o">&gt;</span> <span class="mi">9</span><span class="p">);</span> 
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">index</span><span class="p">);</span> <span class="c1">// 2</span>
+</pre></table></code></div></div><h4 id="314-实例方法includes">3.1.4 实例方法：includes()<a href="#314-实例方法includes" class="anchor"><i class="fas fa-hashtag"></i></a></h4></h4><p>判断某个数组是否包含给定的值，返回布尔值。</p><div class="language-javascript highlighter-rouge"><div class="code-header"> <span label-text="JavaScript"><i class="fas fa-code small"></i></span> <button aria-label="copy" title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre><td class="rouge-code"><pre><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">].</span><span class="nx">includes</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="c1">// true </span>
+<span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">].</span><span class="nx">includes</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span> <span class="c1">// false</span>
+
+</pre></table></code></div></div><h4 id="315-排序方法">3.1.5 排序方法<a href="#315-排序方法" class="anchor"><i class="fas fa-hashtag"></i></a></h4></h4><p><code class="language-plaintext highlighter-rouge">sort()方法</code></p><p>升序：a-b；降序：b-a</p><div class="language-js highlighter-rouge"><div class="code-header"> <span label-text="JavaScript"><i class="fas fa-code small"></i></span> <button aria-label="copy" title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+</pre><td class="rouge-code"><pre><span class="kd">var</span> <span class="nx">arr</span> <span class="o">=</span> <span class="p">[</span><span class="mi">123</span><span class="p">,</span><span class="mi">203</span><span class="p">,</span><span class="mi">23</span><span class="p">,</span><span class="mi">13</span><span class="p">,</span><span class="mi">34</span><span class="p">,</span><span class="mi">65</span><span class="p">,</span><span class="mi">65</span><span class="p">,</span><span class="mi">45</span><span class="p">,</span><span class="mi">89</span><span class="p">,</span><span class="mi">13</span><span class="p">,</span><span class="mi">1</span><span class="p">];</span>
+<span class="kd">function</span> <span class="nx">func</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">){</span>
+    <span class="k">return</span> <span class="nx">a</span><span class="o">-</span><span class="nx">b</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">arr</span><span class="p">.</span><span class="nx">sort</span><span class="p">(</span><span class="nx">func</span><span class="p">));</span> <span class="c1">//(11) [1, 13, 13, 23, 34, 45, 65, 65, 89, 123, 203]</span>
+</pre></table></code></div></div><p><code class="language-plaintext highlighter-rouge">选择排序</code></p><p>基本思想：</p><ol><li>首先在未排序数组中找到最小(大)元素，存放在数组的起始位置。<li>再从剩余数组元素中继续寻找最小(大)元素，返回放在已排序数组的末尾<li>重复第二步，直到所有元素都排序完成</ol><p>动画演示：</p><p><img data-src="../../assets/images/20210516jsES6/20210528182937412.gif" alt="" data-proofer-ignore></p><div class="language-js highlighter-rouge"><div class="code-header"> <span label-text="JavaScript"><i class="fas fa-code small"></i></span> <button aria-label="copy" title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+</pre><td class="rouge-code"><pre><span class="kd">var</span> <span class="nx">arr</span> <span class="o">=</span> <span class="p">[</span><span class="mi">123</span><span class="p">,</span><span class="mi">203</span><span class="p">,</span><span class="mi">23</span><span class="p">,</span><span class="mi">13</span><span class="p">,</span><span class="mi">34</span><span class="p">,</span><span class="mi">65</span><span class="p">,</span><span class="mi">65</span><span class="p">,</span><span class="mi">45</span><span class="p">,</span><span class="mi">89</span><span class="p">,</span><span class="mi">13</span><span class="p">,</span><span class="mi">1</span><span class="p">];</span>
+<span class="k">for</span><span class="p">(</span><span class="kd">var</span> <span class="nx">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="nx">i</span><span class="o">&lt;</span><span class="nx">arr</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span><span class="nx">i</span><span class="o">++</span><span class="p">){</span>
+    <span class="k">for</span><span class="p">(</span><span class="kd">var</span> <span class="nx">j</span><span class="o">=</span><span class="nx">i</span><span class="o">+</span><span class="mi">1</span><span class="p">;</span><span class="nx">j</span><span class="o">&lt;</span><span class="nx">arr</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span><span class="nx">j</span><span class="o">++</span><span class="p">){</span>
+        <span class="c1">//如果第一个比第二个大，就交换他们两个位置</span>
+        <span class="k">if</span><span class="p">(</span><span class="nx">arr</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span><span class="o">&gt;</span><span class="nx">arr</span><span class="p">[</span><span class="nx">j</span><span class="p">]){</span>
+            <span class="kd">var</span> <span class="nx">temp</span> <span class="o">=</span> <span class="nx">arr</span><span class="p">[</span><span class="nx">i</span><span class="p">];</span>
+            <span class="nx">arr</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="nx">arr</span><span class="p">[</span><span class="nx">j</span><span class="p">];</span>
+            <span class="nx">arr</span><span class="p">[</span><span class="nx">j</span><span class="p">]</span> <span class="o">=</span> <span class="nx">temp</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">arr</span><span class="p">);</span> <span class="c1">//(11) [1, 13, 13, 23, 34, 45, 65, 65, 89, 123, 203]</span>
+</pre></table></code></div></div><p><code class="language-plaintext highlighter-rouge">冒泡排序</code></p><p>基本思想：</p><ol><li>一次比较两个相邻的数，如果不符合规则互换位置，一次比较就能够将最大或最小的值放在数组最后一位<li>继续对除<strong>【最后一位】</strong>之外的所有元素重复上述过程</ol><p>动画演示：</p><p><img data-src="../../assets/images/20210516jsES6/20210528183702101.gif" alt="" data-proofer-ignore></p><div class="language-js highlighter-rouge"><div class="code-header"> <span label-text="JavaScript"><i class="fas fa-code small"></i></span> <button aria-label="copy" title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+</pre><td class="rouge-code"><pre><span class="kd">var</span> <span class="nx">arr</span> <span class="o">=</span> <span class="p">[</span><span class="mi">123</span><span class="p">,</span><span class="mi">203</span><span class="p">,</span><span class="mi">23</span><span class="p">,</span><span class="mi">13</span><span class="p">,</span><span class="mi">34</span><span class="p">,</span><span class="mi">65</span><span class="p">,</span><span class="mi">65</span><span class="p">,</span><span class="mi">45</span><span class="p">,</span><span class="mi">89</span><span class="p">,</span><span class="mi">13</span><span class="p">,</span><span class="mi">1</span><span class="p">];</span>
+<span class="k">for</span><span class="p">(</span><span class="kd">var</span> <span class="nx">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="nx">i</span><span class="o">&lt;</span><span class="nx">arr</span><span class="p">.</span><span class="nx">length</span><span class="o">-</span><span class="mi">1</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">){</span>
+    <span class="c1">//每一轮比较要比多少次</span>
+    <span class="k">for</span><span class="p">(</span><span class="kd">var</span> <span class="nx">j</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="nx">j</span><span class="o">&lt;</span><span class="nx">arr</span><span class="p">.</span><span class="nx">length</span><span class="o">-</span><span class="mi">1</span><span class="o">-</span><span class="nx">i</span><span class="p">;</span> <span class="nx">j</span><span class="o">++</span><span class="p">){</span>
+        <span class="c1">//如果第一个比第二个大，就交换他们两个位置</span>
+        <span class="k">if</span><span class="p">(</span><span class="nx">arr</span><span class="p">[</span><span class="nx">j</span><span class="p">]</span><span class="o">&gt;</span><span class="nx">arr</span><span class="p">[</span><span class="nx">j</span><span class="o">+</span><span class="mi">1</span><span class="p">]){</span>
+            <span class="kd">var</span> <span class="nx">temp</span> <span class="o">=</span> <span class="nx">arr</span><span class="p">[</span><span class="nx">j</span><span class="p">];</span>
+            <span class="nx">arr</span><span class="p">[</span><span class="nx">j</span><span class="p">]</span> <span class="o">=</span> <span class="nx">arr</span><span class="p">[</span><span class="nx">j</span><span class="o">+</span><span class="mi">1</span><span class="p">];</span>
+            <span class="nx">arr</span><span class="p">[</span><span class="nx">j</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="nx">temp</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>    
+<span class="p">}</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">arr</span><span class="p">);</span> 
+</pre></table></code></div></div><p><code class="language-plaintext highlighter-rouge">插入排序</code></p><p>基本思想：</p><ol><li>将数组第一个元素看做一个有序序列，把第二个元素到最后一个元素当成是未排序序列。<li>从头到尾依次扫描未排序序列，将扫描到的每个元素插入有序序列的适当位置。 如果待插入的元素与有序序列中的某个元素相等，则将待插入元素插入到相等元素的后面。</ol><p><img data-src="../../assets/images/20210516jsES6/20210528183942655.gif" alt="" data-proofer-ignore></p><div class="language-js highlighter-rouge"><div class="code-header"> <span label-text="JavaScript"><i class="fas fa-code small"></i></span> <button aria-label="copy" title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+</pre><td class="rouge-code"><pre><span class="kd">var</span> <span class="nx">arr</span> <span class="o">=</span> <span class="p">[</span><span class="mi">123</span><span class="p">,</span><span class="mi">203</span><span class="p">,</span><span class="mi">23</span><span class="p">,</span><span class="mi">13</span><span class="p">,</span><span class="mi">34</span><span class="p">,</span><span class="mi">65</span><span class="p">,</span><span class="mi">65</span><span class="p">,</span><span class="mi">45</span><span class="p">,</span><span class="mi">89</span><span class="p">,</span><span class="mi">13</span><span class="p">,</span><span class="mi">1</span><span class="p">];</span>
+<span class="kd">var</span> <span class="nx">preIndex</span><span class="p">,</span> <span class="nx">current</span><span class="p">;</span>
+<span class="k">for</span><span class="p">(</span><span class="kd">var</span> <span class="nx">i</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span><span class="nx">i</span><span class="o">&lt;</span><span class="nx">arr</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span><span class="nx">i</span><span class="o">++</span><span class="p">){</span>
+    <span class="nx">preIndex</span> <span class="o">=</span> <span class="nx">i</span><span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+    <span class="nx">current</span> <span class="o">=</span> <span class="nx">arr</span><span class="p">[</span><span class="nx">i</span><span class="p">];</span>
+    <span class="k">while</span><span class="p">(</span><span class="nx">preIndex</span><span class="o">&gt;=</span><span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="nx">arr</span><span class="p">[</span><span class="nx">preIndex</span><span class="p">]</span><span class="o">&gt;</span><span class="nx">current</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">arr</span><span class="p">[</span><span class="nx">preIndex</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="nx">arr</span><span class="p">[</span><span class="nx">preIndex</span><span class="p">];</span>
+        <span class="nx">preIndex</span><span class="o">--</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="nx">arr</span><span class="p">[</span><span class="nx">preIndex</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="nx">current</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">arr</span><span class="p">);</span> 
+</pre></table></code></div></div><p><code class="language-plaintext highlighter-rouge">快速排序(依托递归函数)</code></p><p>基本思想：在已知数据集合中随便去一个基准(pivot) 将其余数据以基准为中心，大于分放右边，小于的放左边 将左右两个子集重复以上两个步骤 动画演示：</p><p><img data-src="../../assets/images/20210516jsES6/20210528184117686.gif" alt="" data-proofer-ignore></p><div class="language-js highlighter-rouge"><div class="code-header"> <span label-text="JavaScript"><i class="fas fa-code small"></i></span> <button aria-label="copy" title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+</pre><td class="rouge-code"><pre>
+<span class="kd">var</span> <span class="nx">arr</span> <span class="o">=</span> <span class="p">[</span><span class="mi">123</span><span class="p">,</span><span class="mi">203</span><span class="p">,</span><span class="mi">23</span><span class="p">,</span><span class="mi">13</span><span class="p">,</span><span class="mi">34</span><span class="p">,</span><span class="mi">65</span><span class="p">,</span><span class="mi">65</span><span class="p">,</span><span class="mi">45</span><span class="p">,</span><span class="mi">89</span><span class="p">,</span><span class="mi">13</span><span class="p">,</span><span class="mi">1</span><span class="p">];</span>	
+<span class="c1">//创建快速排序函数</span>
+<span class="kd">function</span> <span class="nx">quickSort</span><span class="p">(</span><span class="nx">tempArr</span><span class="p">){</span>
+    <span class="c1">//递归终止条件</span>
+    <span class="k">if</span><span class="p">(</span><span class="nx">tempArr</span><span class="p">.</span><span class="nx">length</span><span class="o">&lt;=</span><span class="mi">1</span><span class="p">){</span>
+        <span class="k">return</span> <span class="nx">tempArr</span><span class="p">;</span>
+    <span class="p">};</span>
+    <span class="c1">//取基准</span>
+    <span class="kd">var</span> <span class="nx">pivotIndex</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="nx">tempArr</span><span class="p">.</span><span class="nx">length</span><span class="o">/</span><span class="mi">2</span><span class="p">);</span>
+    <span class="kd">var</span> <span class="nx">pivot</span> <span class="o">=</span> <span class="nx">tempArr</span><span class="p">.</span><span class="nx">splice</span><span class="p">(</span><span class="nx">pivotIndex</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span>
+    <span class="c1">//分左右</span>
+    <span class="kd">var</span> <span class="nx">leftArr</span> <span class="o">=</span> <span class="p">[];</span>
+    <span class="kd">var</span> <span class="nx">rightArr</span> <span class="o">=</span> <span class="p">[];</span>
+    <span class="k">for</span><span class="p">(</span><span class="kd">var</span> <span class="nx">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="nx">i</span><span class="o">&lt;</span><span class="nx">tempArr</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span><span class="nx">i</span><span class="o">++</span><span class="p">){</span>
+        <span class="k">if</span><span class="p">(</span><span class="nx">tempArr</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span><span class="o">&gt;</span><span class="nx">pivot</span><span class="p">){</span>
+            <span class="nx">rightArr</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">tempArr</span><span class="p">[</span><span class="nx">i</span><span class="p">]);</span>
+        <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+            <span class="nx">leftArr</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">tempArr</span><span class="p">[</span><span class="nx">i</span><span class="p">]);</span>
+        <span class="p">};</span>
+    <span class="p">};</span>
+    <span class="k">return</span> <span class="nx">quickSort</span><span class="p">(</span><span class="nx">leftArr</span><span class="p">).</span><span class="nx">concat</span><span class="p">(</span><span class="nx">pivot</span><span class="p">,</span><span class="nx">quickSort</span><span class="p">(</span><span class="nx">rightArr</span><span class="p">));</span>
+<span class="p">};</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">quickSort</span><span class="p">(</span><span class="nx">arr</span><span class="p">));</span> <span class="c1">//(11) </span>
+</pre></table></code></div></div><h3 id="32-string-扩展">3.2 String 扩展<a href="#32-string-扩展" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><h4 id="321-模板字符串">3.2.1 模板字符串（★★★）<a href="#321-模板字符串" class="anchor"><i class="fas fa-hashtag"></i></a></h4></h4><div class="language-js highlighter-rouge"><div class="code-header"> <span label-text="JavaScript"><i class="fas fa-code small"></i></span> <button aria-label="copy" title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+</pre><td class="rouge-code"><pre><span class="c1">// ES6新增的创建字符串的方式，使用反引号定义</span>
+<span class="c1">// 类似于mysql的写法</span>
+<span class="kd">let</span> <span class="nx">name</span> <span class="o">=</span> <span class="s2">`zhangsan`</span><span class="p">;</span>
+
+<span class="c1">// 模板字符串中可以解析变量</span>
+<span class="kd">let</span> <span class="nx">name</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">张三</span><span class="dl">'</span><span class="p">;</span> 
+<span class="kd">let</span> <span class="nx">sayHello</span> <span class="o">=</span> <span class="s2">`hello,my name is </span><span class="p">${</span><span class="nx">name</span><span class="p">}</span><span class="s2">`</span><span class="p">;</span> <span class="c1">// hello, my name is zhangsan</span>
+
+<span class="c1">// 模板字符串中可以换行</span>
+ <span class="kd">let</span> <span class="nx">result</span> <span class="o">=</span> <span class="p">{</span> 
+     <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">zhangsan</span><span class="dl">'</span><span class="p">,</span> 
+     <span class="na">age</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
+     <span class="na">sex</span><span class="p">:</span> <span class="dl">'</span><span class="s1">男</span><span class="dl">'</span> 
+ <span class="p">}</span> 
+ <span class="kd">let</span> <span class="nx">html</span> <span class="o">=</span> <span class="s2">` &lt;div&gt;
+     &lt;span&gt;</span><span class="p">${</span><span class="nx">result</span><span class="p">.</span><span class="nx">name</span><span class="p">}</span><span class="s2">&lt;/span&gt;
+     &lt;span&gt;</span><span class="p">${</span><span class="nx">result</span><span class="p">.</span><span class="nx">age</span><span class="p">}</span><span class="s2">&lt;/span&gt;
+     &lt;span&gt;</span><span class="p">${</span><span class="nx">result</span><span class="p">.</span><span class="nx">sex</span><span class="p">}</span><span class="s2">&lt;/span&gt;
+ &lt;/div&gt; `</span><span class="p">;</span>
+
+<span class="c1">// 模板字符串中可以调用函数</span>
+<span class="kd">const</span> <span class="nx">sayHello</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span> 
+    <span class="k">return</span> <span class="dl">'</span><span class="s1">哈哈哈哈 追不到我吧 我就是这么强大</span><span class="dl">'</span><span class="p">;</span>
+ <span class="p">};</span> 
+ <span class="kd">let</span> <span class="nx">greet</span> <span class="o">=</span> <span class="s2">`</span><span class="p">${</span><span class="nx">sayHello</span><span class="p">()}</span><span class="s2"> 哈哈哈哈`</span><span class="p">;</span>
+ <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">greet</span><span class="p">);</span> <span class="c1">// 哈哈哈哈 追不到我吧 我就是这么强大 哈哈哈哈</span>
+
+</pre></table></code></div></div><h4 id="322-startswith-和-endswith">3.2.2 startsWith() 和 endsWith()<a href="#322-startswith-和-endswith" class="anchor"><i class="fas fa-hashtag"></i></a></h4></h4><ul><li>startsWith()：表示参数字符串是否在原字符串的头部，返回布尔值<li>endsWith()：表示参数字符串是否在原字符串的尾部，返回布尔值</ul><div class="language-js highlighter-rouge"><div class="code-header"> <span label-text="JavaScript"><i class="fas fa-code small"></i></span> <button aria-label="copy" title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre><td class="rouge-code"><pre><span class="c1">// 类似python字符串处理中的startsWith和endsWith</span>
+<span class="kd">let</span> <span class="nx">str</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">Hello world!</span><span class="dl">'</span><span class="p">;</span>
+<span class="nx">str</span><span class="p">.</span><span class="nx">startsWith</span><span class="p">(</span><span class="dl">'</span><span class="s1">Hello</span><span class="dl">'</span><span class="p">)</span> <span class="c1">// true </span>
+<span class="nx">str</span><span class="p">.</span><span class="nx">endsWith</span><span class="p">(</span><span class="dl">'</span><span class="s1">!</span><span class="dl">'</span><span class="p">)</span>       <span class="c1">// true</span>
+</pre></table></code></div></div><h4 id="323-repeat">3.2.3 repeat()<a href="#323-repeat" class="anchor"><i class="fas fa-hashtag"></i></a></h4></h4><p>repeat方法表示将原字符串重复n次，返回一个新字符串</p><div class="language-javascript highlighter-rouge"><div class="code-header"> <span label-text="JavaScript"><i class="fas fa-code small"></i></span> <button aria-label="copy" title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre><td class="rouge-code"><pre><span class="c1">// 类似于python中的乘号 *</span>
+<span class="dl">'</span><span class="s1">x</span><span class="dl">'</span><span class="p">.</span><span class="nx">repeat</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>      <span class="c1">// "xxx" </span>
+<span class="dl">'</span><span class="s1">hello</span><span class="dl">'</span><span class="p">.</span><span class="nx">repeat</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>  <span class="c1">// "hellohello"</span>
+</pre></table></code></div></div><h3 id="33-set-数据结构">3.3 Set 数据结构（★★）<a href="#33-set-数据结构" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><p>​ ES6 提供了新的数据结构 Set。它类似于数组，但是成员的值都是唯一的，没有重复的值。（类似于python中的set）</p><div class="language-javascript highlighter-rouge"><div class="code-header"> <span label-text="JavaScript"><i class="fas fa-code small"></i></span> <button aria-label="copy" title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre><td class="rouge-code"><pre><span class="c1">// Set本身是一个构造函数，用来生成  Set  数据结构</span>
+<span class="kd">const</span> <span class="nx">s</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Set</span><span class="p">();</span>
+</pre></table></code></div></div><div class="language-javascript highlighter-rouge"><div class="code-header"> <span label-text="JavaScript"><i class="fas fa-code small"></i></span> <button aria-label="copy" title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre><td class="rouge-code"><pre><span class="c1">// Set函数可以接受一个数组作为参数，用来初始化。</span>
+<span class="kd">const</span> <span class="kd">set</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Set</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">]);</span><span class="c1">//{1, 2, 3, 4}</span>
+</pre></table></code></div></div><p>实例方法</p><ul><li>add(value)：添加某个值，返回 Set 结构本身<li>delete(value)：删除某个值，返回一个布尔值，表示删除是否成功<li>has(value)：返回一个布尔值，表示该值是否为 Set 的成员<li>clear()：清除所有成员，没有返回值</ul><div class="language-js highlighter-rouge"><div class="code-header"> <span label-text="JavaScript"><i class="fas fa-code small"></i></span> <button aria-label="copy" title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+</pre><td class="rouge-code"><pre> <span class="kd">const</span> <span class="nx">s</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Set</span><span class="p">();</span>
+ <span class="nx">s</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="mi">1</span><span class="p">).</span><span class="nx">add</span><span class="p">(</span><span class="mi">2</span><span class="p">).</span><span class="nx">add</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span> <span class="c1">// 向 set 结构中添加值 </span>
+ <span class="nx">s</span><span class="p">.</span><span class="k">delete</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>             <span class="c1">// 删除 set 结构中的2值   </span>
+ <span class="nx">s</span><span class="p">.</span><span class="nx">has</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>                <span class="c1">// 表示 set 结构中是否有1这个值 返回布尔值 </span>
+ <span class="nx">s</span><span class="p">.</span><span class="nx">clear</span><span class="p">()</span>               <span class="c1">// 清除 set 结构中的所有值</span>
+ <span class="c1">//注意：删除的是元素的值，不是代表的索引</span>
+</pre></table></code></div></div><div class="language-js highlighter-rouge"><div class="code-header"> <span label-text="JavaScript"><i class="fas fa-code small"></i></span> <button aria-label="copy" title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre><td class="rouge-code"><pre><span class="c1">// Set 结构的实例与数组一样，也拥有forEach方法，用于对每个成员执行某种操作，没有返回值。</span>
+<span class="nx">s</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="nx">value</span> <span class="o">=&gt;</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">value</span><span class="p">))</span>
+</pre></table></code></div></div><h2 id="参考链接">参考链接<a href="#参考链接" class="anchor"><i class="fas fa-hashtag"></i></a></h2></h2><p>1.<a href="https://www.jianshu.com/p/b62ca176417a">JS 作用域，闭包，箭头函数，普通函数中this指向问题</a></p><p>2.<a href="https://blog.csdn.net/weixin_55992854/article/details/116849789s">js中数组排序的五种方式</a></p></div><div class="post-tail-wrapper text-muted"><div class="post-meta mb-3"> <i class="far fa-folder-open fa-fw mr-1"></i> <a href='/categories/%E5%89%8D%E7%AB%AF/'>前端</a></div><div class="post-tags"> <i class="fa fa-tags fa-fw mr-1"></i> <a href="/tags/%E5%89%8D%E7%AB%AFjs/" class="post-tag no-text-decoration" >前端JS</a></div><div class="post-tail-bottom d-flex justify-content-between align-items-center mt-3 pt-5 pb-2"><div class="license-wrapper"> 本文由作者按照 <a href="https://creativecommons.org/licenses/by/4.0/"> CC BY 4.0 </a> 进行授权</div><div class="share-wrapper"> <span class="share-label text-muted mr-1">分享</span> <span class="share-icons"> <a href="https://twitter.com/intent/tweet?text=JS-ES6新增语法 - Technical Blogs&url=https://carmanzheng.github.io//posts/%E5%89%8D%E7%AB%AF-JSES6%E6%96%B0%E5%A2%9E%E8%AF%AD%E6%B3%95/" data-toggle="tooltip" data-placement="top" title="Twitter" target="_blank" rel="noopener" aria-label="Twitter"> <i class="fa-fw fab fa-twitter"></i> </a> <a href="https://www.facebook.com/sharer/sharer.php?title=JS-ES6新增语法 - Technical Blogs&u=https://carmanzheng.github.io//posts/%E5%89%8D%E7%AB%AF-JSES6%E6%96%B0%E5%A2%9E%E8%AF%AD%E6%B3%95/" data-toggle="tooltip" data-placement="top" title="Facebook" target="_blank" rel="noopener" aria-label="Facebook"> <i class="fa-fw fab fa-facebook-square"></i> </a> <a href="https://telegram.me/share?text=JS-ES6新增语法 - Technical Blogs&url=https://carmanzheng.github.io//posts/%E5%89%8D%E7%AB%AF-JSES6%E6%96%B0%E5%A2%9E%E8%AF%AD%E6%B3%95/" data-toggle="tooltip" data-placement="top" title="Telegram" target="_blank" rel="noopener" aria-label="Telegram"> <i class="fa-fw fab fa-telegram"></i> </a> <i id="copy-link" class="fa-fw fas fa-link small" data-toggle="tooltip" data-placement="top" title="分享链接" title-succeed="链接已复制！"> </i> </span></div></div></div></div></div><div id="panel-wrapper" class="col-xl-3 pl-2 text-muted topbar-down"><div class="access"><div id="access-lastmod" class="post"><div class="panel-heading">最近更新</div><ul class="post-content pl-0 pb-1 ml-1 mt-2"><li><a href="/posts/Kubernetes%E6%A6%82%E8%BF%B0/">Kubernetes</a><li><a href="/posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E7%B4%A2%E5%BC%95%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">MySQL存储引擎</a><li><a href="/posts/Linux%E5%9F%BA%E7%A1%80/">Linux基础</a><li><a href="/posts/Python-%E5%A4%9A%E8%BF%9B%E7%A8%8B%E5%A4%9A%E7%BA%BF%E7%A8%8B/">Python基操-多进程与多线程</a><li><a href="/posts/%E5%89%8D%E7%AB%AF-Vue%E8%B7%AF%E7%94%B1%E4%B8%8EVuex/">前端 Vue路由与vuex</a></ul></div><div id="access-tags"><div class="panel-heading">热门标签</div><div class="d-flex flex-wrap mt-3 mb-1 mr-3"> <a class="post-tag" href="/tags/mysql/">MySQL</a> <a class="post-tag" href="/tags/python%E5%9F%BA%E6%93%8D/">Python基操</a> <a class="post-tag" href="/tags/%E5%89%8D%E7%AB%AFjs/">前端JS</a> <a class="post-tag" href="/tags/%E5%89%8D%E7%AB%AFvue/">前端Vue</a> <a class="post-tag" href="/tags/%E5%89%8D%E7%AB%AFcss/">前端CSS</a> <a class="post-tag" href="/tags/devops/">DevOps</a> <a class="post-tag" href="/tags/linux%E5%9F%BA%E7%A1%80/">Linux基础</a> <a class="post-tag" href="/tags/%E5%89%8D%E7%AB%AFhtml/">前端HTML</a> <a class="post-tag" href="/tags/github/">Github</a> <a class="post-tag" href="/tags/%E5%AE%A2%E6%88%B7%E7%AB%AF%E5%BC%80%E5%8F%91/">客户端开发</a></div></div></div><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@1.0.1/dist/bootstrap-toc.min.js"></script><div id="toc-wrapper" class="pl-0 pr-4 mb-5"><div class="panel-heading pl-3 pt-2 mb-2">文章内容</div><nav id="toc" data-toggle="toc"></nav></div></div></div><div class="row"><div class="col-12 col-lg-11 col-xl-8"><div id="tail-wrapper" class="pl-1 pr-1 pl-sm-2 pr-sm-2 pl-md-4 pr-md-4"><div id="related-posts" class="mt-5 mb-2 mb-sm-4"><h3 class="pt-2 mt-1 mb-4 ml-1" data-toc-skip>相关文章</h3><div class="card-deck mb-4"><div class="card"> <a href="/posts/%E5%89%8D%E7%AB%AF-JS%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5/"><div class="card-body"> <em class="timeago small" date="2021-05-09 00:00:00 +0800" >2021-05-09</em><h3 class="pt-0 mt-1 mb-3" data-toc-skip>JS基础概念</h3><div class="text-muted small"><p> 1.概述 ​ JavaScript，就是我们通常所说的JS，是一种嵌入到HTML页面中的脚本语言，由浏览器一边解释一边执行。HTML只是一门描述性的语言，实际需求中单纯地使用HTML是无法实现的，而必须使用编程的方式来实现，那就必须使用JavaScript了。 HTML、CSS和JavaScript的关系如下： HTML是网页的结构，CSS是网页的外观，而JavaScript是页面的...</p></div></div></a></div><div class="card"> <a href="/posts/%E5%89%8D%E7%AB%AF-JS-DOM%E5%92%8CBOM/"><div class="card-body"> <em class="timeago small" date="2021-05-10 00:00:00 +0800" >2021-05-10</em><h3 class="pt-0 mt-1 mb-3" data-toc-skip>JS对象、BOM与DOM</h3><div class="text-muted small"><p> 1.内置对象 1.1 对象 ​ JS中所有的事物都是对象，字符串、数值、数组、函数… 每个对象都带有属性和方法。 1.2 自定义对象 1. 定义并创建对象实例 2. 使用函数来定义对象，然后创建新的对象实例 &amp;lt;body&amp;gt; &amp;lt;script&amp;gt; people = new Object(): people.name = &#39;liming&#39; ...</p></div></div></a></div><div class="card"> <a href="/posts/%E5%89%8D%E7%AB%AF-JS%E6%89%A7%E8%A1%8C%E6%9C%BA%E5%88%B6/"><div class="card-body"> <em class="timeago small" date="2021-05-11 00:00:00 +0800" >2021-05-11</em><h3 class="pt-0 mt-1 mb-3" data-toc-skip>JS执行机制</h3><div class="text-muted small"><p> 1.概述 ​ JavaScript语言的一大特点就是单线程，即同一个时间只能做一件事。 ​ 单线程就意味着，所有任务需要排队，前一个任务结束，才会执行后一个任务。如果前一个任务耗时很长，后一个任务就不得不一直等着。 ​ 这样所导致的问题是： 如果 JS 执行的时间过长，这样就会造成页面的渲染不连贯，导致页面渲染加载阻塞的感觉。 2.同步任务和异步任务 ​ 为了解决单线程问题...</p></div></div></a></div></div></div><div class="post-navigation d-flex justify-content-between"> <a href="/posts/%E5%89%8D%E7%AB%AF-JS%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F/" class="btn btn-outline-primary" prompt="上一篇"><p>JS正则表达式</p></a> <a href="/posts/%E5%89%8D%E7%AB%AF-Vue%E5%9F%BA%E7%A1%80/" class="btn btn-outline-primary" prompt="下一篇"><p>Vue基础</p></a></div></div></div></div><footer class="d-flex w-100 justify-content-center"><div class="d-flex justify-content-between align-items-center text-muted"><div class="footer-left"><p class="mb-0"> © 2022 <a href="https://github.com/carmanzheng">carmanzheng</a>. <span data-toggle="tooltip" data-placement="top" title="除非另有说明，本网站上的博客文章均由作者按照知识共享署名 4.0 国际 (CC BY 4.0) 许可协议进行授权。">保留部分权利。</span></p></div><div class="footer-right"><p class="mb-0"> 本站由 <a href="https://jekyllrb.com" target="_blank" rel="noopener">Jekyll</a> 生成，采用 <a href="https://github.com/cotes2020/jekyll-theme-chirpy" target="_blank" rel="noopener">Chirpy</a> 主题。</p></div></div></footer></div><div id="search-result-wrapper" class="d-flex justify-content-center unloaded"><div class="col-12 col-sm-11 post-content"><div id="search-hints"><div id="access-tags"><div class="panel-heading">热门标签</div><div class="d-flex flex-wrap mt-3 mb-1 mr-3"> <a class="post-tag" href="/tags/mysql/">MySQL</a> <a class="post-tag" href="/tags/python%E5%9F%BA%E6%93%8D/">Python基操</a> <a class="post-tag" href="/tags/%E5%89%8D%E7%AB%AFjs/">前端JS</a> <a class="post-tag" href="/tags/%E5%89%8D%E7%AB%AFvue/">前端Vue</a> <a class="post-tag" href="/tags/%E5%89%8D%E7%AB%AFcss/">前端CSS</a> <a class="post-tag" href="/tags/devops/">DevOps</a> <a class="post-tag" href="/tags/linux%E5%9F%BA%E7%A1%80/">Linux基础</a> <a class="post-tag" href="/tags/%E5%89%8D%E7%AB%AFhtml/">前端HTML</a> <a class="post-tag" href="/tags/github/">Github</a> <a class="post-tag" href="/tags/%E5%AE%A2%E6%88%B7%E7%AB%AF%E5%BC%80%E5%8F%91/">客户端开发</a></div></div></div><div id="search-results" class="d-flex flex-wrap justify-content-center text-muted mt-3"></div></div></div></div><div id="mask"></div><a id="back-to-top" href="#" aria-label="back-to-top" class="btn btn-lg btn-box-shadow" role="button"> <i class="fas fa-angle-up"></i> </a> <script src="https://cdn.jsdelivr.net/npm/simple-jekyll-search@1.10.0/dest/simple-jekyll-search.min.js"></script> <script> SimpleJekyllSearch({ searchInput: document.getElementById('search-input'), resultsContainer: document.getElementById('search-results'), json: '/assets/js/data/search.json', searchResultTemplate: '<div class="pl-1 pr-1 pl-sm-2 pr-sm-2 pl-lg-4 pr-lg-4 pl-xl-0 pr-xl-0"> <a href="{url}">{title}</a><div class="post-meta d-flex flex-column flex-sm-row text-muted mt-1 mb-1"> {categories} {tags}</div><p>{snippet}</p></div>', noResultsText: '<p class="mt-5">搜索结果为空</p>', templateMiddleware: function(prop, value, template) { if (prop === 'categories') { if (value === '') { return `${value}`; } else { return `<div class="mr-sm-4"><i class="far fa-folder fa-fw"></i>${value}</div>`; } } if (prop === 'tags') { if (value === '') { return `${value}`; } else { return `<div><i class="fa fa-tag fa-fw"></i>${value}</div>`; } } } }); </script> <script src="https://cdn.jsdelivr.net/combine/npm/lozad/dist/lozad.min.js,npm/magnific-popup@1/dist/jquery.magnific-popup.min.js,npm/clipboard@2/dist/clipboard.min.js"></script> <script defer src="/assets/js/dist/post.min.js"></script> <script src="https://cdn.jsdelivr.net/combine/npm/popper.js@1.16.1,npm/bootstrap@4/dist/js/bootstrap.min.js"></script> <script defer src="/app.js"></script> <script defer src="https://www.googletagmanager.com/gtag/js?id="></script> <script> document.addEventListener("DOMContentLoaded", function(event) { window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', ''); }); </script>

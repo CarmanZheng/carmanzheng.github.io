@@ -1,0 +1,259 @@
+<!DOCTYPE html><html lang="zh-CN" ><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><meta name="day-prompt" content="天前"><meta name="hour-prompt" content="小时前"><meta name="minute-prompt" content="分钟前"><meta name="justnow-prompt" content="刚刚"><meta name="generator" content="Jekyll v4.2.1" /><meta property="og:title" content="MySQL在Linux安装" /><meta property="og:locale" content="zh_CN" /><meta name="description" content="1.MySQL的4大版本" /><meta property="og:description" content="1.MySQL的4大版本" /><link rel="canonical" href="https://carmanzheng.github.io//posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E5%9C%A8Linux%E5%AE%89%E8%A3%85/" /><meta property="og:url" content="https://carmanzheng.github.io//posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E5%9C%A8Linux%E5%AE%89%E8%A3%85/" /><meta property="og:site_name" content="Technical Blogs" /><meta property="og:type" content="article" /><meta property="article:published_time" content="2021-07-01T00:00:00+08:00" /><meta name="twitter:card" content="summary" /><meta property="twitter:title" content="MySQL在Linux安装" /><meta name="twitter:site" content="@twitter_username" /><meta name="google-site-verification" content="google_meta_tag_verification" /> <script type="application/ld+json"> {"description":"1.MySQL的4大版本","headline":"MySQL在Linux安装","dateModified":"2021-07-01T00:00:00+08:00","datePublished":"2021-07-01T00:00:00+08:00","url":"https://carmanzheng.github.io//posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E5%9C%A8Linux%E5%AE%89%E8%A3%85/","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://carmanzheng.github.io//posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E5%9C%A8Linux%E5%AE%89%E8%A3%85/"},"@context":"https://schema.org"}</script><title>MySQL在Linux安装 | Technical Blogs</title><link rel="apple-touch-icon" sizes="180x180" href="/assets/img/favicons/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicons/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicons/favicon-16x16.png"><link rel="manifest" href="/assets/img/favicons/site.webmanifest"><link rel="shortcut icon" href="/assets/img/favicons/favicon.ico"><meta name="apple-mobile-web-app-title" content="Technical Blogs"><meta name="application-name" content="Technical Blogs"><meta name="msapplication-TileColor" content="#da532c"><meta name="msapplication-config" content="/assets/img/favicons/browserconfig.xml"><meta name="theme-color" content="#ffffff"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"><link rel="dns-prefetch" href="https://fonts.gstatic.com"><link rel="preconnect" href="https://www.google-analytics.com" crossorigin="use-credentials"><link rel="dns-prefetch" href="https://www.google-analytics.com"><link rel="preconnect" href="https://www.googletagmanager.com" crossorigin="anonymous"><link rel="dns-prefetch" href="https://www.googletagmanager.com"><link rel="preconnect" href="https://cdn.jsdelivr.net"><link rel="dns-prefetch" href="https://cdn.jsdelivr.net"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.11.2/css/all.min.css"><link rel="stylesheet" href="/assets/css/style.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@1.0.1/dist/bootstrap-toc.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/magnific-popup@1.1.0/dist/magnific-popup.min.css"> <script src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script> <script type="text/javascript"> class ModeToggle { static get MODE_KEY() { return "mode"; } static get DARK_MODE() { return "dark"; } static get LIGHT_MODE() { return "light"; } static get ID() { return "mode-toggle"; } constructor() { if (this.hasMode) { if (this.isDarkMode) { if (!this.isSysDarkPrefer) { this.setDark(); } } else { if (this.isSysDarkPrefer) { this.setLight(); } } } let self = this; /* always follow the system prefers */ this.sysDarkPrefers.addEventListener("change", () => { if (self.hasMode) { if (self.isDarkMode) { if (!self.isSysDarkPrefer) { self.setDark(); } } else { if (self.isSysDarkPrefer) { self.setLight(); } } self.clearMode(); } self.notify(); }); } /* constructor() */ get sysDarkPrefers() { return window.matchMedia("(prefers-color-scheme: dark)"); } get isSysDarkPrefer() { return this.sysDarkPrefers.matches; } get isDarkMode() { return this.mode === ModeToggle.DARK_MODE; } get isLightMode() { return this.mode === ModeToggle.LIGHT_MODE; } get hasMode() { return this.mode != null; } get mode() { return sessionStorage.getItem(ModeToggle.MODE_KEY); } /* get the current mode on screen */ get modeStatus() { if (this.isDarkMode || (!this.hasMode && this.isSysDarkPrefer)) { return ModeToggle.DARK_MODE; } else { return ModeToggle.LIGHT_MODE; } } setDark() { $('html').attr(ModeToggle.MODE_KEY, ModeToggle.DARK_MODE); sessionStorage.setItem(ModeToggle.MODE_KEY, ModeToggle.DARK_MODE); } setLight() { $('html').attr(ModeToggle.MODE_KEY, ModeToggle.LIGHT_MODE); sessionStorage.setItem(ModeToggle.MODE_KEY, ModeToggle.LIGHT_MODE); } clearMode() { $('html').removeAttr(ModeToggle.MODE_KEY); sessionStorage.removeItem(ModeToggle.MODE_KEY); } /* Notify another plugins that the theme mode has changed */ notify() { window.postMessage({ direction: ModeToggle.ID, message: this.modeStatus }, "*"); } } /* ModeToggle */ const toggle = new ModeToggle(); function flipMode() { if (toggle.hasMode) { if (toggle.isSysDarkPrefer) { if (toggle.isLightMode) { toggle.clearMode(); } else { toggle.setLight(); } } else { if (toggle.isDarkMode) { toggle.clearMode(); } else { toggle.setDark(); } } } else { if (toggle.isSysDarkPrefer) { toggle.setLight(); } else { toggle.setDark(); } } toggle.notify(); } /* flipMode() */ </script><body data-spy="scroll" data-target="#toc"><div id="sidebar" class="d-flex flex-column align-items-end" lang="zh-CN"><div class="profile-wrapper text-center"><div id="avatar"> <a href="/" alt="avatar" class="mx-auto"> <img src="/assets/img/favicons/android-chrome-192x192.png" alt="avatar" onerror="this.style.display='none'"> </a></div><div class="site-title mt-3"> <a href="/">Technical Blogs</a></div><div class="site-subtitle font-italic">Learning by Doing, Sharing for more!</div></div><ul class="w-100"><li class="nav-item"> <a href="/" class="nav-link"> <i class="fa-fw fas fa-home ml-xl-3 mr-xl-3 unloaded"></i> <span>首页</span> </a><li class="nav-item"> <a href="/categories/" class="nav-link"> <i class="fa-fw fas fa-stream ml-xl-3 mr-xl-3 unloaded"></i> <span>分类</span> </a><li class="nav-item"> <a href="/tags/" class="nav-link"> <i class="fa-fw fas fa-tag ml-xl-3 mr-xl-3 unloaded"></i> <span>标签</span> </a><li class="nav-item"> <a href="/archives/" class="nav-link"> <i class="fa-fw fas fa-archive ml-xl-3 mr-xl-3 unloaded"></i> <span>归档</span> </a><li class="nav-item"> <a href="/about/" class="nav-link"> <i class="fa-fw fas fa-info-circle ml-xl-3 mr-xl-3 unloaded"></i> <span>关于</span> </a></ul><div class="sidebar-bottom mt-auto d-flex flex-wrap justify-content-center align-items-center"> <button class="mode-toggle btn" aria-label="Switch Mode"> <i class="fas fa-adjust"></i> </button> <span class="icon-border"></span> <a href="https://github.com/Carmanzheng" aria-label="github" target="_blank" rel="noopener"> <i class="fab fa-github"></i> </a> <a href="https://twitter.com/twitter_username" aria-label="twitter" target="_blank" rel="noopener"> <i class="fab fa-twitter"></i> </a> <a href=" javascript:location.href = 'mailto:' + ['zhengkan1993','gmail.com'].join('@')" aria-label="email" > <i class="fas fa-envelope"></i> </a> <a href="/feed.xml" aria-label="rss" > <i class="fas fa-rss"></i> </a></div></div><div id="topbar-wrapper" class="row justify-content-center topbar-down"><div id="topbar" class="col-11 d-flex h-100 align-items-center justify-content-between"> <span id="breadcrumb"> <span> <a href="/"> 首页 </a> </span> <span>MySQL在Linux安装</span> </span> <i id="sidebar-trigger" class="fas fa-bars fa-fw"></i><div id="topbar-title"> 文章</div><i id="search-trigger" class="fas fa-search fa-fw"></i> <span id="search-wrapper" class="align-items-center"> <i class="fas fa-search fa-fw"></i> <input class="form-control" id="search-input" type="search" aria-label="search" autocomplete="off" placeholder="搜索..."> <i class="fa fa-times-circle fa-fw" id="search-cleaner"></i> </span> <span id="search-cancel" >取消</span></div></div><div id="main-wrapper"><div id="main"><div class="row"><div id="core-wrapper" class="col-12 col-lg-11 col-xl-8"><div class="post pl-1 pr-1 pl-sm-2 pr-sm-2 pl-md-4 pr-md-4"><h1 data-toc-skip>MySQL在Linux安装</h1><div class="post-meta text-muted"><div> 作者 <em> <a href="https://github.com/carmanzheng">carmanzheng</a> </em></div><div class="d-flex"><div> <span> 发表于 <em class="timeago" date="2021-07-01 00:00:00 +0800" data-toggle="tooltip" data-placement="bottom" title="2021-07-01, 00:00 +0800" >2021-07-01</em> </span> <span class="readtime" data-toggle="tooltip" data-placement="bottom" title="5419 字"> <em>30 分钟</em>阅读</span></div></div></div><div class="post-content"><h2 id="1mysql的4大版本">1.MySQL的4大版本<a href="#1mysql的4大版本" class="anchor"><i class="fas fa-hashtag"></i></a></h2></h2><pre><code class="language-mysql">1. MySQL Community Server 社区版本，开源免费，自由下载，但不提供官方技术支持，适用于大多数普通用户。
+2. MySQL Enterprise Edition 企业版本，需付费，不能在线下载，可以试用30天。提供了更多的功能和更完备的技术支持，更适合于对数据库的功能和可靠性要求较高的企业客户。
+3. MySQL Cluster 集群版，开源免费。用于架设集群服务器，可将几个MySQL Server封装成一个Server。需要在社区版或企业版的基础上使用。
+4. MySQL Cluster CGE 高级集群版，需付费
+</code></pre><h3 id="11-mysql卸载">1.1 MySQL卸载<a href="#11-mysql卸载" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><div class="language-sh highlighter-rouge"><div class="code-header"> <span label-text="Shell"><i class="fas fa-code small"></i></span> <button aria-label="copy" title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre><td class="rouge-code"><pre><span class="c"># 删除数据文件</span>
+<span class="nb">sudo rm</span> /var/lib/mysql/ <span class="nt">-R</span>
+<span class="c"># 删除mysql的配置文件</span>
+<span class="nb">sudo rm</span> /etc/mysql/ <span class="nt">-R</span>
+</pre></table></code></div></div><div class="language-sh highlighter-rouge"><div class="code-header"> <span label-text="Shell"><i class="fas fa-code small"></i></span> <button aria-label="copy" title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre><td class="rouge-code"><pre><span class="c"># 自动卸载mysql（包括server和client）</span>
+<span class="nb">sudo </span>apt-get autoremove mysql<span class="k">*</span> <span class="nt">--purge</span>
+<span class="nb">sudo </span>apt-get remove apparmor
+</pre></table></code></div></div><pre><code class="language-mysql"># 检查是否卸载干净
+dpkg -l | grep mysql# 若没有返回，说明已完成卸载
+</code></pre><h3 id="12-mysql安装">1.2 MySQL安装<a href="#12-mysql安装" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><div class="language-sh highlighter-rouge"><div class="code-header"> <span label-text="Shell"><i class="fas fa-code small"></i></span> <button aria-label="copy" title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre><td class="rouge-code"><pre><span class="nb">sudo </span>apt-get <span class="nb">install </span>mysql-server mysql-client
+</pre></table></code></div></div><div class="language-sh highlighter-rouge"><div class="code-header"> <span label-text="Shell"><i class="fas fa-code small"></i></span> <button aria-label="copy" title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+</pre><td class="rouge-code"><pre><span class="c"># 检查安装</span>
+zheng@ubuntu:~/Desktop<span class="nv">$ </span>mysql <span class="nt">-V</span>
+mysql  Ver 8.0.29-0ubuntu0.20.04.3 <span class="k">for </span>Linux on x86_64 <span class="o">((</span>Ubuntu<span class="o">))</span>
+
+zheng@ubuntu:/var/log/mysql<span class="nv">$ </span>systemctl status mysql
+● mysql.service - MySQL Community Server
+     Loaded: loaded <span class="o">(</span>/lib/systemd/system/mysql.service<span class="p">;</span> enabled<span class="p">;</span> vendor preset: enabled<span class="o">)</span>
+     Active: active <span class="o">(</span>running<span class="o">)</span> since Tue 2022-05-31 11:35:36 CST<span class="p">;</span> 32s ago
+    Process: 40389 <span class="nv">ExecStartPre</span><span class="o">=</span>/usr/share/mysql/mysql-systemd-start pre <span class="o">(</span><span class="nv">code</span><span class="o">=</span>exited, <span class="nv">status</span><span class="o">=</span>0/SUCCESS<span class="o">)</span>
+   Main PID: 40397 <span class="o">(</span>mysqld<span class="o">)</span>
+     Status: <span class="s2">"Server is operational"</span>
+      Tasks: 39 <span class="o">(</span>limit: 9420<span class="o">)</span>
+     Memory: 359.4M
+     CGroup: /system.slice/mysql.service
+             └─40397 /usr/sbin/mysqld
+
+5月 31 11:35:36 ubuntu systemd[1]: Starting MySQL Community Server...
+5月 31 11:35:36 ubuntu systemd[1]: Started MySQL Community Server.
+</pre></table></code></div></div><pre><code class="language-mysql">root@ubuntu:~# mysql
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 13
+Server version: 8.0.29-0ubuntu0.20.04.3 (Ubuntu)
+
+Copyright (c) 2000, 2022, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql&gt; 
+</code></pre><div class="language-sh highlighter-rouge"><div class="code-header"> <span label-text="Shell"><i class="fas fa-code small"></i></span> <button aria-label="copy" title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+</pre><td class="rouge-code"><pre><span class="c"># 开机自启动</span>
+root@ubuntu:~# systemctl list-unit-files | <span class="nb">grep </span>mysql
+mysql.service                              enabled         enabled  
+<span class="c"># 如果不是enabled</span>
+root@ubuntu:~# systemctl <span class="nb">enable </span>mysqld.service
+</pre></table></code></div></div><h3 id="13-远程连接">1.3 远程连接<a href="#13-远程连接" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><p><strong>1.关注机器是否开启防火墙</strong></p><div class="language-sh highlighter-rouge"><div class="code-header"> <span label-text="Shell"><i class="fas fa-code small"></i></span> <button aria-label="copy" title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+</pre><td class="rouge-code"><pre><span class="c"># ubuntu系统</span>
+root@ubuntu:~# ufw status
+状态： 激活
+至                          动作          来自
+-                          <span class="nt">--</span>          <span class="nt">--</span>
+3306                       ALLOW       Anywhere                  
+22                         ALLOW       Anywhere                  
+3306 <span class="o">(</span>v6<span class="o">)</span>                  ALLOW       Anywhere <span class="o">(</span>v6<span class="o">)</span>             
+22 <span class="o">(</span>v6<span class="o">)</span>                    ALLOW       Anywhere <span class="o">(</span>v6<span class="o">)</span> 
+
+root@ubuntu:~# ufw <span class="nb">enable
+</span>在系统启动时启用和激活防火墙
+
+root@ubuntu:~# ufw disable 
+防火墙在系统启动时自动禁用
+
+<span class="c"># 如果3306端口没有打开，需要打开3306端口</span>
+ufw allow 3306
+<span class="c"># 如果需要关闭，使用下面命令</span>
+ufw delete allow 3306
+</pre></table></code></div></div><p><strong>2.更改权限</strong></p><pre><code class="language-mysql">mysql&gt; use mysql
+Database changed
+mysql&gt; select host,user from user;
++-----------+------------------+
+| host      | user             |
++-----------+------------------+
+| localhost | debian-sys-maint |
+| localhost | mysql.infoschema |
+| localhost | mysql.session    |
+| localhost | mysql.sys        |
+| localhost | root             |
++-----------+------------------+
+5 rows in set (0.00 sec)
+</code></pre><p>更新user表中的root的属性</p><pre><code class="language-mysql"># 此处可以直接使用%，所有用户都可以连接
+update user set host = '192.168.1.%' where user = 'root';
+flush privileges;
+</code></pre><p>在mysql8.0中，需要修改密码保存格式</p><pre><code class="language-mysql">alter user 'root'@'%' identified with mysql_native_password by 'abc123';
+</code></pre><p>外部连接即可</p><h2 id="2字符集">2.字符集<a href="#2字符集" class="anchor"><i class="fas fa-hashtag"></i></a></h2></h2><h3 id="21-修改字符集">2.1 修改字符集<a href="#21-修改字符集" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><p>​ 在MySQL 8.0版本之前，默认字符集为 latin1 ，utf8字符集指向的是 utf8mb3 。网站开发人员在数据库 设计的时候往往会将编码修改为utf8字符集。如果遗忘修改默认的编码，就会出现乱码的问题。从MySQL 8.0开始，数据库的默认编码将改为 <code class="language-plaintext highlighter-rouge">utf8mb4</code> ，从而避免上述乱码的问题。</p><pre><code class="language-mysql">show variables like '%char%';
++--------------------------+----------------------------+
+| Variable_name            | Value                      |
++--------------------------+----------------------------+
+| character_set_client     | utf8mb4                    |
+| character_set_connection | utf8mb4                    |
+| character_set_database   | utf8mb4                    |
+| character_set_filesystem | binary                     |
+| character_set_results    | utf8mb4                    |
+| character_set_server     | utf8mb4                    |
+| character_set_system     | utf8mb3                    |
+| character_sets_dir       | /usr/share/mysql/charsets/ |
++--------------------------+----------------------------+
+8 rows in set (0.00 sec)
+</code></pre><p>在MySQL5.7或之前的版本中，在文件最后加上中文字符集配置：</p><div class="language-sh highlighter-rouge"><div class="code-header"> <span label-text="Shell"><i class="fas fa-code small"></i></span> <button aria-label="copy" title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre><td class="rouge-code"><pre>vim /etc/my.cnf
+</pre></table></code></div></div><div class="language-sh highlighter-rouge"><div class="code-header"> <span label-text="Shell"><i class="fas fa-code small"></i></span> <button aria-label="copy" title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre><td class="rouge-code"><pre><span class="c"># 在[mysqld]下添加下面的修改</span>
+<span class="nv">character_set_server</span><span class="o">=</span>utf8
+</pre></table></code></div></div><div class="language-sh highlighter-rouge"><div class="code-header"> <span label-text="Shell"><i class="fas fa-code small"></i></span> <button aria-label="copy" title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre><td class="rouge-code"><pre>systemctl restart mysqld
+</pre></table></code></div></div><p>这样，没修改前录入的数据任然是latin，修改后录入的才是utf8。所以，已有的数据需要导出后，重新导入才行。</p><p>修改已创建数据库的字符集</p><pre><code class="language-mysql">alter database dbtest1 character set 'utf8';
+</code></pre><p>修改已创建数据表的字符集</p><pre><code class="language-mysql">alter table t_emp convert to character set 'utf8';
+</code></pre><p><code class="language-plaintext highlighter-rouge">注意：但是原有的数据如果是用非'utf8'编码的话，数据本身编码不会发生改变。已有数据需要导出或删除，然后重新插入。</code></p><h3 id="22-各级别的字符集">2.2 各级别的字符集<a href="#22-各级别的字符集" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><p>MySQL有4个级别的字符集和比较规则，分别是：</p><ul><li>服务器级别<li>数据库级别<li>表级别<li>列级别</ul><p>执行如下SQL语句：</p><pre><code class="language-mysql">show variables like 'character%';
++--------------------------+----------------------------+
+| Variable_name            | Value                      |
++--------------------------+----------------------------+
+| character_set_client     | utf8mb4                    |
+| character_set_connection | utf8mb4                    |
+| character_set_database   | utf8mb4                    |
+| character_set_filesystem | binary                     |
+| character_set_results    | utf8mb4                    |
+| character_set_server     | utf8mb4                    |
+| character_set_system     | utf8mb3                    |
+| character_sets_dir       | /usr/share/mysql/charsets/ |
++--------------------------+----------------------------+
+8 rows in set (0.01 sec)
+</code></pre><ul><li>character_set_server：服务器级别的字符集<li>character_set_database：当前数据库的字符集<li>character_set_client：服务器解码请求时使用的字符集<li>character_set_connection：服务器处理请求时会把请求字符串从character_set_client转为 character_set_connection<li>character_set_results：服务器向客户端返回数据时使用的字符集</ul><p>1.服务器级别</p><p>character_set_server ：服务器级别的字符集。</p><p>我们可以在启动服务器程序时通过启动选项或者在服务器程序运行过程中使用 SET 语句修改这两个变量 的值。比如我们可以在配置文件中这样写：</p><pre><code class="language-mysql">[server]
+character_set_server=gbk # 默认字符集
+collation_server=gbk_chinese_ci #对应的默认的比较规则
+</code></pre><p>当服务器启动的时候读取这个配置文件后这两个系统变量的值便修改了。</p><p>2.数据库级别</p><p>character_set_database ：当前数据库的字符集</p><p>我们在创建和修改数据库的时候可以指定该数据库的字符集和比较规则，具体语法如下：</p><pre><code class="language-mysql">CREATE DATABASE 数据库名
+[[DEFAULT] CHARACTER SET 字符集名称]
+[[DEFAULT] COLLATE 比较规则名称];
+ALTER DATABASE 数据库名
+[[DEFAULT] CHARACTER SET 字符集名称]
+[[DEFAULT] COLLATE 比较规则名称];
+</code></pre><p>3.表级别</p><p>我们也可以在创建和修改表的时候指定表的字符集和比较规则，语法如下：</p><pre><code class="language-mysql">CREATE TABLE 表名 (列的信息)
+[[DEFAULT] CHARACTER SET 字符集名称]
+[COLLATE 比较规则名称]]
+ALTER TABLE 表名
+[[DEFAULT] CHARACTER SET 字符集名称]
+[COLLATE 比较规则名称]
+</code></pre><p>4.列级别</p><p>对于存储字符串的列，同一个表中的不同的列也可以有不同的字符集和比较规则。我们在创建和修改列 定义的时候可以指定该列的字符集和比较规则，语法如下：</p><pre><code class="language-mysql">CREATE TABLE 表名(
+列名 字符串类型 [CHARACTER SET 字符集名称] [COLLATE 比较规则名称],
+其他列...
+);
+ALTER TABLE 表名 MODIFY 列名 字符串类型 [CHARACTER SET 字符集名称] [COLLATE 比较规则名称];
+</code></pre><p>对于某个列来说，如果在创建和修改的语句中没有指明字符集和比较规则，将使用该列所在表的字符集 和比较规则作为该列的字符集和比较规则。</p><p><code class="language-plaintext highlighter-rouge">提示 在转换列的字符集时需要注意，如果转换前列中存储的数据不能用转换后的字符集进行表示会发生 错误。比方说原先列使用的字符集是utf8，列中存储了一些汉字，现在把列的字符集转换为ascii的 话就会出错，因为ascii字符集并不能表示汉字字符。</code></p><p>5.小结</p><p>我们介绍的这4个级别字符集和比较规则的联系如下：</p><ul><li>如果 创建或修改列 时没有显式的指定字符集和比较规则，则该列 默认用表的 字符集和比较规则<li>如果 创建表时 没有显式的指定字符集和比较规则，则该表 默认用数据库的 字符集和比较规则<li>如果 创建数据库时 没有显式的指定字符集和比较规则，则该数据库 默认用服务器的 字符集和比较规 则 知道了这些规则之后，对于给定的表，我们应该知道它的各个列的字符集和比较规则是什么，从而根据 这个列的类型来确定存储数据时每个列的实际数据占用的存储空间大小了。比方说我们向表 t 中插入一 条记录：</ul><pre><code class="language-mysql">mysql&gt; INSERT INTO t(col) VALUES('我们');
+Query OK, 1 row affected (0.00 sec)
+mysql&gt; SELECT * FROM t;
++--------+
+| s      |
++--------+
+| 我们    |
++--------+
+1 row in set (0.00 sec)
+</code></pre><p>首先列 <code class="language-plaintext highlighter-rouge">col </code>使用的字符集是 <code class="language-plaintext highlighter-rouge">gbk</code> ，一个字符 <code class="language-plaintext highlighter-rouge">'我' </code>在 gbk 中的编码为 <code class="language-plaintext highlighter-rouge">0xCED2</code> ，占用两个字节，两个字 符的实际数据就占用4个字节。如果把该列的字符集修改为 <code class="language-plaintext highlighter-rouge">utf8 </code>的话，这两个字符就实际占用6个字节</p><h2 id="3-字符集与比较规则了解">3 字符集与比较规则(了解)<a href="#3-字符集与比较规则了解" class="anchor"><i class="fas fa-hashtag"></i></a></h2></h2><h3 id="1-utf8-与-utf8mb4">1. utf8 与 utf8mb4<a href="#1-utf8-与-utf8mb4" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><p>utf8 字符集表示一个字符需要使用1～4个字节，但是我们常用的一些字符使用1～3个字节就可以表示 了。而字符集表示一个字符所用的最大字节长度，在某些方面会影响系统的存储和性能，所以设计 MySQL的设计者偷偷的定义了两个概念：</p><ul><li><p>utf8mb3 ：阉割过的 utf8 字符集，只使用1～3个字节表示字符。</p><li><p>utf8mb4 ：正宗的 utf8 字符集，使用1～4个字节表示字符。</p></ul><h3 id="2-比较规则">2. 比较规则<a href="#2-比较规则" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><p>上表中，MySQL版本一共支持41种字符集，其中的 Default collation 列表示这种字符集中一种默认 的比较规则，里面包含着该比较规则主要作用于哪种语言，比如 <code class="language-plaintext highlighter-rouge">utf8_polish_ci</code> 表示以波兰语的规则 比较，<code class="language-plaintext highlighter-rouge"> utf8_spanish_ci</code> 是以西班牙语的规则比较， <code class="language-plaintext highlighter-rouge">utf8_general_ci </code>是一种通用的比较规则。</p><p>后缀表示该比较规则是否区分语言中的重音、大小写。具体如下：</p><div class="table-wrapper"><table><thead><tr><th>后缀<th>英文释义<th>描述<tbody><tr><td>_ai<td>accent insensitive<td>不区分重音<tr><td>_as<td>accent sensitive<td>区分重音<tr><td>_ci<td>case insensitive<td>不区分大小写<tr><td>_cs<td>case sensitive<td>区分大小写<tr><td>_bin<td>binary<td>以二进制方式比较</table></div><p>最后一列 Maxlen ，它代表该种字符集表示一个字符最多需要几个字节。</p><p>常用操作1：</p><pre><code class="language-mysql">#查看GBK字符集的比较规则
+SHOW COLLATION LIKE 'gbk%';
+#查看UTF-8字符集的比较规则
+SHOW COLLATION LIKE 'utf8%';
+</code></pre><p>常用操作2：</p><pre><code class="language-mysql">#查看服务器的字符集和比较规则
+SHOW VARIABLES LIKE '%_server';
+#查看数据库的字符集和比较规则
+SHOW VARIABLES LIKE '%_database';
+#查看具体数据库的字符集
+SHOW CREATE DATABASE dbtest1;
+#修改具体数据库的字符集
+ALTER DATABASE dbtest1 DEFAULT CHARACTER SET 'utf8' COLLATE 'utf8_general_ci';
+</code></pre><p>常用操作3：</p><pre><code class="language-mysql">#查看表的字符集
+show create table employees;
+#查看表的比较规则
+show table status from atguigudb like 'employees';
+#修改表的字符集和比较规则
+ALTER TABLE emp1 DEFAULT CHARACTER SET 'utf8' COLLATE 'utf8_general_ci';
+</code></pre><h3 id="3请求到响应过程中字符集的变化">3.请求到响应过程中字符集的变化<a href="#3请求到响应过程中字符集的变化" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><div class="table-wrapper"><table><thead><tr><th>系统变量<th>描述<tbody><tr><td>character_set_client<td>服务器解码请求时使用的字符集<tr><td>character_set_connection<td>服务器处理请求时会把请求字符串从 character_set_client 转为 character_set_connection<tr><td>character_set_results<td>服务器向客户端返回数据时使用的字符集</table></div><p>这几个系统变量在我的计算机上的默认值如下（不同操作系统的默认值可能不同）：</p><p>为了体现出字符集在请求处理过程中的变化，我们这里特意修改一个系统变量的值：</p><pre><code class="language-mysql">mysql&gt; set character_set_connection = gbk;
+Query OK, 0 rows affected (0.00 sec)
+</code></pre><p>现在假设我们客户端发送的请求是下边这个字符串：</p><pre><code class="language-mysql">SELECT * FROM t WHERE s = '我';
+</code></pre><p>为了方便大家理解这个过程，我们只分析字符 ‘我’ 在这个过程中字符集的转换。 现在看一下在请求从发送到结果返回过程中字符集的变化：</p><ol><li><p>客户端发送请求所使用的字符集 一般情况下客户端所使用的字符集和当前操作系统一致，不同操作系统使用的字符集可能不一 样，如下：</p><p>类 Unix 系统使用的是 utf8 Windows 使用的是 gbk 当客户端使用的是 utf8 字符集，字符 ‘我’ 在发送给服务器的请求中的字节形式就是： 0xE68891</p></ol><p><code class="language-plaintext highlighter-rouge">提示 如果你使用的是可视化工具，比如navicat之类的，这些工具可能会使用自定义的字符集来编 码发送到服务器的字符串，而不采用操作系统默认的字符集（所以在学习的时候还是尽量用 命令行窗口）。</code></p><ol><li><p>服务器接收到客户端发送来的请求其实是一串二进制的字节，它会认为这串字节采用的字符集是 character_set_client ，然后把这串字节转换为 character_set_connection 字符集编码的 字符。 由于我的计算机上 character_set_client 的值是 utf8 ，首先会按照 utf8 字符集对字节串 0xE68891 进行解码，得到的字符串就是 ‘我’ ，然后按照 character_set_connection 代表的 字符集，也就是 gbk 进行编码，得到的结果就是字节串 0xCED2 。</p><li><p>因为表 t 的列 col 采用的是 gbk 字符集，与 character_set_connection 一致，所以直接到列 中找字节值为 0xCED2 的记录，最后找到了一条记录。</p></ol><p><code class="language-plaintext highlighter-rouge">提示 如果某个列使用的字符集和character_set_connection代表的字符集不一致的话，还需要进行 一次字符集转换。</code></p><ol><li><p>上一步骤找到的记录中的 col 列其实是一个字节串 0xCED2 ， col 列是采用 gbk 进行编码的，所 以首先会将这个字节串使用 gbk 进行解码，得到字符串 ‘我’ ，然后再把这个字符串使用 character_set_results 代表的字符集，也就是 utf8 进行编码，得到了新的字节串： 0xE68891 ，然后发送给客户端。</p><li><p>由于客户端是用的字符集是 utf8 ，所以可以顺利的将 0xE68891 解释成字符 我 ，从而显示到我 们的显示器上，所以我们人类也读懂了返回的结果。</p></ol><p><img data-src="../../assets/images/20210701MysqlInstall/image-20220531150917874.png" alt="image-20220531150917874" data-proofer-ignore></p><h2 id="4-sql大小写规范">4. SQL大小写规范<a href="#4-sql大小写规范" class="anchor"><i class="fas fa-hashtag"></i></a></h2></h2><h3 id="1windows和linux平台区别">1.Windows和Linux平台区别<a href="#1windows和linux平台区别" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><p>​ 在 SQL 中，关键字和函数名是不用区分字母大小写的，比如 SELECT、WHERE、ORDER、GROUP BY 等关 键字，以及 ABS、MOD、ROUND、MAX 等函数名。</p><p>​ 不过在 SQL 中，你还是要确定大小写的规范，因为在 Linux 和 Windows 环境下，你可能会遇到不同的大 小写问题。 windows系统默认大小写不敏感 ，但是 linux系统是大小写敏感的 。</p><p>​ 通过如下命令查看：</p><pre><code class="language-mysql">SHOW VARIABLES LIKE '%lower_case_table_names%'
++------------------------+-------+
+| Variable_name          | Value |
++------------------------+-------+
+| lower_case_table_names | 0     |
++------------------------+-------+
+1 row in set (0.00 sec)
+</code></pre><p>lower_case_table_names参数值的设置：</p><ul><li>默认为0，大小写敏感 。<li>设置1，大小写不敏感。创建的表，数据库都是以小写形式存放在磁盘上，对于sql语句都是转 换为小写对表和数据库进行查找。<li>设置2，创建的表和数据库依据语句上格式存放，凡是查找都是转换为小写进行。</ul><p>两个平台上SQL大小写的区别具体来说：</p><pre><code class="language-mysql">MySQL在Linux下数据库名、表名、列名、别名大小写规则是这样的：
+1、数据库名、表名、表的别名、变量名是严格区分大小写的；
+2、关键字、函数名称在 SQL 中不区分大小写；
+3、列名（或字段名）与列的别名（或字段别名）在所有的情况下均是忽略大小写的；
+</code></pre><p><strong>MySQL在Windows的环境下全部不区分大小写</strong></p><h3 id="2-linux下大小写规则设置">2 Linux下大小写规则设置<a href="#2-linux下大小写规则设置" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><p>​ 当想设置为大小写不敏感时，要在 my.cnf 这个配置文件 [mysqld] 中加入 lower_case_table_names=1 ，然后重启服务器。 但是要在重启数据库实例之前就需要将原来的数据库和表转换为小写，否则将找不到数据库名。此参数适用于MySQL5.7。</p><p>​ 在MySQL 8下禁止在重新启动 MySQL 服务时将 lower_case_table_names 设置成不同于初始化 MySQL 服务时设置的 lower_case_table_names 值。如果非要将MySQL8设置为大小写不敏感，具体步骤为：</p><pre><code class="language-mysql">1、停止MySQL服务
+2、删除数据目录，即删除 /var/lib/mysql 目录
+3、在MySQL配置文件（ /etc/my.cnf ）中添加 lower_case_table_names=1
+4、启动MySQL服务
+</code></pre><h3 id="3-sql编写建议">3 SQL编写建议<a href="#3-sql编写建议" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><p>如果你的变量名命名规范没有统一，就可能产生错误。这里有一个有关命名规范的建议：</p><pre><code class="language-mysql">1. 关键字和函数名称全部大写；
+2. 数据库名、表名、表别名、字段名、字段别名等全部小写；
+3. SQL 语句必须以分号结尾。
+</code></pre><p>数据库名、表名和字段名在 Linux MySQL 环境下是区分大小写的，因此建议你统一这些字段的命名规 则，比如全部采用小写的方式。</p><p>​ 虽然关键字和函数名称在 SQL 中不区分大小写，也就是如果小写的话同样可以执行。但是同时将关键词 和函数名称全部大写，以便于区分数据库名、表名、字段名。</p><h2 id="5sql_mode的合理设置">5.sql_mode的合理设置<a href="#5sql_mode的合理设置" class="anchor"><i class="fas fa-hashtag"></i></a></h2></h2><h3 id="51-宽松模式-vs-严格模式">5.1 宽松模式 vs 严格模式<a href="#51-宽松模式-vs-严格模式" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><p><strong>宽松模式</strong>： 如果设置的是宽松模式，那么我们在插入数据的时候，即便是给了一个错误的数据，也可能会被接受， 并且不报错。</p><p>​ 举例 ：我在创建一个表时，该表中有一个字段为name，给name设置的字段类型时<code class="language-plaintext highlighter-rouge"> char(10) </code>，如果我 在插入数据的时候，其中name这个字段对应的有一条数据的 长度超过了10 ，例如’1234567890abc’，超过了设定的字段长度10，那么不会报错，并且取前10个字符存上，也就是说你这个数据被存为 了’1234567890’，而’abc’就没有了。但是，我们给的这条数据是错误的，因为超过了字段长度，但是并没 有报错，并且mysql自行处理并接受了，这就是宽松模式的效果。</p><p>应用场景 ：通过设置sql mode为宽松模式，来保证大多数sql符合标准的sql语法，这样应用在不同数据库之间进行迁移 时，则不需要对业务sql 进行较大的修改。</p><p><strong>严格模式：</strong> 出现上面宽松模式的错误，应该报错才对，所以MySQL5.7版本就将sql_mode默认值改为了严格模式。所 以在 <code class="language-plaintext highlighter-rouge">生产等环境 </code>中，我们必须采用的是严格模式，进而 <code class="language-plaintext highlighter-rouge">开发、测试环境 </code>的数据库也必须要设置，这样在 开发测试阶段就可以发现问题。并且我们即便是用的MySQL5.6，也应该自行将其改为严格模式。</p><p>​ 开发经验 ：MySQL等数据库总想把关于数据的所有操作都自己包揽下来，包括数据的校验，其实开发 中，我们应该在自己 <code class="language-plaintext highlighter-rouge">开发的项目程序级别将这些校验给做了</code> ，虽然写项目的时候麻烦了一些步骤，但是这 样做之后，我们在进行数据库迁移或者在项目的迁移时，就会方便很多。 改为严格模式后可能会存在的问题：</p><p>若设置模式中包含了<code class="language-plaintext highlighter-rouge"> NO_ZERO_DATE</code> ，那么MySQL数据库不允许插入零日期，插入零日期会抛出错误而 不是警告。例如，表中含字段TIMESTAMP列（如果未声明为NULL或显示DEFAULT子句）将自动分配 DEFAULT ‘0000-00-00 00:00:00’（零时间戳），这显然是不满足sql_mode中的NO_ZERO_DATE而报错。</p><h3 id="52-模式查看和设置">5.2 模式查看和设置<a href="#52-模式查看和设置" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><p>查看当前的sql_mode</p><pre><code class="language-mysql">select @@session.sql_mode
+select @@global.sql_mode
+#或者
+show variables like 'sql_mode';
+</code></pre><p><img data-src="../../assets/images/20210701MysqlInstall/image-20220531160149536.png" alt="image-20220531160149536" data-proofer-ignore></p><p>临时设置方式：设置当前窗口中设置sql_mode</p><pre><code class="language-mysql">SET GLOBAL sql_mode = 'modes...'; #全局
+SET SESSION sql_mode = 'modes...'; #当前会话
+</code></pre><pre><code class="language-mysql">#改为严格模式。此方法只在当前会话中生效，关闭当前会话就不生效了。
+set SESSION sql_mode='STRICT_TRANS_TABLES';
+</code></pre><pre><code class="language-mysql">#改为严格模式。此方法在当前服务中生效，重启MySQL服务后失效。
+set GLOBAL sql_mode='STRICT_TRANS_TABLES';
+</code></pre><p>永久设置方式：在/etc/my.cnf中配置sql_mode</p><p>在my.cnf文件(windows系统是my.ini文件)，新增：</p><pre><code class="language-SH">[mysqld]
+sql_mode=ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR
+_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION
+</code></pre><p>然后 重启MySQL 。</p><p>​ 当然生产环境上是禁止重启MySQL服务的，所以采用 <code class="language-plaintext highlighter-rouge">临时设置方式 + 永久设置方式</code> 来解决线上的问题， 那么即便是有一天真的重启了MySQL服务，也会永久生效了。</p></div><div class="post-tail-wrapper text-muted"><div class="post-meta mb-3"> <i class="far fa-folder-open fa-fw mr-1"></i> <a href='/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/'>数据库</a></div><div class="post-tags"> <i class="fa fa-tags fa-fw mr-1"></i> <a href="/tags/mysql/" class="post-tag no-text-decoration" >MySQL</a></div><div class="post-tail-bottom d-flex justify-content-between align-items-center mt-3 pt-5 pb-2"><div class="license-wrapper"> 本文由作者按照 <a href="https://creativecommons.org/licenses/by/4.0/"> CC BY 4.0 </a> 进行授权</div><div class="share-wrapper"> <span class="share-label text-muted mr-1">分享</span> <span class="share-icons"> <a href="https://twitter.com/intent/tweet?text=MySQL在Linux安装 - Technical Blogs&url=https://carmanzheng.github.io//posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E5%9C%A8Linux%E5%AE%89%E8%A3%85/" data-toggle="tooltip" data-placement="top" title="Twitter" target="_blank" rel="noopener" aria-label="Twitter"> <i class="fa-fw fab fa-twitter"></i> </a> <a href="https://www.facebook.com/sharer/sharer.php?title=MySQL在Linux安装 - Technical Blogs&u=https://carmanzheng.github.io//posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E5%9C%A8Linux%E5%AE%89%E8%A3%85/" data-toggle="tooltip" data-placement="top" title="Facebook" target="_blank" rel="noopener" aria-label="Facebook"> <i class="fa-fw fab fa-facebook-square"></i> </a> <a href="https://telegram.me/share?text=MySQL在Linux安装 - Technical Blogs&url=https://carmanzheng.github.io//posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E5%9C%A8Linux%E5%AE%89%E8%A3%85/" data-toggle="tooltip" data-placement="top" title="Telegram" target="_blank" rel="noopener" aria-label="Telegram"> <i class="fa-fw fab fa-telegram"></i> </a> <i id="copy-link" class="fa-fw fas fa-link small" data-toggle="tooltip" data-placement="top" title="分享链接" title-succeed="链接已复制！"> </i> </span></div></div></div></div></div><div id="panel-wrapper" class="col-xl-3 pl-2 text-muted topbar-down"><div class="access"><div id="access-lastmod" class="post"><div class="panel-heading">最近更新</div><ul class="post-content pl-0 pb-1 ml-1 mt-2"><li><a href="/posts/Kubernetes%E6%A6%82%E8%BF%B0/">Kubernetes</a><li><a href="/posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E7%B4%A2%E5%BC%95%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">MySQL存储引擎</a><li><a href="/posts/Linux%E5%9F%BA%E7%A1%80/">Linux基础</a><li><a href="/posts/Python-%E5%A4%9A%E8%BF%9B%E7%A8%8B%E5%A4%9A%E7%BA%BF%E7%A8%8B/">Python基操-多进程与多线程</a><li><a href="/posts/%E5%89%8D%E7%AB%AF-Vue%E8%B7%AF%E7%94%B1%E4%B8%8EVuex/">前端 Vue路由与vuex</a></ul></div><div id="access-tags"><div class="panel-heading">热门标签</div><div class="d-flex flex-wrap mt-3 mb-1 mr-3"> <a class="post-tag" href="/tags/mysql/">MySQL</a> <a class="post-tag" href="/tags/python%E5%9F%BA%E6%93%8D/">Python基操</a> <a class="post-tag" href="/tags/%E5%89%8D%E7%AB%AFjs/">前端JS</a> <a class="post-tag" href="/tags/%E5%89%8D%E7%AB%AFvue/">前端Vue</a> <a class="post-tag" href="/tags/%E5%89%8D%E7%AB%AFcss/">前端CSS</a> <a class="post-tag" href="/tags/devops/">DevOps</a> <a class="post-tag" href="/tags/linux%E5%9F%BA%E7%A1%80/">Linux基础</a> <a class="post-tag" href="/tags/%E5%89%8D%E7%AB%AFhtml/">前端HTML</a> <a class="post-tag" href="/tags/github/">Github</a> <a class="post-tag" href="/tags/%E5%AE%A2%E6%88%B7%E7%AB%AF%E5%BC%80%E5%8F%91/">客户端开发</a></div></div></div><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@1.0.1/dist/bootstrap-toc.min.js"></script><div id="toc-wrapper" class="pl-0 pr-4 mb-5"><div class="panel-heading pl-3 pt-2 mb-2">文章内容</div><nav id="toc" data-toggle="toc"></nav></div></div></div><div class="row"><div class="col-12 col-lg-11 col-xl-8"><div id="tail-wrapper" class="pl-1 pr-1 pl-sm-2 pr-sm-2 pl-md-4 pr-md-4"><div id="related-posts" class="mt-5 mb-2 mb-sm-4"><h3 class="pt-2 mt-1 mb-4 ml-1" data-toc-skip>相关文章</h3><div class="card-deck mb-4"><div class="card"> <a href="/posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E7%B4%A2%E5%BC%95%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/"><div class="card-body"> <em class="timeago small" date="2021-07-06 00:00:00 +0800" >2021-07-06</em><h3 class="pt-0 mt-1 mb-3" data-toc-skip>MySQL存储引擎</h3><div class="text-muted small"><p> 1.为什么使用索引 假如给数据使用 二叉树 这样的数据结构进行存储，如下图所示 2. 索引及其优缺点 2.1 索引概述 MySQL官方对索引的定义为：索引（Index）是帮助MySQL高效获取数据的数据结构。 索引的本质：索引是数据结构。你可以简单理解为“排好序的快速查找数据结构”，满足特定查找算法。 这些数据结构以某种方式指向数据， 这样就可以在这些数据结构的基础上实现 ...</p></div></div></a></div><div class="card"> <a href="/posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E5%9F%BA%E7%A1%80/"><div class="card-body"> <em class="timeago small" date="2021-06-01 00:00:00 +0800" >2021-06-01</em><h3 class="pt-0 mt-1 mb-3" data-toc-skip>MySQL基础</h3><div class="text-muted small"><p> 1. 数据库功能 ​ 持久化(persistence)：把数据保存到可掉电式存储设备中以供之后使用。大多数情况下，特别是企业级应用，数据持久化意味着将内存中的数据保存到硬盘上加以”固化”，而持久化的实现过程大多 通过各种关系数据库来完成。 ​ 持久化的主要作用是将内存中的数据存储在关系型数据库中，当然也可以存储在磁盘文件、XML数 据文件中。 2.数据库与数据库管理系统 2....</p></div></div></a></div><div class="card"> <a href="/posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E5%AE%89%E8%A3%85/"><div class="card-body"> <em class="timeago small" date="2021-06-02 00:00:00 +0800" >2021-06-02</em><h3 class="pt-0 mt-1 mb-3" data-toc-skip>MySQL安装</h3><div class="text-muted small"><p> 1. 下载软件 官网：https://www.mysql.com 下载地址：https://dev.mysql.com/downloads/windows/installer/8.0.html MySQL Community Server 社区版本，开源免费，自由下载，但不提供官方技术支持，适用于 大多数普通用户。 MySQL Enterprise Edition 企业版本，...</p></div></div></a></div></div></div><div class="post-navigation d-flex justify-content-between"> <a href="/posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E8%A7%A6%E5%8F%91%E5%99%A8/" class="btn btn-outline-primary" prompt="上一篇"><p>MySQL触发器</p></a> <a href="/posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E6%96%87%E4%BB%B6%E7%9B%AE%E5%BD%95/" class="btn btn-outline-primary" prompt="下一篇"><p>MySQL文件目录</p></a></div></div></div></div><footer class="d-flex w-100 justify-content-center"><div class="d-flex justify-content-between align-items-center text-muted"><div class="footer-left"><p class="mb-0"> © 2022 <a href="https://github.com/carmanzheng">carmanzheng</a>. <span data-toggle="tooltip" data-placement="top" title="除非另有说明，本网站上的博客文章均由作者按照知识共享署名 4.0 国际 (CC BY 4.0) 许可协议进行授权。">保留部分权利。</span></p></div><div class="footer-right"><p class="mb-0"> 本站由 <a href="https://jekyllrb.com" target="_blank" rel="noopener">Jekyll</a> 生成，采用 <a href="https://github.com/cotes2020/jekyll-theme-chirpy" target="_blank" rel="noopener">Chirpy</a> 主题。</p></div></div></footer></div><div id="search-result-wrapper" class="d-flex justify-content-center unloaded"><div class="col-12 col-sm-11 post-content"><div id="search-hints"><div id="access-tags"><div class="panel-heading">热门标签</div><div class="d-flex flex-wrap mt-3 mb-1 mr-3"> <a class="post-tag" href="/tags/mysql/">MySQL</a> <a class="post-tag" href="/tags/python%E5%9F%BA%E6%93%8D/">Python基操</a> <a class="post-tag" href="/tags/%E5%89%8D%E7%AB%AFjs/">前端JS</a> <a class="post-tag" href="/tags/%E5%89%8D%E7%AB%AFvue/">前端Vue</a> <a class="post-tag" href="/tags/%E5%89%8D%E7%AB%AFcss/">前端CSS</a> <a class="post-tag" href="/tags/devops/">DevOps</a> <a class="post-tag" href="/tags/linux%E5%9F%BA%E7%A1%80/">Linux基础</a> <a class="post-tag" href="/tags/%E5%89%8D%E7%AB%AFhtml/">前端HTML</a> <a class="post-tag" href="/tags/github/">Github</a> <a class="post-tag" href="/tags/%E5%AE%A2%E6%88%B7%E7%AB%AF%E5%BC%80%E5%8F%91/">客户端开发</a></div></div></div><div id="search-results" class="d-flex flex-wrap justify-content-center text-muted mt-3"></div></div></div></div><div id="mask"></div><a id="back-to-top" href="#" aria-label="back-to-top" class="btn btn-lg btn-box-shadow" role="button"> <i class="fas fa-angle-up"></i> </a> <script src="https://cdn.jsdelivr.net/npm/simple-jekyll-search@1.10.0/dest/simple-jekyll-search.min.js"></script> <script> SimpleJekyllSearch({ searchInput: document.getElementById('search-input'), resultsContainer: document.getElementById('search-results'), json: '/assets/js/data/search.json', searchResultTemplate: '<div class="pl-1 pr-1 pl-sm-2 pr-sm-2 pl-lg-4 pr-lg-4 pl-xl-0 pr-xl-0"> <a href="{url}">{title}</a><div class="post-meta d-flex flex-column flex-sm-row text-muted mt-1 mb-1"> {categories} {tags}</div><p>{snippet}</p></div>', noResultsText: '<p class="mt-5">搜索结果为空</p>', templateMiddleware: function(prop, value, template) { if (prop === 'categories') { if (value === '') { return `${value}`; } else { return `<div class="mr-sm-4"><i class="far fa-folder fa-fw"></i>${value}</div>`; } } if (prop === 'tags') { if (value === '') { return `${value}`; } else { return `<div><i class="fa fa-tag fa-fw"></i>${value}</div>`; } } } }); </script> <script src="https://cdn.jsdelivr.net/combine/npm/lozad/dist/lozad.min.js,npm/magnific-popup@1/dist/jquery.magnific-popup.min.js,npm/clipboard@2/dist/clipboard.min.js"></script> <script defer src="/assets/js/dist/post.min.js"></script> <script src="https://cdn.jsdelivr.net/combine/npm/popper.js@1.16.1,npm/bootstrap@4/dist/js/bootstrap.min.js"></script> <script defer src="/app.js"></script> <script defer src="https://www.googletagmanager.com/gtag/js?id="></script> <script> document.addEventListener("DOMContentLoaded", function(event) { window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', ''); }); </script>

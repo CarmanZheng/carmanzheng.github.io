@@ -1,0 +1,182 @@
+<!DOCTYPE html><html lang="zh-CN" ><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><meta name="day-prompt" content="天前"><meta name="hour-prompt" content="小时前"><meta name="minute-prompt" content="分钟前"><meta name="justnow-prompt" content="刚刚"><meta name="generator" content="Jekyll v4.2.1" /><meta property="og:title" content="MySQL多表查询" /><meta property="og:locale" content="zh_CN" /><meta name="description" content="​ 多表查询，也称为关联查询，指两个或更多个表一起完成查询操作。 前提条件：这些一起查询的表之间是有关系的（一对一、一对多），它们之间一定是有关联字段，这个 关联字段可能建立了外键，也可能没有建立外键。比如：员工表和部门表，这两个表依靠“部门编号”进 行关联。" /><meta property="og:description" content="​ 多表查询，也称为关联查询，指两个或更多个表一起完成查询操作。 前提条件：这些一起查询的表之间是有关系的（一对一、一对多），它们之间一定是有关联字段，这个 关联字段可能建立了外键，也可能没有建立外键。比如：员工表和部门表，这两个表依靠“部门编号”进 行关联。" /><link rel="canonical" href="https://carmanzheng.github.io//posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E5%A4%9A%E8%A1%A8%E6%9F%A5%E8%AF%A2/" /><meta property="og:url" content="https://carmanzheng.github.io//posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E5%A4%9A%E8%A1%A8%E6%9F%A5%E8%AF%A2/" /><meta property="og:site_name" content="Technical Blogs" /><meta property="og:type" content="article" /><meta property="article:published_time" content="2021-06-06T00:00:00+08:00" /><meta name="twitter:card" content="summary" /><meta property="twitter:title" content="MySQL多表查询" /><meta name="twitter:site" content="@twitter_username" /><meta name="google-site-verification" content="google_meta_tag_verification" /> <script type="application/ld+json"> {"description":"​ 多表查询，也称为关联查询，指两个或更多个表一起完成查询操作。 前提条件：这些一起查询的表之间是有关系的（一对一、一对多），它们之间一定是有关联字段，这个 关联字段可能建立了外键，也可能没有建立外键。比如：员工表和部门表，这两个表依靠“部门编号”进 行关联。","headline":"MySQL多表查询","dateModified":"2022-05-13T11:18:02+08:00","datePublished":"2021-06-06T00:00:00+08:00","url":"https://carmanzheng.github.io//posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E5%A4%9A%E8%A1%A8%E6%9F%A5%E8%AF%A2/","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://carmanzheng.github.io//posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E5%A4%9A%E8%A1%A8%E6%9F%A5%E8%AF%A2/"},"@context":"https://schema.org"}</script><title>MySQL多表查询 | Technical Blogs</title><link rel="apple-touch-icon" sizes="180x180" href="/assets/img/favicons/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicons/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicons/favicon-16x16.png"><link rel="manifest" href="/assets/img/favicons/site.webmanifest"><link rel="shortcut icon" href="/assets/img/favicons/favicon.ico"><meta name="apple-mobile-web-app-title" content="Technical Blogs"><meta name="application-name" content="Technical Blogs"><meta name="msapplication-TileColor" content="#da532c"><meta name="msapplication-config" content="/assets/img/favicons/browserconfig.xml"><meta name="theme-color" content="#ffffff"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"><link rel="dns-prefetch" href="https://fonts.gstatic.com"><link rel="preconnect" href="https://www.google-analytics.com" crossorigin="use-credentials"><link rel="dns-prefetch" href="https://www.google-analytics.com"><link rel="preconnect" href="https://www.googletagmanager.com" crossorigin="anonymous"><link rel="dns-prefetch" href="https://www.googletagmanager.com"><link rel="preconnect" href="https://cdn.jsdelivr.net"><link rel="dns-prefetch" href="https://cdn.jsdelivr.net"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.11.2/css/all.min.css"><link rel="stylesheet" href="/assets/css/style.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@1.0.1/dist/bootstrap-toc.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/magnific-popup@1.1.0/dist/magnific-popup.min.css"> <script src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script> <script type="text/javascript"> class ModeToggle { static get MODE_KEY() { return "mode"; } static get DARK_MODE() { return "dark"; } static get LIGHT_MODE() { return "light"; } static get ID() { return "mode-toggle"; } constructor() { if (this.hasMode) { if (this.isDarkMode) { if (!this.isSysDarkPrefer) { this.setDark(); } } else { if (this.isSysDarkPrefer) { this.setLight(); } } } let self = this; /* always follow the system prefers */ this.sysDarkPrefers.addEventListener("change", () => { if (self.hasMode) { if (self.isDarkMode) { if (!self.isSysDarkPrefer) { self.setDark(); } } else { if (self.isSysDarkPrefer) { self.setLight(); } } self.clearMode(); } self.notify(); }); } /* constructor() */ get sysDarkPrefers() { return window.matchMedia("(prefers-color-scheme: dark)"); } get isSysDarkPrefer() { return this.sysDarkPrefers.matches; } get isDarkMode() { return this.mode === ModeToggle.DARK_MODE; } get isLightMode() { return this.mode === ModeToggle.LIGHT_MODE; } get hasMode() { return this.mode != null; } get mode() { return sessionStorage.getItem(ModeToggle.MODE_KEY); } /* get the current mode on screen */ get modeStatus() { if (this.isDarkMode || (!this.hasMode && this.isSysDarkPrefer)) { return ModeToggle.DARK_MODE; } else { return ModeToggle.LIGHT_MODE; } } setDark() { $('html').attr(ModeToggle.MODE_KEY, ModeToggle.DARK_MODE); sessionStorage.setItem(ModeToggle.MODE_KEY, ModeToggle.DARK_MODE); } setLight() { $('html').attr(ModeToggle.MODE_KEY, ModeToggle.LIGHT_MODE); sessionStorage.setItem(ModeToggle.MODE_KEY, ModeToggle.LIGHT_MODE); } clearMode() { $('html').removeAttr(ModeToggle.MODE_KEY); sessionStorage.removeItem(ModeToggle.MODE_KEY); } /* Notify another plugins that the theme mode has changed */ notify() { window.postMessage({ direction: ModeToggle.ID, message: this.modeStatus }, "*"); } } /* ModeToggle */ const toggle = new ModeToggle(); function flipMode() { if (toggle.hasMode) { if (toggle.isSysDarkPrefer) { if (toggle.isLightMode) { toggle.clearMode(); } else { toggle.setLight(); } } else { if (toggle.isDarkMode) { toggle.clearMode(); } else { toggle.setDark(); } } } else { if (toggle.isSysDarkPrefer) { toggle.setLight(); } else { toggle.setDark(); } } toggle.notify(); } /* flipMode() */ </script><body data-spy="scroll" data-target="#toc"><div id="sidebar" class="d-flex flex-column align-items-end" lang="zh-CN"><div class="profile-wrapper text-center"><div id="avatar"> <a href="/" alt="avatar" class="mx-auto"> <img src="/assets/img/favicons/android-chrome-192x192.png" alt="avatar" onerror="this.style.display='none'"> </a></div><div class="site-title mt-3"> <a href="/">Technical Blogs</a></div><div class="site-subtitle font-italic">Learning by Doing, Sharing for more!</div></div><ul class="w-100"><li class="nav-item"> <a href="/" class="nav-link"> <i class="fa-fw fas fa-home ml-xl-3 mr-xl-3 unloaded"></i> <span>首页</span> </a><li class="nav-item"> <a href="/categories/" class="nav-link"> <i class="fa-fw fas fa-stream ml-xl-3 mr-xl-3 unloaded"></i> <span>分类</span> </a><li class="nav-item"> <a href="/tags/" class="nav-link"> <i class="fa-fw fas fa-tag ml-xl-3 mr-xl-3 unloaded"></i> <span>标签</span> </a><li class="nav-item"> <a href="/archives/" class="nav-link"> <i class="fa-fw fas fa-archive ml-xl-3 mr-xl-3 unloaded"></i> <span>归档</span> </a><li class="nav-item"> <a href="/about/" class="nav-link"> <i class="fa-fw fas fa-info-circle ml-xl-3 mr-xl-3 unloaded"></i> <span>关于</span> </a></ul><div class="sidebar-bottom mt-auto d-flex flex-wrap justify-content-center align-items-center"> <button class="mode-toggle btn" aria-label="Switch Mode"> <i class="fas fa-adjust"></i> </button> <span class="icon-border"></span> <a href="https://github.com/Carmanzheng" aria-label="github" target="_blank" rel="noopener"> <i class="fab fa-github"></i> </a> <a href="https://twitter.com/twitter_username" aria-label="twitter" target="_blank" rel="noopener"> <i class="fab fa-twitter"></i> </a> <a href=" javascript:location.href = 'mailto:' + ['zhengkan1993','gmail.com'].join('@')" aria-label="email" > <i class="fas fa-envelope"></i> </a> <a href="/feed.xml" aria-label="rss" > <i class="fas fa-rss"></i> </a></div></div><div id="topbar-wrapper" class="row justify-content-center topbar-down"><div id="topbar" class="col-11 d-flex h-100 align-items-center justify-content-between"> <span id="breadcrumb"> <span> <a href="/"> 首页 </a> </span> <span>MySQL多表查询</span> </span> <i id="sidebar-trigger" class="fas fa-bars fa-fw"></i><div id="topbar-title"> 文章</div><i id="search-trigger" class="fas fa-search fa-fw"></i> <span id="search-wrapper" class="align-items-center"> <i class="fas fa-search fa-fw"></i> <input class="form-control" id="search-input" type="search" aria-label="search" autocomplete="off" placeholder="搜索..."> <i class="fa fa-times-circle fa-fw" id="search-cleaner"></i> </span> <span id="search-cancel" >取消</span></div></div><div id="main-wrapper"><div id="main"><div class="row"><div id="core-wrapper" class="col-12 col-lg-11 col-xl-8"><div class="post pl-1 pr-1 pl-sm-2 pr-sm-2 pl-md-4 pr-md-4"><h1 data-toc-skip>MySQL多表查询</h1><div class="post-meta text-muted"><div> 作者 <em> <a href="https://github.com/carmanzheng">carmanzheng</a> </em></div><div class="d-flex"><div> <span> 发表于 <em class="timeago" date="2021-06-06 00:00:00 +0800" data-toggle="tooltip" data-placement="bottom" title="2021-06-06, 00:00 +0800" >2021-06-06</em> </span> <span> 更新于 <em class="timeago" date="2022-05-13 11:18:02 +0800 " data-toggle="tooltip" data-placement="bottom" title="2022-05-13, 11:18 +0800" >05-13</em> </span> <span class="readtime" data-toggle="tooltip" data-placement="bottom" title="2448 字"> <em>13 分钟</em>阅读</span></div></div></div><div class="post-content"><p>​ 多表查询，也称为关联查询，指两个或更多个表一起完成查询操作。 前提条件：这些一起查询的表之间是有关系的（一对一、一对多），它们之间一定是有关联字段，这个 关联字段可能建立了外键，也可能没有建立外键。比如：员工表和部门表，这两个表依靠“部门编号”进 行关联。</p><h2 id="1--多表查询分类讲解">1. 多表查询分类讲解<a href="#1--多表查询分类讲解" class="anchor"><i class="fas fa-hashtag"></i></a></h2></h2><h3 id="1-等值连接">1. 等值连接<a href="#1-等值连接" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><p>等值连接</p><pre><code class="language-mysql">SELECT employees.employee_id, employees.last_name,
+employees.department_id, departments.department_id,
+departments.location_id
+FROM employees, departments
+WHERE employees.department_id = departments.department_id;
+</code></pre><ul><li><p>拓展1：多个连接条件与 AND 操作符</p><li><p>拓展2：区分重复的列名</p><p>多个表中有相同列时，必须在列名之前加上表名前缀。</p><p>在不同表中具有相同列名的列可以用 表名 加以区分。</p></ul><pre><code class="language-mysql">SELECT employees.last_name, departments.department_name,employees.department_id
+FROM employees, departments
+WHERE employees.department_id = departments.department_id;
+</code></pre><ul><li><p>拓展3：表的别名</p><p>使用别名可以简化查询</p><p>列名前使用表名前缀可以提高查询效率</p></ul><pre><code class="language-mysql">SELECT e.employee_id, e.last_name, e.department_id,
+d.department_id, d.location_id
+FROM employees e , departments d
+WHERE e.department_id = d.department_id;
+</code></pre><p><code class="language-plaintext highlighter-rouge">需要注意的是，如果我们使用了表的别名，在查询字段中、过滤条件中就只能使用别名进行代替， 不能使用原有的表名，否则就会报错。</code></p><pre><code class="language-mysql">阿里开发规范 ：
+【 强制 】：对于数据库中表记录的查询和变更，只要涉及多个表，都需要在列名前加表的别名（或表名）进行限定。
+【 说明 】：对多表进行查询记录、更新记录、删除记录时，如果对操作列没有限定表的别名（或表名），并且操作列在多个表中存在时，就会抛异常。
+【 正例 】 ：select t1.name from table_first as t1 , table_second as t2 where t1.id=t2.id;
+【 反例 】 ：在某业务中，由于多表关联查询语句没有加表的别名（或表名）的限制，正常运行两年后，最近在 某个表中增加一个同名字段，在预发布环境做数据库变更后，线上查询语句出现出 1052 异常：Column 'name' in field list is ambiguous。
+</code></pre><ul><li>拓展4：连接多个表</ul><p><img data-src="../../assets/images/20210606Mysql_multi_sheet/image-20220512140339146.png" alt="image-20220512140339146" data-proofer-ignore></p><p>总结：连接 n个表,至少需要n-1个连接条件。比如，连接三个表，至少需要两个连接条件。</p><h3 id="2-非等值连接">2. 非等值连接<a href="#2-非等值连接" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><p><img data-src="../../assets/images/20210606Mysql_multi_sheet/image-20220512140511197.png" alt="image-20220512140511197" data-proofer-ignore></p><pre><code class="language-mysql">SELECT e.last_name, e.salary, j.grade_level
+FROM employees e, job_grades j
+WHERE e.salary BETWEEN j.lowest_sal AND j.highest_sal;
+</code></pre><h3 id="3-自连接">3. 自连接<a href="#3-自连接" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><p>​ 当table1和table2本质上是同一张表，只是用取别名的方式虚拟成两张表以代表不同的意义。然后两 个表再进行内连接，外连接等查询。</p><h3 id="4内连接和外连接">4.内连接和外连接<a href="#4内连接和外连接" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><p>​ 内连接: 合并具有同一列的两个以上的表的行, 结果集中不包含一个表与另一个表不匹配的行</p><p>​ 外连接: 两个表在连接过程中除了返回满足连接条件的行以外还返回左（或右）表中不满足条件的 行 ，这种连接称为左（或右） 外连接。没有匹配的行时, 结果表中相应的列为空(NULL)。</p><ul><li>如果是左外连接，则连接条件中左边的表也称为 <code class="language-plaintext highlighter-rouge">主表</code> ，右边的表称为 <code class="language-plaintext highlighter-rouge">从表</code> 。<li>如果是右外连接，则连接条件中右边的表也称为 <code class="language-plaintext highlighter-rouge">主表 </code>，左边的表称为 <code class="language-plaintext highlighter-rouge">从表</code> 。</ul><h2 id="2多表查询实现">2.多表查询实现<a href="#2多表查询实现" class="anchor"><i class="fas fa-hashtag"></i></a></h2></h2><h3 id="1内连接inner-join的实现">1.内连接(INNER JOIN)的实现<a href="#1内连接inner-join的实现" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><pre><code class="language-mysql">SELECT 字段列表
+FROM A表 INNER JOIN B表
+ON 关联条件
+WHERE 等其他子句;
+</code></pre><pre><code class="language-mysql">SELECT e.employee_id, e.last_name, e.department_id,
+d.department_id, d.location_id
+FROM employees e JOIN departments d
+ON (e.department_id = d.department_id);
+</code></pre><p><img data-src="../../assets/images/20210606Mysql_multi_sheet/image-20220512141254072.png" alt="image-20220512141254072" data-proofer-ignore></p><pre><code class="language-mysql">SELECT employee_id, city, department_name
+FROM employees e
+JOIN departments d
+ON d.department_id = e.department_id
+JOIN locations l
+ON d.location_id = l.location_id;
+</code></pre><p><img data-src="../../assets/images/20210606Mysql_multi_sheet/image-20220512141535433.png" alt="image-20220512141535433" data-proofer-ignore></p><h3 id="2外连接outer-join的实现">2.外连接(OUTER JOIN)的实现<a href="#2外连接outer-join的实现" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><h4 id="21-左外连接left-outer-join">2.1 左外连接(LEFT OUTER JOIN)<a href="#21-左外连接left-outer-join" class="anchor"><i class="fas fa-hashtag"></i></a></h4></h4><p>语法：</p><pre><code class="language-mysql">#实现查询结果是A
+SELECT 字段列表
+FROM A表 LEFT JOIN B表
+ON 关联条件
+WHERE 等其他子句;
+</code></pre><p>举例：</p><pre><code class="language-mysql">SELECT e.last_name, e.department_id, d.department_name
+FROM employees e
+LEFT OUTER JOIN departments d
+ON (e.department_id = d.department_id) ;
+</code></pre><p><img data-src="../../assets/images/20210606Mysql_multi_sheet/image-20220512141725552.png" alt="image-20220512141725552" data-proofer-ignore></p><h4 id="22-右外连接right-outer-join">2.2 右外连接(RIGHT OUTER JOIN)<a href="#22-右外连接right-outer-join" class="anchor"><i class="fas fa-hashtag"></i></a></h4></h4><p>语法：</p><pre><code class="language-mysql">#实现查询结果是B
+SELECT 字段列表
+FROM A表 RIGHT JOIN B表
+ON 关联条件
+WHERE 等其他子句;
+</code></pre><p>举例：</p><pre><code class="language-mysql">SELECT e.last_name, e.department_id, d.department_name
+FROM employees e
+RIGHT OUTER JOIN departments d
+ON (e.department_id = d.department_id) ;
+</code></pre><h4 id="23-满外连接full-outer-join">2.3 满外连接(FULL OUTER JOIN)<a href="#23-满外连接full-outer-join" class="anchor"><i class="fas fa-hashtag"></i></a></h4></h4><ul><li>满外连接的结果 = 左右表匹配的数据 + 左表没有匹配到的数据 + 右表没有匹配到的数据。<li>SQL99是支持满外连接的。使用FULL JOIN 或 FULL OUTER JOIN来实现。<li>需要注意的是，MySQL不支持FULL JOIN，但是可以用 LEFT JOIN UNION RIGHT join代替。</ul><h3 id="3-union的使用">3. UNION的使用<a href="#3-union的使用" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><p>​ 合并查询结果 利用UNION关键字，可以给出多条SELECT语句，并将它们的结果组合成单个结果集。合并时，两个表对应的列数和数据类型必须相同，并且相互对应。</p><p>​ 各个SELECT语句之间使用UNION或UNION ALL关键字分隔。</p><p>语法格式：</p><pre><code class="language-mysql">SELECT column,... FROM table1
+UNION [ALL]
+SELECT column,... FROM table2
+</code></pre><p><strong>UNION操作符</strong></p><p><img data-src="../../assets/images/20210606Mysql_multi_sheet/image-20220512142026228.png" alt="image-20220512142026228" data-proofer-ignore></p><p>UNION 操作符返回两个查询的结果集的并集，去除重复记录。</p><p><strong>UNION ALL操作符</strong></p><p><img data-src="../../assets/images/20210606Mysql_multi_sheet/image-20220512142100397.png" alt="image-20220512142100397" data-proofer-ignore></p><p>UNION ALL操作符返回两个查询的结果集的并集。对于两个结果集的重复部分，不去重。</p><p>​ <code class="language-plaintext highlighter-rouge">注意：执行UNION ALL语句时所需要的资源比UNION语句少。如果明确知道合并数据后的结果数据 不存在重复数据，或者不需要去除重复的数据，则尽量使用UNION ALL语句，以提高数据查询的效 率。</code></p><p>举例：查询部门编号&gt;90或邮箱包含a的员工信息</p><pre><code class="language-mysql">#方式1
+SELECT * FROM employees WHERE email LIKE '%a%' OR department_id&gt;90;
+</code></pre><pre><code class="language-mysql">#方式2
+SELECT * FROM employees WHERE email LIKE '%a%'
+UNION
+SELECT * FROM employees WHERE department_id&gt;90;
+</code></pre><p>举例：查询中国用户中男性的信息以及美国用户中年男性的用户信息</p><pre><code class="language-mysql">SELECT id,cname FROM t_chinamale WHERE csex='男'
+UNION ALL
+SELECT id,tname FROM t_usmale WHERE tGender='male';
+</code></pre><h2 id="3-七种sql-joins的实现">3. 七种SQL JOINS的实现<a href="#3-七种sql-joins的实现" class="anchor"><i class="fas fa-hashtag"></i></a></h2></h2><p><img data-src="../../assets/images/20210606Mysql_multi_sheet/image-20220512142252728.png" alt="image-20220512142252728" data-proofer-ignore></p><h3 id="41-代码实现">4.1 代码实现<a href="#41-代码实现" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><pre><code class="language-mysql">#中图：内连接 A∩B
+SELECT employee_id,last_name,department_name
+FROM employees e JOIN departments d
+ON e.`department_id` = d.`department_id`;
+</code></pre><pre><code class="language-mysql">#左上图：左外连接
+SELECT employee_id,last_name,department_name
+FROM employees e LEFT JOIN departments d
+ON e.`department_id` = d.`department_id`;
+</code></pre><pre><code class="language-mysql">#右上图：右外连接
+SELECT employee_id,last_name,department_name
+FROM employees e RIGHT JOIN departments d
+ON e.`department_id` = d.`department_id`;
+</code></pre><pre><code class="language-mysql">#左中图：A - A∩B
+SELECT employee_id,last_name,department_name
+FROM employees e LEFT JOIN departments d
+ON e.`department_id` = d.`department_id`
+WHERE d.`department_id` IS NULL
+</code></pre><pre><code class="language-mysql">#右中图：B-A∩B
+SELECT employee_id,last_name,department_name
+FROM employees e RIGHT JOIN departments d
+ON e.`department_id` = d.`department_id`
+WHERE e.`department_id` IS NULL
+</code></pre><pre><code class="language-mysql">#左下图：满外连接
+# 左中图 + 右上图 A∪B
+SELECT employee_id,last_name,department_name
+FROM employees e LEFT JOIN departments d
+ON e.`department_id` = d.`department_id`
+WHERE d.`department_id` IS NULL
+UNION ALL #没有去重操作，效率高
+SELECT employee_id,last_name,department_name
+FROM employees e RIGHT JOIN departments d
+ON e.`department_id` = d.`department_id`;
+</code></pre><pre><code class="language-mysql">#右下图
+#左中图 + 右中图 A ∪B- A∩B 或者 (A - A∩B) ∪ （B - A∩B）
+SELECT employee_id,last_name,department_name
+FROM employees e LEFT JOIN departments d
+ON e.`department_id` = d.`department_id`
+WHERE d.`department_id` IS NULL
+UNION ALL
+SELECT employee_id,last_name,department_name
+FROM employees e RIGHT JOIN departments d
+ON e.`department_id` = d.`department_id`
+WHERE e.`department_id` IS NULL
+</code></pre><h3 id="42-小结">4.2 小结<a href="#42-小结" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><p>左中图</p><pre><code class="language-mysql">#实现A - A∩B
+select 字段列表
+from A表 left join B表
+on 关联条件
+where 从表关联字段 is null and 等其他子句;
+</code></pre><p>右中图</p><pre><code class="language-mysql">#实现B - A∩B
+select 字段列表
+from A表 right join B表
+on 关联条件
+where 从表关联字段 is null and 等其他子句;
+</code></pre><p>左下图</p><pre><code class="language-mysql">#实现查询结果是A∪B
+#用左外的A，union 右外的B
+select 字段列表
+from A表 left join B表
+on 关联条件
+where 等其他子句
+union
+select 字段列表
+from A表 right join B表
+on 关联条件
+where 等其他子句;
+</code></pre><p>右下图</p><pre><code class="language-mysql">#实现A∪B - A∩B 或 (A - A∩B) ∪ （B - A∩B）
+#使用左外的 (A - A∩B) union 右外的（B - A∩B）
+select 字段列表
+from A表 left join B表
+on 关联条件
+where 从表关联字段 is null and 等其他子句
+union
+select 字段列表
+from A表 right join B表
+on 关联条件
+where 从表关联字段 is null and 等其他子句
+</code></pre><h2 id="4课后练习">4.课后练习<a href="#4课后练习" class="anchor"><i class="fas fa-hashtag"></i></a></h2></h2><ol><li>显示所有员工的姓名、部门号和部门名称</ol><pre><code class="language-mysql">SELECT e.last_name,e.department_id,d.department_name
+FROM employees e JOIN departments d
+ON e.`department_id` = d.`department_id`;
+</code></pre><ol><li>查询<code class="language-plaintext highlighter-rouge">90号部门员工</code>的<code class="language-plaintext highlighter-rouge">job_id</code>和<code class="language-plaintext highlighter-rouge">90号部门员工</code>的<code class="language-plaintext highlighter-rouge">location_id</code></ol><pre><code class="language-mysql">SELECT e.job_id, d.location_id
+FROM employees e JOIN departments d
+ON e.`department_id` = d.`department_id`
+WHERE d.`department_id` = 90;
+</code></pre><ol><li>选择所有有奖金的员工的last_name，department_name，location_id，city</ol><pre><code class="language-mysql">SELECT last_name,department_name,location_id,city
+FROM employees e LEFT JOIN departments d
+ON e.`department_id` = d.`department_id`
+LEFT JOIN locations l 
+ON d.`location_id` = l.`location_id`
+WHERE e.`commission_pct` IS NOT NULL;
+</code></pre><ol><li>选择city在Toronto工作的员工的last_name，job_id，department_id，department_name</ol><pre><code class="language-mysql">SELECT last_name，job_id，department_id，department_name
+FROM employees e JOIN departments d
+ON e.`department_id` = d.`department_id`
+JOIN locations l
+ON d.`location_id` = l.`location_id`
+WHERE l.`city` = 'Toronto';
+</code></pre><ol><li>查询员工所在的部门名称、部门地址、姓名、工作、工资，其中员工所在部门的部门名称为Executive</ol><pre><code class="language-mysql">SELECT department_name,street_address,last_name,job_id,salary
+FROM employees e LEFT JOIN departments d
+ON e.`department_id` = d.`department_id`
+LEFT JOIN locations l
+ON d.`location_id` = l.`location_id`
+WHERE d.`department_name` = 'Executive';
+</code></pre><ol><li><p>选择指定员工的姓名、员工号、他的管理者的姓名、员工号，结果显示如下</p><pre><code class="language-mysql">employees 	Emp 	manager 	Mgr
+jack 		101		tom 	   02
+</code></pre></ol><pre><code class="language-mysql">SELECT emp.last_name "employees",emp.employee_id "Emp",mgr.last_name "manager",mgr.employee_id "Mgr"
+FROM employees emp LEFT JOIN employees mgr
+ON emp.manager_id = mgr.employee_id;
+</code></pre><ol><li>查询哪些部门没有员工</ol><pre><code class="language-mysql">SELECT d.department_id
+FROM departments d LEFT JOIN employees e
+ON d.`department_id` = e.`department_id`
+WHERE e.`department_id` IS NULL;
+</code></pre><ol><li>查询哪个城市没有部门</ol><pre><code class="language-mysql">SELECT l.location_id,l.city
+FROM locations l LEFT JOIN departments d
+ON l.`location_id` = d.`location_id`
+WHERE d.`location` IS NULL;
+</code></pre><ol><li>查询部门名为Sales或IT的员工信息</ol><pre><code class="language-mysql">SELECT e.employee_id,e.last_name,e.department_id,d.department_name
+FROM employees e JOIN departments d 
+ON e.`department_id` = d.`department_id`
+WHERE d.`department_name` IN ('Sales','IT');
+</code></pre><h2 id="参考链接">参考链接<a href="#参考链接" class="anchor"><i class="fas fa-hashtag"></i></a></h2></h2><ol><li><a href="https://www.bilibili.com/video/BV1iq4y1u7vj?p=31&amp;spm_id_from=pageDriver">MySQL数据库教程天花板，mysql安装到mysql高级，强！硬！</a></ol></div><div class="post-tail-wrapper text-muted"><div class="post-meta mb-3"> <i class="far fa-folder-open fa-fw mr-1"></i> <a href='/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/'>数据库</a></div><div class="post-tags"> <i class="fa fa-tags fa-fw mr-1"></i> <a href="/tags/mysql/" class="post-tag no-text-decoration" >MySQL</a></div><div class="post-tail-bottom d-flex justify-content-between align-items-center mt-3 pt-5 pb-2"><div class="license-wrapper"> 本文由作者按照 <a href="https://creativecommons.org/licenses/by/4.0/"> CC BY 4.0 </a> 进行授权</div><div class="share-wrapper"> <span class="share-label text-muted mr-1">分享</span> <span class="share-icons"> <a href="https://twitter.com/intent/tweet?text=MySQL多表查询 - Technical Blogs&url=https://carmanzheng.github.io//posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E5%A4%9A%E8%A1%A8%E6%9F%A5%E8%AF%A2/" data-toggle="tooltip" data-placement="top" title="Twitter" target="_blank" rel="noopener" aria-label="Twitter"> <i class="fa-fw fab fa-twitter"></i> </a> <a href="https://www.facebook.com/sharer/sharer.php?title=MySQL多表查询 - Technical Blogs&u=https://carmanzheng.github.io//posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E5%A4%9A%E8%A1%A8%E6%9F%A5%E8%AF%A2/" data-toggle="tooltip" data-placement="top" title="Facebook" target="_blank" rel="noopener" aria-label="Facebook"> <i class="fa-fw fab fa-facebook-square"></i> </a> <a href="https://telegram.me/share?text=MySQL多表查询 - Technical Blogs&url=https://carmanzheng.github.io//posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E5%A4%9A%E8%A1%A8%E6%9F%A5%E8%AF%A2/" data-toggle="tooltip" data-placement="top" title="Telegram" target="_blank" rel="noopener" aria-label="Telegram"> <i class="fa-fw fab fa-telegram"></i> </a> <i id="copy-link" class="fa-fw fas fa-link small" data-toggle="tooltip" data-placement="top" title="分享链接" title-succeed="链接已复制！"> </i> </span></div></div></div></div></div><div id="panel-wrapper" class="col-xl-3 pl-2 text-muted topbar-down"><div class="access"><div id="access-lastmod" class="post"><div class="panel-heading">最近更新</div><ul class="post-content pl-0 pb-1 ml-1 mt-2"><li><a href="/posts/Kubernetes%E6%A6%82%E8%BF%B0/">Kubernetes</a><li><a href="/posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E7%B4%A2%E5%BC%95%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">MySQL存储引擎</a><li><a href="/posts/Linux%E5%9F%BA%E7%A1%80/">Linux基础</a><li><a href="/posts/Python-%E5%A4%9A%E8%BF%9B%E7%A8%8B%E5%A4%9A%E7%BA%BF%E7%A8%8B/">Python基操-多进程与多线程</a><li><a href="/posts/%E5%89%8D%E7%AB%AF-Vue%E8%B7%AF%E7%94%B1%E4%B8%8EVuex/">前端 Vue路由与vuex</a></ul></div><div id="access-tags"><div class="panel-heading">热门标签</div><div class="d-flex flex-wrap mt-3 mb-1 mr-3"> <a class="post-tag" href="/tags/mysql/">MySQL</a> <a class="post-tag" href="/tags/python%E5%9F%BA%E6%93%8D/">Python基操</a> <a class="post-tag" href="/tags/%E5%89%8D%E7%AB%AFjs/">前端JS</a> <a class="post-tag" href="/tags/%E5%89%8D%E7%AB%AFvue/">前端Vue</a> <a class="post-tag" href="/tags/%E5%89%8D%E7%AB%AFcss/">前端CSS</a> <a class="post-tag" href="/tags/devops/">DevOps</a> <a class="post-tag" href="/tags/linux%E5%9F%BA%E7%A1%80/">Linux基础</a> <a class="post-tag" href="/tags/%E5%89%8D%E7%AB%AFhtml/">前端HTML</a> <a class="post-tag" href="/tags/github/">Github</a> <a class="post-tag" href="/tags/%E5%AE%A2%E6%88%B7%E7%AB%AF%E5%BC%80%E5%8F%91/">客户端开发</a></div></div></div><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@1.0.1/dist/bootstrap-toc.min.js"></script><div id="toc-wrapper" class="pl-0 pr-4 mb-5"><div class="panel-heading pl-3 pt-2 mb-2">文章内容</div><nav id="toc" data-toggle="toc"></nav></div></div></div><div class="row"><div class="col-12 col-lg-11 col-xl-8"><div id="tail-wrapper" class="pl-1 pr-1 pl-sm-2 pr-sm-2 pl-md-4 pr-md-4"><div id="related-posts" class="mt-5 mb-2 mb-sm-4"><h3 class="pt-2 mt-1 mb-4 ml-1" data-toc-skip>相关文章</h3><div class="card-deck mb-4"><div class="card"> <a href="/posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E7%B4%A2%E5%BC%95%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/"><div class="card-body"> <em class="timeago small" date="2021-07-06 00:00:00 +0800" >2021-07-06</em><h3 class="pt-0 mt-1 mb-3" data-toc-skip>MySQL存储引擎</h3><div class="text-muted small"><p> 1.为什么使用索引 假如给数据使用 二叉树 这样的数据结构进行存储，如下图所示 2. 索引及其优缺点 2.1 索引概述 MySQL官方对索引的定义为：索引（Index）是帮助MySQL高效获取数据的数据结构。 索引的本质：索引是数据结构。你可以简单理解为“排好序的快速查找数据结构”，满足特定查找算法。 这些数据结构以某种方式指向数据， 这样就可以在这些数据结构的基础上实现 ...</p></div></div></a></div><div class="card"> <a href="/posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E5%9F%BA%E7%A1%80/"><div class="card-body"> <em class="timeago small" date="2021-06-01 00:00:00 +0800" >2021-06-01</em><h3 class="pt-0 mt-1 mb-3" data-toc-skip>MySQL基础</h3><div class="text-muted small"><p> 1. 数据库功能 ​ 持久化(persistence)：把数据保存到可掉电式存储设备中以供之后使用。大多数情况下，特别是企业级应用，数据持久化意味着将内存中的数据保存到硬盘上加以”固化”，而持久化的实现过程大多 通过各种关系数据库来完成。 ​ 持久化的主要作用是将内存中的数据存储在关系型数据库中，当然也可以存储在磁盘文件、XML数 据文件中。 2.数据库与数据库管理系统 2....</p></div></div></a></div><div class="card"> <a href="/posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E5%AE%89%E8%A3%85/"><div class="card-body"> <em class="timeago small" date="2021-06-02 00:00:00 +0800" >2021-06-02</em><h3 class="pt-0 mt-1 mb-3" data-toc-skip>MySQL安装</h3><div class="text-muted small"><p> 1. 下载软件 官网：https://www.mysql.com 下载地址：https://dev.mysql.com/downloads/windows/installer/8.0.html MySQL Community Server 社区版本，开源免费，自由下载，但不提供官方技术支持，适用于 大多数普通用户。 MySQL Enterprise Edition 企业版本，...</p></div></div></a></div></div></div><div class="post-navigation d-flex justify-content-between"> <a href="/posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E6%8E%92%E5%BA%8F%E5%92%8C%E5%88%86%E9%A1%B5/" class="btn btn-outline-primary" prompt="上一篇"><p>MySQL排序和分页</p></a> <a href="/posts/%E6%95%B0%E6%8D%AE%E5%BA%93-Mysql%E5%87%BD%E6%95%B0/" class="btn btn-outline-primary" prompt="下一篇"><p>MySQL函数</p></a></div></div></div></div><footer class="d-flex w-100 justify-content-center"><div class="d-flex justify-content-between align-items-center text-muted"><div class="footer-left"><p class="mb-0"> © 2022 <a href="https://github.com/carmanzheng">carmanzheng</a>. <span data-toggle="tooltip" data-placement="top" title="除非另有说明，本网站上的博客文章均由作者按照知识共享署名 4.0 国际 (CC BY 4.0) 许可协议进行授权。">保留部分权利。</span></p></div><div class="footer-right"><p class="mb-0"> 本站由 <a href="https://jekyllrb.com" target="_blank" rel="noopener">Jekyll</a> 生成，采用 <a href="https://github.com/cotes2020/jekyll-theme-chirpy" target="_blank" rel="noopener">Chirpy</a> 主题。</p></div></div></footer></div><div id="search-result-wrapper" class="d-flex justify-content-center unloaded"><div class="col-12 col-sm-11 post-content"><div id="search-hints"><div id="access-tags"><div class="panel-heading">热门标签</div><div class="d-flex flex-wrap mt-3 mb-1 mr-3"> <a class="post-tag" href="/tags/mysql/">MySQL</a> <a class="post-tag" href="/tags/python%E5%9F%BA%E6%93%8D/">Python基操</a> <a class="post-tag" href="/tags/%E5%89%8D%E7%AB%AFjs/">前端JS</a> <a class="post-tag" href="/tags/%E5%89%8D%E7%AB%AFvue/">前端Vue</a> <a class="post-tag" href="/tags/%E5%89%8D%E7%AB%AFcss/">前端CSS</a> <a class="post-tag" href="/tags/devops/">DevOps</a> <a class="post-tag" href="/tags/linux%E5%9F%BA%E7%A1%80/">Linux基础</a> <a class="post-tag" href="/tags/%E5%89%8D%E7%AB%AFhtml/">前端HTML</a> <a class="post-tag" href="/tags/github/">Github</a> <a class="post-tag" href="/tags/%E5%AE%A2%E6%88%B7%E7%AB%AF%E5%BC%80%E5%8F%91/">客户端开发</a></div></div></div><div id="search-results" class="d-flex flex-wrap justify-content-center text-muted mt-3"></div></div></div></div><div id="mask"></div><a id="back-to-top" href="#" aria-label="back-to-top" class="btn btn-lg btn-box-shadow" role="button"> <i class="fas fa-angle-up"></i> </a> <script src="https://cdn.jsdelivr.net/npm/simple-jekyll-search@1.10.0/dest/simple-jekyll-search.min.js"></script> <script> SimpleJekyllSearch({ searchInput: document.getElementById('search-input'), resultsContainer: document.getElementById('search-results'), json: '/assets/js/data/search.json', searchResultTemplate: '<div class="pl-1 pr-1 pl-sm-2 pr-sm-2 pl-lg-4 pr-lg-4 pl-xl-0 pr-xl-0"> <a href="{url}">{title}</a><div class="post-meta d-flex flex-column flex-sm-row text-muted mt-1 mb-1"> {categories} {tags}</div><p>{snippet}</p></div>', noResultsText: '<p class="mt-5">搜索结果为空</p>', templateMiddleware: function(prop, value, template) { if (prop === 'categories') { if (value === '') { return `${value}`; } else { return `<div class="mr-sm-4"><i class="far fa-folder fa-fw"></i>${value}</div>`; } } if (prop === 'tags') { if (value === '') { return `${value}`; } else { return `<div><i class="fa fa-tag fa-fw"></i>${value}</div>`; } } } }); </script> <script src="https://cdn.jsdelivr.net/combine/npm/lozad/dist/lozad.min.js,npm/magnific-popup@1/dist/jquery.magnific-popup.min.js,npm/clipboard@2/dist/clipboard.min.js"></script> <script defer src="/assets/js/dist/post.min.js"></script> <script src="https://cdn.jsdelivr.net/combine/npm/popper.js@1.16.1,npm/bootstrap@4/dist/js/bootstrap.min.js"></script> <script defer src="/app.js"></script> <script defer src="https://www.googletagmanager.com/gtag/js?id="></script> <script> document.addEventListener("DOMContentLoaded", function(event) { window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', ''); }); </script>

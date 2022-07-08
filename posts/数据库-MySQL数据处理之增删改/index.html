@@ -1,0 +1,339 @@
+<!DOCTYPE html><html lang="zh-CN" ><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><meta name="day-prompt" content="天前"><meta name="hour-prompt" content="小时前"><meta name="minute-prompt" content="分钟前"><meta name="justnow-prompt" content="刚刚"><meta name="generator" content="Jekyll v4.2.1" /><meta property="og:title" content="MySQL数据处理之增删改" /><meta property="og:locale" content="zh_CN" /><meta name="description" content="1.插入数据" /><meta property="og:description" content="1.插入数据" /><link rel="canonical" href="https://carmanzheng.github.io//posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E6%95%B0%E6%8D%AE%E5%A4%84%E7%90%86%E4%B9%8B%E5%A2%9E%E5%88%A0%E6%94%B9/" /><meta property="og:url" content="https://carmanzheng.github.io//posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E6%95%B0%E6%8D%AE%E5%A4%84%E7%90%86%E4%B9%8B%E5%A2%9E%E5%88%A0%E6%94%B9/" /><meta property="og:site_name" content="Technical Blogs" /><meta property="og:type" content="article" /><meta property="article:published_time" content="2021-06-11T00:00:00+08:00" /><meta name="twitter:card" content="summary" /><meta property="twitter:title" content="MySQL数据处理之增删改" /><meta name="twitter:site" content="@twitter_username" /><meta name="google-site-verification" content="google_meta_tag_verification" /> <script type="application/ld+json"> {"description":"1.插入数据","headline":"MySQL数据处理之增删改","dateModified":"2022-05-20T18:48:31+08:00","datePublished":"2021-06-11T00:00:00+08:00","url":"https://carmanzheng.github.io//posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E6%95%B0%E6%8D%AE%E5%A4%84%E7%90%86%E4%B9%8B%E5%A2%9E%E5%88%A0%E6%94%B9/","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://carmanzheng.github.io//posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E6%95%B0%E6%8D%AE%E5%A4%84%E7%90%86%E4%B9%8B%E5%A2%9E%E5%88%A0%E6%94%B9/"},"@context":"https://schema.org"}</script><title>MySQL数据处理之增删改 | Technical Blogs</title><link rel="apple-touch-icon" sizes="180x180" href="/assets/img/favicons/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicons/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicons/favicon-16x16.png"><link rel="manifest" href="/assets/img/favicons/site.webmanifest"><link rel="shortcut icon" href="/assets/img/favicons/favicon.ico"><meta name="apple-mobile-web-app-title" content="Technical Blogs"><meta name="application-name" content="Technical Blogs"><meta name="msapplication-TileColor" content="#da532c"><meta name="msapplication-config" content="/assets/img/favicons/browserconfig.xml"><meta name="theme-color" content="#ffffff"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"><link rel="dns-prefetch" href="https://fonts.gstatic.com"><link rel="preconnect" href="https://www.google-analytics.com" crossorigin="use-credentials"><link rel="dns-prefetch" href="https://www.google-analytics.com"><link rel="preconnect" href="https://www.googletagmanager.com" crossorigin="anonymous"><link rel="dns-prefetch" href="https://www.googletagmanager.com"><link rel="preconnect" href="https://cdn.jsdelivr.net"><link rel="dns-prefetch" href="https://cdn.jsdelivr.net"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.11.2/css/all.min.css"><link rel="stylesheet" href="/assets/css/style.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@1.0.1/dist/bootstrap-toc.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/magnific-popup@1.1.0/dist/magnific-popup.min.css"> <script src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script> <script type="text/javascript"> class ModeToggle { static get MODE_KEY() { return "mode"; } static get DARK_MODE() { return "dark"; } static get LIGHT_MODE() { return "light"; } static get ID() { return "mode-toggle"; } constructor() { if (this.hasMode) { if (this.isDarkMode) { if (!this.isSysDarkPrefer) { this.setDark(); } } else { if (this.isSysDarkPrefer) { this.setLight(); } } } let self = this; /* always follow the system prefers */ this.sysDarkPrefers.addEventListener("change", () => { if (self.hasMode) { if (self.isDarkMode) { if (!self.isSysDarkPrefer) { self.setDark(); } } else { if (self.isSysDarkPrefer) { self.setLight(); } } self.clearMode(); } self.notify(); }); } /* constructor() */ get sysDarkPrefers() { return window.matchMedia("(prefers-color-scheme: dark)"); } get isSysDarkPrefer() { return this.sysDarkPrefers.matches; } get isDarkMode() { return this.mode === ModeToggle.DARK_MODE; } get isLightMode() { return this.mode === ModeToggle.LIGHT_MODE; } get hasMode() { return this.mode != null; } get mode() { return sessionStorage.getItem(ModeToggle.MODE_KEY); } /* get the current mode on screen */ get modeStatus() { if (this.isDarkMode || (!this.hasMode && this.isSysDarkPrefer)) { return ModeToggle.DARK_MODE; } else { return ModeToggle.LIGHT_MODE; } } setDark() { $('html').attr(ModeToggle.MODE_KEY, ModeToggle.DARK_MODE); sessionStorage.setItem(ModeToggle.MODE_KEY, ModeToggle.DARK_MODE); } setLight() { $('html').attr(ModeToggle.MODE_KEY, ModeToggle.LIGHT_MODE); sessionStorage.setItem(ModeToggle.MODE_KEY, ModeToggle.LIGHT_MODE); } clearMode() { $('html').removeAttr(ModeToggle.MODE_KEY); sessionStorage.removeItem(ModeToggle.MODE_KEY); } /* Notify another plugins that the theme mode has changed */ notify() { window.postMessage({ direction: ModeToggle.ID, message: this.modeStatus }, "*"); } } /* ModeToggle */ const toggle = new ModeToggle(); function flipMode() { if (toggle.hasMode) { if (toggle.isSysDarkPrefer) { if (toggle.isLightMode) { toggle.clearMode(); } else { toggle.setLight(); } } else { if (toggle.isDarkMode) { toggle.clearMode(); } else { toggle.setDark(); } } } else { if (toggle.isSysDarkPrefer) { toggle.setLight(); } else { toggle.setDark(); } } toggle.notify(); } /* flipMode() */ </script><body data-spy="scroll" data-target="#toc"><div id="sidebar" class="d-flex flex-column align-items-end" lang="zh-CN"><div class="profile-wrapper text-center"><div id="avatar"> <a href="/" alt="avatar" class="mx-auto"> <img src="/assets/img/favicons/android-chrome-192x192.png" alt="avatar" onerror="this.style.display='none'"> </a></div><div class="site-title mt-3"> <a href="/">Technical Blogs</a></div><div class="site-subtitle font-italic">Learning by Doing, Sharing for more!</div></div><ul class="w-100"><li class="nav-item"> <a href="/" class="nav-link"> <i class="fa-fw fas fa-home ml-xl-3 mr-xl-3 unloaded"></i> <span>首页</span> </a><li class="nav-item"> <a href="/categories/" class="nav-link"> <i class="fa-fw fas fa-stream ml-xl-3 mr-xl-3 unloaded"></i> <span>分类</span> </a><li class="nav-item"> <a href="/tags/" class="nav-link"> <i class="fa-fw fas fa-tag ml-xl-3 mr-xl-3 unloaded"></i> <span>标签</span> </a><li class="nav-item"> <a href="/archives/" class="nav-link"> <i class="fa-fw fas fa-archive ml-xl-3 mr-xl-3 unloaded"></i> <span>归档</span> </a><li class="nav-item"> <a href="/about/" class="nav-link"> <i class="fa-fw fas fa-info-circle ml-xl-3 mr-xl-3 unloaded"></i> <span>关于</span> </a></ul><div class="sidebar-bottom mt-auto d-flex flex-wrap justify-content-center align-items-center"> <button class="mode-toggle btn" aria-label="Switch Mode"> <i class="fas fa-adjust"></i> </button> <span class="icon-border"></span> <a href="https://github.com/Carmanzheng" aria-label="github" target="_blank" rel="noopener"> <i class="fab fa-github"></i> </a> <a href="https://twitter.com/twitter_username" aria-label="twitter" target="_blank" rel="noopener"> <i class="fab fa-twitter"></i> </a> <a href=" javascript:location.href = 'mailto:' + ['zhengkan1993','gmail.com'].join('@')" aria-label="email" > <i class="fas fa-envelope"></i> </a> <a href="/feed.xml" aria-label="rss" > <i class="fas fa-rss"></i> </a></div></div><div id="topbar-wrapper" class="row justify-content-center topbar-down"><div id="topbar" class="col-11 d-flex h-100 align-items-center justify-content-between"> <span id="breadcrumb"> <span> <a href="/"> 首页 </a> </span> <span>MySQL数据处理之增删改</span> </span> <i id="sidebar-trigger" class="fas fa-bars fa-fw"></i><div id="topbar-title"> 文章</div><i id="search-trigger" class="fas fa-search fa-fw"></i> <span id="search-wrapper" class="align-items-center"> <i class="fas fa-search fa-fw"></i> <input class="form-control" id="search-input" type="search" aria-label="search" autocomplete="off" placeholder="搜索..."> <i class="fa fa-times-circle fa-fw" id="search-cleaner"></i> </span> <span id="search-cancel" >取消</span></div></div><div id="main-wrapper"><div id="main"><div class="row"><div id="core-wrapper" class="col-12 col-lg-11 col-xl-8"><div class="post pl-1 pr-1 pl-sm-2 pr-sm-2 pl-md-4 pr-md-4"><h1 data-toc-skip>MySQL数据处理之增删改</h1><div class="post-meta text-muted"><div> 作者 <em> <a href="https://github.com/carmanzheng">carmanzheng</a> </em></div><div class="d-flex"><div> <span> 发表于 <em class="timeago" date="2021-06-11 00:00:00 +0800" data-toggle="tooltip" data-placement="bottom" title="2021-06-11, 00:00 +0800" >2021-06-11</em> </span> <span> 更新于 <em class="timeago" date="2022-05-20 18:48:31 +0800 " data-toggle="tooltip" data-placement="bottom" title="2022-05-20, 18:48 +0800" >05-20</em> </span> <span class="readtime" data-toggle="tooltip" data-placement="bottom" title="2912 字"> <em>16 分钟</em>阅读</span></div></div></div><div class="post-content"><h2 id="1插入数据">1.插入数据<a href="#1插入数据" class="anchor"><i class="fas fa-hashtag"></i></a></h2></h2><h3 id="11-插入数据">1.1 插入数据<a href="#11-插入数据" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><p><img data-src="../../assets/images/20210611MysqlAddDelMod/image-20220520114327065.png" alt="image-20220520114327065" data-proofer-ignore></p><p>解决方式：使用 INSERT 语句向表中插入数据。</p><h3 id="12-插入方式">1.2 插入方式<a href="#12-插入方式" class="anchor"><i class="fas fa-hashtag"></i></a></h3></h3><p>方式1：VALUES的方式添加</p><p>使用这种语法一次只能向表中插入一条数据。</p><p><strong>情况1：为表的所有字段按默认顺序插入数据</strong></p><pre><code class="language-mysql">INSERT INTO 表名
+VALUES (value1,value2,....);
+</code></pre><p>值列表中需要为表的每一个字段指定值，并且值的顺序必须和数据表中字段定义时的顺序相同。</p><pre><code class="language-mysql">INSERT INTO departments
+VALUES (70, 'Pub', 100, 1700);
+
+INSERT INTO departments
+VALUES (100, 'Finance', NULL, NULL);
+
+INSERT INTO 表名(column1 [, column2, …, columnn])
+VALUES (value1 [,value2, …, valuen]);
+</code></pre><p><strong>情况2 ：为指定列添加数据</strong></p><p>为表的指定字段插入数据，就是在INSERT语句中只向部分字段中插入值，而其他字段的值为表定义时的默认值。</p><p>​ 在 INSERT 子句中随意列出列名，但是一旦列出，VALUES中要插入的value1,….valuen需要与 column1,…columnn列一一对应。如果类型不同，将无法插入，并且MySQL会产生错误。</p><pre><code class="language-mysql">INSERT INTO departments(department_id, department_name)
+VALUES (80, 'IT');
+</code></pre><p><strong>情况3：同时插入多条记录</strong></p><p>INSERT语句可以同时向数据表中插入多条记录，插入时指定多个值列表，每个值列表之间用逗号分隔 开，基本语法格式如下：</p><pre><code class="language-mysql">INSERT INTO table_name
+VALUES
+(value1 [,value2, …, valuen]),
+(value1 [,value2, …, valuen]),
+……
+(value1 [,value2, …, valuen]);
+</code></pre><p>或者</p><pre><code class="language-mysql">INSERT INTO table_name(column1 [, column2, …, columnn])
+VALUES
+(value1 [,value2, …, valuen]),
+(value1 [,value2, …, valuen]),
+……
+(value1 [,value2, …, valuen]);
+
+</code></pre><p>举例：</p><pre><code class="language-mysql">mysql&gt; 
+INSERT INTO emp(emp_id,emp_name)
+VALUES (1001,'shkstart'),
+		(1002,'atguigu'),
+		(1003,'Tom');
+
+Query OK, 3 rows affected (0.00 sec)
+Records: 3 Duplicates: 0 Warnings: 0
+</code></pre><p>使用INSERT同时插入多条记录时，MySQL会返回一些在执行单行插入时没有的额外信息，这些信息的含 义如下：</p><p>●　Records：表明插入的记录条数。</p><p>●　Duplicates：表明插入时被忽略的记录，原因可能是这 些记录包含了重复的主键值。</p><p>●　Warnings：表明有问题的数据值，例如发生数据类型转换。</p><p><code class="language-plaintext highlighter-rouge">一个同时插入多行记录的INSERT语句等同于多个单行插入的INSERT语句，但是多行的INSERT语句 在处理过程中 效率更高 。因为MySQL执行单条INSERT语句插入多行数据比使用多条INSERT语句 快，所以在插入多条记录时最好选择使用单条INSERT语句的方式插入。</code></p><p><code class="language-plaintext highlighter-rouge">小结： VALUES 也可以写成 VALUE ，但是VALUES是标准写法。</code></p><p><strong>INSERT还可以将SELECT语句查询的结果插入到表中，此时不需要把每一条记录的值一个一个输入，只需 要使用一条INSERT语句和一条SELECT语句组成的组合语句即可快速地从一个或多个表中向一个表中插入 多行。</strong></p><p>基本语法格式如下：</p><pre><code class="language-mysql">INSERT INTO 目标表名
+(tar_column1 [, tar_column2, …, tar_columnn])
+SELECT
+(src_column1 [, src_column2, …, src_columnn])
+FROM 源表名
+[WHERE condition]
+</code></pre><ul><li>在 INSERT 语句中加入子查询。<li>不必书写 VALUES 子句。<li>子查询中的值列表应与 INSERT 子句中的列名对应。</ul><p>举例：</p><pre><code class="language-mysql">INSERT INTO emp2
+SELECT *
+FROM employees
+WHERE department_id = 90;
+</code></pre><pre><code class="language-mysql">INSERT INTO sales_reps(id, name, salary, commission_pct)
+SELECT employee_id, last_name, salary, commission_pct
+FROM employees
+WHERE job_id LIKE '%REP%'
+</code></pre><h2 id="2-更新数据">2. 更新数据<a href="#2-更新数据" class="anchor"><i class="fas fa-hashtag"></i></a></h2></h2><p><img data-src="../../assets/images/20210611MysqlAddDelMod/image-20220520140027078.png" alt="image-20220520140027078" data-proofer-ignore></p><p>使用 UPDATE 语句更新数据。语法如下：</p><pre><code class="language-mysql">[WHERE condition]
+</code></pre><ul><li>可以一次更新多条数据。<li>如果需要回滚数据，需要保证在DML前，进行设置：<code class="language-plaintext highlighter-rouge">SET AUTOCOMMIT = FALSE;</code></ul><p>使用 WHERE 子句指定需要更新的数据。</p><pre><code class="language-mysql">UPDATE employees
+SET department_id = 70
+WHERE employee_id = 113;
+</code></pre><p>如果省略 WHERE 子句，则表中的所有数据都将被更新。</p><pre><code class="language-mysql">UPDATE copy_emp
+SET department_id = 110;
+</code></pre><p><strong>更新中的数据完整性错误</strong></p><pre><code class="language-mysql">UPDATE employees
+SET department_id = 55
+WHERE department_id = 110;
+</code></pre><p><img data-src="../../assets/images/20210611MysqlAddDelMod/image-20220520140202582.png" alt="image-20220520140202582" data-proofer-ignore></p><p><code class="language-plaintext highlighter-rouge">说明：不存在 55 号部门，导致删除失败</code></p><h2 id="3-删除数据">3. 删除数据<a href="#3-删除数据" class="anchor"><i class="fas fa-hashtag"></i></a></h2></h2><p><img data-src="../../assets/images/20210611MysqlAddDelMod/image-20220520140239104.png" alt="image-20220520140239104" data-proofer-ignore></p><pre><code class="language-mysql">DELETE FROM table_name [WHERE &lt;condition&gt;];
+</code></pre><p><code class="language-plaintext highlighter-rouge">table_name</code>指定要执行删除操作的表；<code class="language-plaintext highlighter-rouge">“[WHERE ]”</code>为可选参数，指定删除条件，如果没有WHERE子句， DELETE语句将删除表中的所有记录。</p><p>使用 WHERE 子句删除指定的记录。</p><pre><code class="language-mysql">DELETE FROM departments
+WHERE department_name = 'Finance';
+</code></pre><p>如果省略 WHERE 子句，则表中的全部数据将被删除</p><pre><code class="language-mysql">DELETE FROM copy_emp;
+</code></pre><pre><code class="language-mysql">DELETE FROM departments
+WHERE department_id = 60;
+</code></pre><p><img data-src="../../assets/images/20210611MysqlAddDelMod/image-20220520140403248.png" alt="image-20220520140403248" data-proofer-ignore></p><p><code class="language-plaintext highlighter-rouge">说明：You cannot delete a row that contains a primary key that is used as a foreign key in another table.</code></p><h2 id="4-mysql8新特性计算列">4. MySQL8新特性：计算列<a href="#4-mysql8新特性计算列" class="anchor"><i class="fas fa-hashtag"></i></a></h2></h2><p>​ 什么叫计算列呢？简单来说就是某一列的值是通过别的列计算得来的。例如，a列值为1、b列值为2，c列 不需要手动插入，定义a+b的结果为c的值，那么c就是计算列，是通过别的列计算得来的。</p><p>​ 在MySQL 8.0中，<code class="language-plaintext highlighter-rouge">CREATE TABLE </code>和 <code class="language-plaintext highlighter-rouge">ALTER TABLE</code> 中都支持增加计算列。下面以CREATE TABLE为例进行讲 解。</p><p>举例：定义数据表tb1，然后定义字段id、字段a、字段b和字段c，其中字段c为计算列，用于计算a+b的 值。 首先创建测试表tb1，语句如下：</p><pre><code class="language-mysql">CREATE TABLE tb1(
+    id INT,
+    a INT,
+    b INT,
+    c INT GENERATED ALWAYS AS (a + b) VIRTUAL
+);
+</code></pre><p>查询数据表tb1中的数据，结果如下：</p><pre><code class="language-mysql">mysql&gt; SELECT * FROM tb1;
++------+------+------+------+
+| id   | a    | b    | c    |
++------+------+------+------+
+| NULL | 100  | 200   | 300 |
++------+------+------+------+
+1 row in set (0.00 sec)
+</code></pre><p>更新数据中的数据，语句如下：</p><pre><code class="language-mysql">mysql&gt; UPDATE tb1 SET a = 500;
+Query OK, 0 rows affected (0.00 sec)
+Rows matched: 1 Changed: 0 Warnings: 0
+
+</code></pre><h2 id="5综合案例">5.综合案例<a href="#5综合案例" class="anchor"><i class="fas fa-hashtag"></i></a></h2></h2><pre><code class="language-mysql"># 1、创建数据库test01_library
+CREATE DATABASE `test01_library` IF NOT EXISTS CHARACTER SET 'utf8';
+USE test01_library;
+# 2、创建表 books，表结构如下：
+CREATE TABLE IF NOT EXISTS books(
+    id INT,
+    name VARCHAR(50),
+    `authors` VARCHAR(100) ,
+    price FLOAT,
+    pubdate YEAR ,
+    note VARCHAR(100),
+    num INT
+);
+</code></pre><p><img data-src="../../assets/images/20210611MysqlAddDelMod/image-20220520172506488.png" alt="image-20220520172506488" data-proofer-ignore></p><pre><code class="language-mysql"># 3、向books表中插入记录
+# 1）不指定字段名称，插入第一条记录
+INSERT INTO books
+VALUES(1,'Tal of AAA','Dickes',23,1995,'novel',11);
+# 2）指定所有字段名称，插入第二记录
+INSERT INTO books
+VALUES(1,'Tal of AAA','Dickes',23,1995,'novel',11);
+# 3）同时插入多条记录（剩下的所有记录）
+INSERT INTO books (id,name,`authors`,price,pubdate,note,num) VALUES
+(3,'Story of Jane','Jane Tim',40,2001,'novel',0),
+(4,'Lovey Day','George Byron',20,2005,'novel',30),
+(5,'Old land','Honore Blade',30,2010,'Law',0),
+(6,'The Battle','Upton Sara',30,1999,'medicine',40),
+(7,'Rose Hood','Richard haggard',28,2008,'cartoon',28);
+
+# 4、将小说类型(novel)的书的价格都增加5。
+UPDATE books SET price=price+5 WHERE note = 'novel';
+
+# 5、将名称为EmmaT的书的价格改为40，并将说明改为drama。
+UPDATE books SET price=40,note='drama' WHERE name='EmmaT';
+
+# 6、删除库存为0的记录。
+DELETE FROM books WHERE num=0;
+
+# 7、统计书名中包含a字母的书
+SELECT * FROM books WHERE name LIKE '%a%';
+
+# 8、统计书名中包含a字母的书的数量和库存总量
+SELECT COUNT(*),SUM(num) FROM books WHERE name LIKE '%a%';
+
+# 9、找出“novel”类型的书，按照价格降序排列
+SELECT * FROM books WHERE note = 'novel' ORDER BY price DESC;
+
+# 10、查询图书信息，按照库存量降序排列，如果库存量相同的按照note升序排列
+SELECT * FROM books ORDER BY num DESC,note ASC;
+
+# 11、按照note分类统计书的数量
+SELECT note,COUNT(*) FROM books GROUP BY note;
+
+# 12、按照note分类统计书的库存量，显示库存量超过30本的
+SELECT note,count(*)
+FROM books
+GROUP BY note 
+HAVING sum(num)&gt;30;
+
+# 13、查询所有图书，每页显示5本，显示第二页
+SELECT * FROM books LIMIT 5,5;
+
+# 14、按照note分类统计书的库存量，显示库存量最多的
+SELECT note,SUM(num) sum_num FROM books GROUP BY note ORDER BY sum_num DESC LIMIT 0,1;
+
+# 15、查询书名达到10个字符的书，不包括里面的空格
+SELECT * FROM books WHERE CHAR_LENGTH(REPLACE(name,' ',''))&gt;=10;
+
+/*
+16、查询书名和类型，
+其中note值为 novel显示小说，law显示法律，medicine显示医药，cartoon显示卡通，joke显示笑话
+*/
+SELECT name AS "书名" ,note, CASE note
+WHEN 'novel' THEN '小说'
+WHEN 'law' THEN '法律'
+WHEN 'medicine' THEN '医药'
+WHEN 'cartoon' THEN '卡通'
+WHEN 'joke' THEN '笑话'
+END AS "类型"
+FROM books;
+
+# 17、查询书名、库存，其中num值超过30本的，显示滞销，大于0并低于10的，显示畅销，为0的显示需要无货
+SELECT name,num,CASE
+WHEN num&gt;30 THEN '滞销'
+WHEN num&gt;0 AND num&lt;10 THEN '畅销'
+WHEN num=0 THEN '无货'
+ELSE '正常'
+END AS "库存状态"
+FROM books;
+
+# 18、统计每一种note的库存量，并合计总量
+SELECT IFNULL(note,'合计总库存量') AS note,SUM(num) FROM books GROUP BY note WITH
+ROLLUP;
+
+# 19、统计每一种note的数量，并合计总量(这个用到了rollup)
+SELECT IFNULL(note,'合计总数') AS note,COUNT(*) FROM books GROUP BY note WITH ROLLUP;
+
+# 20、统计库存量前三名的图书
+SELECT * FROM books ORDER BY num DESC LIMIT 0,3;
+
+# 21、找出最早出版的一本书
+SELECT * FROM books ORDER BY pubdate ASC LIMIT 0,1;
+
+# 22、找出novel中价格最高的一本书
+SELECT * FROM books WHERE note = 'novel' ORDER BY price DESC LIMIT 0,1;
+
+# 23、找出书名中字数最多的一本书，不含空格
+SELECT * FROM books ORDER BY CHAR_LENGTH(REPLACE(name,' ','')) DESC LIMIT 0,1;
+</code></pre><h2 id="6课后练习">6.课后练习<a href="#6课后练习" class="anchor"><i class="fas fa-hashtag"></i></a></h2></h2><pre><code class="language-mysql"># 1.创建数据库dbtest11
+CREATE DATABASE IF NOT EXISTS dbtest11 CHARACTER SET 'utf8';
+
+# 2.创建my_employees表
+USE(dbtest11)
+CREATE TABLE my_employees(
+	id INT(10),
+    first_name VARCHAR(10),
+    last_name VARCHAR(10),
+    userid VARCHAR(10),
+    salary DOUBLE(10,2)
+);
+
+CREATE TABLE users(
+	id INT,
+    userid VARCHAR(10),
+    department_id INT
+);
+# 3. 显示表my_employees结构
+DESC my_employees;
+
+# 4. 向my_employees表中插入数据
+INSERT INTO my_employees VALUES
+(1,'Rpatel','Ralph','Rpatel',895),
+(2,'Dancs','Betty','Bancs',860),
+(3,'Biri','Ben','Bbiri',1100),
+(4,'Newman','Chad','Cnewman',750),
+(5,'Ropeburn','Audery','Aropebur',1100);
+
+#5.向user表中插入数据
+INSERT INTO users VALUES 
+(1,'Rpatel',10),
+(2,'Bdancs',10),
+(3,'Bbiri',20),
+(4,'Cnewman',30),
+(5,'Aropebur',40);
+
+# 6.将3号员工的last_name修改为'drelxer'
+UPDATE my_employees 
+SET last_name = "drelxer"
+WHERE id = 3;
+
+# 7. 将所有工资少于900的员工工资修改为1000
+UPDATE my_employees
+SET salary = 1000
+WHERE salary &lt; 900；
+
+# 8.将userid为Bbiri的users表和my_employees表的记录全部删除
+DELETE FROM my_employees
+WHERE userid = 'Bbiri';
+
+DELETE FROM userid 
+WHERE userid = 'Bbiri';
+# 9.删除my_employees、users表中的所有数据
+DELETE FROM my_employees;
+DELETE FROM users;
+
+# 10. 检查是否已经删除
+SELECT * FROM my_employees;
+SELECT * FROM users;
+
+# 11.清空表my_employees
+TRUNCATE TABLE my_employees;
+
+</code></pre><pre><code class="language-MYSQL"># 1. 使用现有数据库dbtest11
+USE dbtest11;
+# 2. 创建表格pet
+CREATE TABLE pet(
+	NAME VARCHAR(20),
+    OWNER VARCHAR(20),
+    species VARCHAR(20),
+    sex CHAR(1),
+    birth YEAR,
+    death YEAR
+);
+
+DESC pet;
+
+# 3. 添加记录
+INSERT INTO pet VALUES
+('Fuffy','harold','Cat','f','2003','2010'),
+('Claws','gwen','Cat','f','2009',NULL),
+('Buffy',NULL,'Dog','m','2000',NULL),
+('Fang','benny','Dog','m','2009',NULL),
+('bowser','dianen','Dog','m','2003','2009');
+
+# 4.添加字段：主人生日 own_birth DATE 类型
+ALTER TABLE pet
+ADD own_birth DATE;
+
+# 5. 将名称为Claws的猫的主人修改为Kevin
+UPDATE pet
+SET OWNER = 'Kevin'
+WHERE NAME = 'Claws' AND species = 'Cat';
+
+# 6.将没有死的狗的主人改为duck
+UPDATE pet
+SET OWNER = 'duck'
+WHERE death IS NOT NULL AND species = 'Dog';
+
+# 7.查询没有主人的宠物的名字
+SELECT NAME 
+FROM pet
+WHERE OWNER IS NULL;
+
+# 8.查询已经死了的cat的姓名、主人、去世时间
+SELECT NAME,OWNER,death
+FROM pet
+WHERE death IS NOT NULL AND species IS 'Dog';
+
+# 9.删除已经死亡的狗
+DELETE FROM pet
+WHERE death IS NOT NULL
+AND species IS 'Dog';
+
+# 10. 查询所有宠物信息
+SELECT * FROM pet;
+</code></pre><pre><code class="language-mysql"># 1. 使用dbtest11数据库
+USE dbtest11;
+
+# 2.创建表employee，并添加记录
+CREATE TABLE employee(
+	id INT,
+    sex CHAR(1),
+    tel VARCHAR(35),
+    addr VARCHAR(34),
+    salary DOUBLE(10,2)
+);
+
+INSERT INTO employee VALUES
+(10001,'张一一','男','13522262227','山东青岛'，1000.25),
+(10002,'刘晓红','女','13533262223','河北保定'，1201.25),
+(10003,'李四','男','0760-21251255','广东中山'，2000.25),
+(10001,'刘小强','男','0755-5555555','广东深圳'，5000.25);
+
+# 3.查询处薪资在1200-1300之间的员工信息
+SELECT * FROM employee
+WHERE salary BETWEEN 1200 AND 1300;
+
+# 4. 查询处姓"刘"的员工的姓名、工号、家庭地址
+SELECT NAME,id,addr
+FROM employee
+WHERE NAME LIKE "刘%";
+
+# 5.将“李四”的家庭住址改为“广东韶关”
+UPDATE employee
+SET addr="广东韶关"
+WHERE NAME = "李四";
+
+# 6.查询名字中带有“小”的员工信息
+SELECT * FROM employee
+WHERE NAME LIKE "%小%";
+</code></pre></div><div class="post-tail-wrapper text-muted"><div class="post-meta mb-3"> <i class="far fa-folder-open fa-fw mr-1"></i> <a href='/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/'>数据库</a></div><div class="post-tags"> <i class="fa fa-tags fa-fw mr-1"></i> <a href="/tags/mysql/" class="post-tag no-text-decoration" >MySQL</a></div><div class="post-tail-bottom d-flex justify-content-between align-items-center mt-3 pt-5 pb-2"><div class="license-wrapper"> 本文由作者按照 <a href="https://creativecommons.org/licenses/by/4.0/"> CC BY 4.0 </a> 进行授权</div><div class="share-wrapper"> <span class="share-label text-muted mr-1">分享</span> <span class="share-icons"> <a href="https://twitter.com/intent/tweet?text=MySQL数据处理之增删改 - Technical Blogs&url=https://carmanzheng.github.io//posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E6%95%B0%E6%8D%AE%E5%A4%84%E7%90%86%E4%B9%8B%E5%A2%9E%E5%88%A0%E6%94%B9/" data-toggle="tooltip" data-placement="top" title="Twitter" target="_blank" rel="noopener" aria-label="Twitter"> <i class="fa-fw fab fa-twitter"></i> </a> <a href="https://www.facebook.com/sharer/sharer.php?title=MySQL数据处理之增删改 - Technical Blogs&u=https://carmanzheng.github.io//posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E6%95%B0%E6%8D%AE%E5%A4%84%E7%90%86%E4%B9%8B%E5%A2%9E%E5%88%A0%E6%94%B9/" data-toggle="tooltip" data-placement="top" title="Facebook" target="_blank" rel="noopener" aria-label="Facebook"> <i class="fa-fw fab fa-facebook-square"></i> </a> <a href="https://telegram.me/share?text=MySQL数据处理之增删改 - Technical Blogs&url=https://carmanzheng.github.io//posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E6%95%B0%E6%8D%AE%E5%A4%84%E7%90%86%E4%B9%8B%E5%A2%9E%E5%88%A0%E6%94%B9/" data-toggle="tooltip" data-placement="top" title="Telegram" target="_blank" rel="noopener" aria-label="Telegram"> <i class="fa-fw fab fa-telegram"></i> </a> <i id="copy-link" class="fa-fw fas fa-link small" data-toggle="tooltip" data-placement="top" title="分享链接" title-succeed="链接已复制！"> </i> </span></div></div></div></div></div><div id="panel-wrapper" class="col-xl-3 pl-2 text-muted topbar-down"><div class="access"><div id="access-lastmod" class="post"><div class="panel-heading">最近更新</div><ul class="post-content pl-0 pb-1 ml-1 mt-2"><li><a href="/posts/Kubernetes%E6%A6%82%E8%BF%B0/">Kubernetes</a><li><a href="/posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E7%B4%A2%E5%BC%95%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">MySQL存储引擎</a><li><a href="/posts/Linux%E5%9F%BA%E7%A1%80/">Linux基础</a><li><a href="/posts/Python-%E5%A4%9A%E8%BF%9B%E7%A8%8B%E5%A4%9A%E7%BA%BF%E7%A8%8B/">Python基操-多进程与多线程</a><li><a href="/posts/%E5%89%8D%E7%AB%AF-Vue%E8%B7%AF%E7%94%B1%E4%B8%8EVuex/">前端 Vue路由与vuex</a></ul></div><div id="access-tags"><div class="panel-heading">热门标签</div><div class="d-flex flex-wrap mt-3 mb-1 mr-3"> <a class="post-tag" href="/tags/mysql/">MySQL</a> <a class="post-tag" href="/tags/python%E5%9F%BA%E6%93%8D/">Python基操</a> <a class="post-tag" href="/tags/%E5%89%8D%E7%AB%AFjs/">前端JS</a> <a class="post-tag" href="/tags/%E5%89%8D%E7%AB%AFvue/">前端Vue</a> <a class="post-tag" href="/tags/%E5%89%8D%E7%AB%AFcss/">前端CSS</a> <a class="post-tag" href="/tags/devops/">DevOps</a> <a class="post-tag" href="/tags/linux%E5%9F%BA%E7%A1%80/">Linux基础</a> <a class="post-tag" href="/tags/%E5%89%8D%E7%AB%AFhtml/">前端HTML</a> <a class="post-tag" href="/tags/github/">Github</a> <a class="post-tag" href="/tags/%E5%AE%A2%E6%88%B7%E7%AB%AF%E5%BC%80%E5%8F%91/">客户端开发</a></div></div></div><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@1.0.1/dist/bootstrap-toc.min.js"></script><div id="toc-wrapper" class="pl-0 pr-4 mb-5"><div class="panel-heading pl-3 pt-2 mb-2">文章内容</div><nav id="toc" data-toggle="toc"></nav></div></div></div><div class="row"><div class="col-12 col-lg-11 col-xl-8"><div id="tail-wrapper" class="pl-1 pr-1 pl-sm-2 pr-sm-2 pl-md-4 pr-md-4"><div id="related-posts" class="mt-5 mb-2 mb-sm-4"><h3 class="pt-2 mt-1 mb-4 ml-1" data-toc-skip>相关文章</h3><div class="card-deck mb-4"><div class="card"> <a href="/posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E7%B4%A2%E5%BC%95%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/"><div class="card-body"> <em class="timeago small" date="2021-07-06 00:00:00 +0800" >2021-07-06</em><h3 class="pt-0 mt-1 mb-3" data-toc-skip>MySQL存储引擎</h3><div class="text-muted small"><p> 1.为什么使用索引 假如给数据使用 二叉树 这样的数据结构进行存储，如下图所示 2. 索引及其优缺点 2.1 索引概述 MySQL官方对索引的定义为：索引（Index）是帮助MySQL高效获取数据的数据结构。 索引的本质：索引是数据结构。你可以简单理解为“排好序的快速查找数据结构”，满足特定查找算法。 这些数据结构以某种方式指向数据， 这样就可以在这些数据结构的基础上实现 ...</p></div></div></a></div><div class="card"> <a href="/posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E5%9F%BA%E7%A1%80/"><div class="card-body"> <em class="timeago small" date="2021-06-01 00:00:00 +0800" >2021-06-01</em><h3 class="pt-0 mt-1 mb-3" data-toc-skip>MySQL基础</h3><div class="text-muted small"><p> 1. 数据库功能 ​ 持久化(persistence)：把数据保存到可掉电式存储设备中以供之后使用。大多数情况下，特别是企业级应用，数据持久化意味着将内存中的数据保存到硬盘上加以”固化”，而持久化的实现过程大多 通过各种关系数据库来完成。 ​ 持久化的主要作用是将内存中的数据存储在关系型数据库中，当然也可以存储在磁盘文件、XML数 据文件中。 2.数据库与数据库管理系统 2....</p></div></div></a></div><div class="card"> <a href="/posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E5%AE%89%E8%A3%85/"><div class="card-body"> <em class="timeago small" date="2021-06-02 00:00:00 +0800" >2021-06-02</em><h3 class="pt-0 mt-1 mb-3" data-toc-skip>MySQL安装</h3><div class="text-muted small"><p> 1. 下载软件 官网：https://www.mysql.com 下载地址：https://dev.mysql.com/downloads/windows/installer/8.0.html MySQL Community Server 社区版本，开源免费，自由下载，但不提供官方技术支持，适用于 大多数普通用户。 MySQL Enterprise Edition 企业版本，...</p></div></div></a></div></div></div><div class="post-navigation d-flex justify-content-between"> <a href="/posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E5%88%9B%E5%BB%BA-%E4%BF%AE%E6%94%B9%E4%B8%8E%E5%88%A0%E9%99%A4/" class="btn btn-outline-primary" prompt="上一篇"><p>MySQL创建、修改与删除</p></a> <a href="/posts/%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E7%B2%BE%E8%AE%B2/" class="btn btn-outline-primary" prompt="下一篇"><p>MySQL数据类型精讲</p></a></div></div></div></div><footer class="d-flex w-100 justify-content-center"><div class="d-flex justify-content-between align-items-center text-muted"><div class="footer-left"><p class="mb-0"> © 2022 <a href="https://github.com/carmanzheng">carmanzheng</a>. <span data-toggle="tooltip" data-placement="top" title="除非另有说明，本网站上的博客文章均由作者按照知识共享署名 4.0 国际 (CC BY 4.0) 许可协议进行授权。">保留部分权利。</span></p></div><div class="footer-right"><p class="mb-0"> 本站由 <a href="https://jekyllrb.com" target="_blank" rel="noopener">Jekyll</a> 生成，采用 <a href="https://github.com/cotes2020/jekyll-theme-chirpy" target="_blank" rel="noopener">Chirpy</a> 主题。</p></div></div></footer></div><div id="search-result-wrapper" class="d-flex justify-content-center unloaded"><div class="col-12 col-sm-11 post-content"><div id="search-hints"><div id="access-tags"><div class="panel-heading">热门标签</div><div class="d-flex flex-wrap mt-3 mb-1 mr-3"> <a class="post-tag" href="/tags/mysql/">MySQL</a> <a class="post-tag" href="/tags/python%E5%9F%BA%E6%93%8D/">Python基操</a> <a class="post-tag" href="/tags/%E5%89%8D%E7%AB%AFjs/">前端JS</a> <a class="post-tag" href="/tags/%E5%89%8D%E7%AB%AFvue/">前端Vue</a> <a class="post-tag" href="/tags/%E5%89%8D%E7%AB%AFcss/">前端CSS</a> <a class="post-tag" href="/tags/devops/">DevOps</a> <a class="post-tag" href="/tags/linux%E5%9F%BA%E7%A1%80/">Linux基础</a> <a class="post-tag" href="/tags/%E5%89%8D%E7%AB%AFhtml/">前端HTML</a> <a class="post-tag" href="/tags/github/">Github</a> <a class="post-tag" href="/tags/%E5%AE%A2%E6%88%B7%E7%AB%AF%E5%BC%80%E5%8F%91/">客户端开发</a></div></div></div><div id="search-results" class="d-flex flex-wrap justify-content-center text-muted mt-3"></div></div></div></div><div id="mask"></div><a id="back-to-top" href="#" aria-label="back-to-top" class="btn btn-lg btn-box-shadow" role="button"> <i class="fas fa-angle-up"></i> </a> <script src="https://cdn.jsdelivr.net/npm/simple-jekyll-search@1.10.0/dest/simple-jekyll-search.min.js"></script> <script> SimpleJekyllSearch({ searchInput: document.getElementById('search-input'), resultsContainer: document.getElementById('search-results'), json: '/assets/js/data/search.json', searchResultTemplate: '<div class="pl-1 pr-1 pl-sm-2 pr-sm-2 pl-lg-4 pr-lg-4 pl-xl-0 pr-xl-0"> <a href="{url}">{title}</a><div class="post-meta d-flex flex-column flex-sm-row text-muted mt-1 mb-1"> {categories} {tags}</div><p>{snippet}</p></div>', noResultsText: '<p class="mt-5">搜索结果为空</p>', templateMiddleware: function(prop, value, template) { if (prop === 'categories') { if (value === '') { return `${value}`; } else { return `<div class="mr-sm-4"><i class="far fa-folder fa-fw"></i>${value}</div>`; } } if (prop === 'tags') { if (value === '') { return `${value}`; } else { return `<div><i class="fa fa-tag fa-fw"></i>${value}</div>`; } } } }); </script> <script src="https://cdn.jsdelivr.net/combine/npm/lozad/dist/lozad.min.js,npm/magnific-popup@1/dist/jquery.magnific-popup.min.js,npm/clipboard@2/dist/clipboard.min.js"></script> <script defer src="/assets/js/dist/post.min.js"></script> <script src="https://cdn.jsdelivr.net/combine/npm/popper.js@1.16.1,npm/bootstrap@4/dist/js/bootstrap.min.js"></script> <script defer src="/app.js"></script> <script defer src="https://www.googletagmanager.com/gtag/js?id="></script> <script> document.addEventListener("DOMContentLoaded", function(event) { window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', ''); }); </script>
