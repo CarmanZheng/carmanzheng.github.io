@@ -523,6 +523,14 @@ $ kubectl get pod
 
 #### 1.系统初始化
 
+<img src="D:\07_GitHub\GitHub_Blogs\assets\images\20220217K8Sprofile\06-第二部分 搭建k8s集群（二进制方式）.png" style="zoom: 67%;" />
+
+* 一台或者多台机器，操作系统centos7以上版本
+* 硬件配置：RAM至少2GB，CPU至少2核，硬盘至少30GB
+* 集群中所有机器之间网络互通
+* 可以访问外网（需要拉取镜像）
+* 进制swap分区
+
 ```sh
 # 关闭防火墙
 systemctl stop firewalld
@@ -548,7 +556,13 @@ homenamectl set-homename k8s-node2
 ```sh
 # 准备cfssl工具
 # 自签etcd ssl证书
-
+wget https://pkg.cfssl.org/R1.2/cfssl_linux-amd64
+wget https://pkg.cfssl.org/R1.2/cfssljson_linux-amd64
+wget https://pkg.cfssl.org/R1.2/cfssl-certinfo_linux-amd64
+chmod +x cfssl_linux-amd64 cfssljson_linux-amd64 cfssl-certinfo_linux-amd64
+mv cfssl_linux-amd64 /usr/local/bin/cfssl
+mv cfssljson_linux-amd64 /usr/local/bin/cfssljson
+mv cfssl-certinfo_linux-amd64 /usr/bin/cfssl-certinfo
 ```
 
 #### 3.下发证书
